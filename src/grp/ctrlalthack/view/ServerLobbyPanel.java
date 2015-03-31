@@ -28,17 +28,18 @@ import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import javax.swing.table.DefaultTableModel;
 
-public class ServerLobbyPanel extends JPanel implements ViewConstants {
-	private JButton btn_start_server;
-	private JButton btn_cancel_start_server;	
+public class ServerLobbyPanel extends CardPanel implements ViewConstants {
+//public class ServerLobbyPanel extends JPanel implements ViewConstants {
+	private JButton btn_start_game;
+	private JButton btn_cancel_start_game;	
 	private JTable table;
 	
 	/**
 	 * Create the panel.
 	 */
-	public ServerLobbyPanel() {
-		super();
-		//super(cards);
+	public ServerLobbyPanel(JPanel cards) {
+		//super();
+		super(cards);
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{30, 0, 0, 0, 0, 0, 30, 0};
 		gridBagLayout.rowHeights = new int[]{30, 0, 0, 0, 30, 0, 0, 30, 0};
@@ -75,25 +76,26 @@ public class ServerLobbyPanel extends JPanel implements ViewConstants {
 		));
 		scrollPane.setViewportView(table);
 		
-		btn_start_server = new JButton("Start Server");
-		GridBagConstraints gbc_btn_start_server = new GridBagConstraints();
-		gbc_btn_start_server.anchor = GridBagConstraints.WEST;
-		gbc_btn_start_server.insets = new Insets(0, 0, 5, 5);
-		gbc_btn_start_server.gridx = 2;
-		gbc_btn_start_server.gridy = 5;
-		add(btn_start_server, gbc_btn_start_server);
+		btn_start_game = new JButton("Start Game");
+		GridBagConstraints gbc_btn_start_game = new GridBagConstraints();
+		gbc_btn_start_game.anchor = GridBagConstraints.WEST;
+		gbc_btn_start_game.insets = new Insets(0, 0, 5, 5);
+		gbc_btn_start_game.gridx = 2;
+		gbc_btn_start_game.gridy = 5;
+		add(btn_start_game, gbc_btn_start_game);
 		
-		btn_cancel_start_server = new JButton("Cancel");
-		GridBagConstraints gbc_btn_cancel_start_server = new GridBagConstraints();
-		gbc_btn_cancel_start_server.anchor = GridBagConstraints.WEST;
-		gbc_btn_cancel_start_server.insets = new Insets(0, 0, 5, 5);
-		gbc_btn_cancel_start_server.gridx = 3;
-		gbc_btn_cancel_start_server.gridy = 5;
-		add(btn_cancel_start_server, gbc_btn_cancel_start_server);
+		btn_cancel_start_game = new JButton("Cancel");
+		GridBagConstraints gbc_btn_cancel_start_game = new GridBagConstraints();
+		gbc_btn_cancel_start_game.anchor = GridBagConstraints.WEST;
+		gbc_btn_cancel_start_game.insets = new Insets(0, 0, 5, 5);
+		gbc_btn_cancel_start_game.gridx = 3;
+		gbc_btn_cancel_start_game.gridy = 5;
+		add(btn_cancel_start_game, gbc_btn_cancel_start_game);
 		
-		btn_cancel_start_server.addActionListener(new ActionListener() {
+		btn_cancel_start_game.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				//navigateTo(HOME_PANEL);
+				navigateTo(HOME_PANEL);
+				getParentLayout().removeLayoutComponent(getInstance());
 			}
 		});
 		

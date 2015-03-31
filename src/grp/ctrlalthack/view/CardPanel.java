@@ -44,4 +44,11 @@ public abstract class CardPanel extends JPanel {
 		CardLayout cl = this.getParentLayout();
         cl.show(this.getParent(), panel_name);
 	}
+	
+	/**
+	 * Returns current instance
+	 */
+	public CardPanel getInstance() {
+		return this;
+	}
 }

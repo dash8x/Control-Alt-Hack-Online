@@ -166,6 +166,13 @@ public class StartServerPanel extends CardPanel implements ViewConstants {
 			}
 		});
 		
+		btn_start_server.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				getParent().add(new ServerLobbyPanel(getParent()), SERVER_LOBBY_PANEL);
+				navigateTo(SERVER_LOBBY_PANEL);
+			}
+		});
+		
 	}
 
 }

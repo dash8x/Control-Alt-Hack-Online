@@ -25,41 +25,97 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class Server {
-	/*
-	private int apr_port; 	//port to run server on	
-	private ServerSocket server; //serversocket
+public class Server implements ServerConstants {
+	
+	private int server_port; 	//port to run server on	
+	private ServerSocket server_socket; //serversocket
+	private String password; //server password
+	private int max_players; //maximum number of players allowed
 	private ExecutorService client_threads; //thread pool to manage client threads
+	private ArrayList<ServerService> clients; //keeps track of all the clients
 	private boolean running; //flag to run the server
-	private Connection db; //the database connection	
-	private ArrayList<ServerService> clients; //keeps track of all the clients		
-	private ReentrantLock lockSynchronizer; //allows concurrent access to the lock methods
+	
 	private ReentrantLock logSynchronizer; //allows concurrent writes to the log
 	private ReentrantLock updatedSynchronizer; //allows concurrent access to updated flag setter
 	
-	*//**
+	/**
 	 * Constructor
-	 *//*
-	public Server() {				
-		this.client_threads = Executors.newCachedThreadPool();
-		this.clients = new ArrayList<ServerService>();		
-		this.lockSynchronizer = new ReentrantLock();
-		this.logSynchronizer = new ReentrantLock();
-		this.updatedSynchronizer = new ReentrantLock();
+	 */
+	public Server(int server_port) {
+		this(server_port, ""); //blank password
 	}
 	
-	*//**
+	/**
+	 * Constructor
+	 */
+	public Server(int server_port, String password) {
+		this(server_port, password, 6);
+	}
+	
+	/**
+	 * Constructor
+	 */
+	public Server(int server_port, String password, int max_players) {
+		this.setPort(server_port);
+		this.setMaxPlayers(max_players);
+		this.password = password;
+		this.client_threads = Executors.newCachedThreadPool();
+		this.clients = new ArrayList<ServerService>();
+		this.logSynchronizer = new ReentrantLock();
+		this.updatedSynchronizer = new ReentrantLock();
+		/*this.lockSynchronizer = new ReentrantLock();		
+		*/
+	}		
+	
+	/**
+	 * Sets the server port
+	 */
+	private void setPort(int port) {
+		if ( port < 1 || port > 65535 ) { //invalid port number
+    		throw new IllegalArgumentException("Invalid Port Number");
+    	} 
+		this.server_port = port;
+	}
+	
+	/**
+	 * Sets the maximum number of players
+	 */
+	private void setMaxPlayers(int num_players) {
+		if ( num_players < 3 || num_players > 6 ) { //max players should be between 3-6
+    		throw new IllegalArgumentException("Maximum number of players should be between 3 and 6");
+    	} 
+		this.max_players = num_players;
+	}
+	
+	/**
+	 * Checks if server is running
+	 */
+	public boolean isRunning() {
+		return this.running;
+	}
+	
+	/**
+	 * Opens the Server Port
+	 */
+	private void openPort() {		
+		try { //open the chosen port
+			this.server_socket = new ServerSocket(this.server_port);
+		} catch (IOException e) { //abort if cannot open the port
+			this.showServerError("Cannot open port " + this.server_port);			
+		}
+	}
+	
+	/**
 	 * Runs the server
-	 *//*
+	 */
 	public void runServer() {
 		try {			
-			this.openPort(); //open the server port
-			this.initGUI(); //initialize the GUI
+			this.openPort(); //open the server port			
 			this.running = true; //initialize flag
 			while(this.isRunning()) {
 				try {
 					//new connection received
-					ServerService new_client = new ServerService(this, this.student_controller, this.server.accept());
+					ServerService new_client = new ServerService(this, this.server_socket.accept());
 					this.addClient(new_client); //add to list of clients
 					this.client_threads.execute(new_client); //run thread for new client
 				} catch (SocketException e) { //something happened to the socket
@@ -69,12 +125,127 @@ public class Server {
 				}
 			}			
 		} catch (IOException e) {
-			this.showServerError("Server error\n" + e.getMessage());			
+			this.showServerError(e.getMessage());			
 		} finally {
 			this.stop();
 		}
 	}
 	
+	/**
+	 * Stops the server
+	 */
+	public void stop() {	
+		this.running = false; //close the flag
+		//send the terminate signal to all clients
+		this.broadcast(new Response("TERMINATE", null));
+		try { //close the server port
+			this.server_socket.close();
+		} catch (IOException e) { //show error if cannot close the port
+			this.showServerError("Error closing the server");			
+		}
+	}
+	
+	/**
+	 * Broadcasts response to all clients
+	 */
+	public void broadcast(Response reply) {
+		for (ServerService client : this.clients) {
+			client.sendResponse(reply);
+		}
+	}
+	
+	/**
+	 * Adds a client from the list of clients
+	 */
+	public void addClient(ServerService client) {
+		this.clients.add(client);
+	}
+	
+	/**
+	 * Removes a client from the list of clients
+	 */
+	public void removeClient(ServerService client) {
+		this.clients.remove(client);
+	}	
+	
+	/**
+	 * Sets the updated flag of all clients
+	 */
+	public void setAllUpdated(boolean updated) {
+		this.updatedSynchronizer.lock();
+		try {
+			for (ServerService client : this.clients) {
+				client.setUpdated(updated);
+			}
+		} finally {
+			this.updatedSynchronizer.unlock();
+		}
+	}
+	
+	//logging
+	
+	/**
+	 * Displays a server error
+	 */
+	public void showServerError(String message) {
+		this.displayLog("Server Error! " + message, ERROR_MSG);
+	}
+	
+	/**
+	 * Displays a command message in the server GUI log
+	 */
+	public void showCommandLog(String message, ServerService client) {
+		this.displayClientLog(message, "COMMAND", client);
+	}
+	
+	/**
+	 * Displays a response message in the server GUI log
+	 */
+	public void showResponseLog(String message, ServerService client) {
+		this.displayClientLog(message, "RESPONSE", client);
+	}
+	
+	/**
+	 * Displays an error message in the server GUI log
+	 */
+	public void showErrorLog(String message, ServerService client) {
+		this.displayClientLog("ERROR " + message, "ERROR", client);
+	}		
+	
+	/**
+	 * Displays a success message in the server GUI log
+	 */
+	public void showSuccessLog(String message, ServerService client) {
+		this.displayClientLog(message, "SUCCESS", client);
+	}
+	
+	/**
+	 * Displays a message in the server GUI log
+	 */
+	public void displayLog(String message, String msg_type) {
+		this.logSynchronizer.lock();
+		try {
+			System.out.println(msg_type + ": " + message);
+		} finally {
+			this.logSynchronizer.unlock();
+		}
+	}
+	
+	/**
+	 * Displays a message from a client in the server GUI log
+	 */
+	public void displayClientLog(String message, String msg_type, ServerService client) {
+		this.logSynchronizer.lock();
+		try {
+			this.displayLog(client.getIP() + ": " + message, msg_type);
+		} finally {
+			this.logSynchronizer.unlock();
+		}
+	}
+	
+	/*						
+	private ReentrantLock lockSynchronizer; //allows concurrent access to the lock methods		
+		
 	*//**
 	 * Locks a student record to a given client
 	 *//*
@@ -140,80 +311,7 @@ public class Server {
 		} finally {
 			this.lockSynchronizer.unlock();
 		}
-	}
-	
-	*//**
-	 * Adds a client from the list of clients
-	 *//*
-	public void addClient(ServerService client) {
-		this.clients.add(client);
-	}
-	
-	*//**
-	 * Removes a client from the list of clients
-	 *//*
-	public void removeClient(ServerService client) {
-		this.clients.remove(client);
-	}
-	
-	*//**
-	 * Displays a message in the server GUI log
-	 *//*
-	public void displayLog(String message, String msg_type) {
-		this.logSynchronizer.lock();
-		try {
-			this.server_gui.displayLog(message, msg_type);
-		} finally {
-			this.logSynchronizer.unlock();
-		}
-	}
-	
-	*//**
-	 * Displays a message from a client in the server GUI log
-	 *//*
-	public void displayClientLog(String message, String msg_type, ServerService client) {
-		this.logSynchronizer.lock();
-		try {
-			this.server_gui.displayClientLog(client.getIP(), message, msg_type);
-		} finally {
-			this.logSynchronizer.unlock();
-		}
-	}
-	
-	*//**
-	 * Displays a command message in the server GUI log
-	 *//*
-	public void showCommandLog(String message, ServerService client) {
-		this.displayClientLog(message, "COMMAND", client);
-	}
-	
-	*//**
-	 * Displays a response message in the server GUI log
-	 *//*
-	public void showResponseLog(String message, ServerService client) {
-		this.displayClientLog(message, "RESPONSE", client);
-	}
-	
-	*//**
-	 * Displays an error message in the server GUI log
-	 *//*
-	public void showErrorLog(String message, ServerService client) {
-		this.displayClientLog("ERROR " + message, "ERROR", client);
-	}
-	
-	*//**
-	 * Displays a server error
-	 *//*
-	public void showServerError(String message) {
-		JOptionPane.showMessageDialog(null, message, "Server Error!", JOptionPane.ERROR_MESSAGE);
-	}
-	
-	*//**
-	 * Displays a success message in the server GUI log
-	 *//*
-	public void showSuccessLog(String message, ServerService client) {
-		this.displayClientLog(message, "SUCCESS", client);
-	}
+	}		
 	
 	*//**
 	 * Method to add client to list of clients in the server GUI
@@ -245,93 +343,7 @@ public class Server {
 		});
 		this.server_gui.setPort(this.apr_port); //display the port number
 		this.server_gui.displayLog("Waiting for connections...");
-	}
-
-	*//**
-	 * Opens the Server Port
-	 *//*
-	private void openPort() {
-		this.initPort(); //get the port number from the user
-		try { //open the chosen port
-			this.server = new ServerSocket(this.apr_port);
-		} catch (IOException e) { //abort if cannot open the port
-			this.showServerError("Cannot open port " + this.apr_port);
-			System.exit(0);
-		}
-	}
+	}						
 	
-	*//**
-	 * Checks if server is running
-	 *//*
-	public boolean isRunning() {
-		return this.running;
-	}
-	
-	*//**
-	 * Stops the server
-	 *//*
-	public void stop() {	
-		this.running = false; //close the flag
-		//send the terminate signal to all clients
-		this.broadcast(new Response("TERMINATE", null));
-		try { //close the server port
-			this.server.close();
-		} catch (IOException e) { //show error if cannot close the port
-			this.showServerError("Error closing the server");			
-		} finally { //close db connection
-			DBConnection.closeDB(this.db);
-		}
-	}
-	
-	*//**
-	 * Broadcasts response to all clients
-	 *//*
-	public void broadcast(Response reply) {
-		for (ServerService client : this.clients) {
-			client.sendResponse(reply);
-		}
-	}
-	
-	*//**
-	 * Sets the updated flag of all clients
-	 *//*
-	public void setAllUpdated(boolean updated) {
-		this.updatedSynchronizer.lock();
-		try {
-			for (ServerService client : this.clients) {
-				client.setUpdated(updated);
-			}
-		} finally {
-			this.updatedSynchronizer.unlock();
-		}
-	}
-	
-	*//**
-	 * Initialize the server socket
-	 *//*
-	private void initPort() {
-		//get the server IP and port number from the user		
-		JTextField txt_port = new JTextField("8888");
-		Object[] fields = {		    
-		    "Port Number:", txt_port
-		};
-		int option = JOptionPane.showConfirmDialog(null, fields, "Server Details", JOptionPane.OK_CANCEL_OPTION);
-		if (option == JOptionPane.OK_OPTION) {		    
-		    Integer port = -1;
-		    try {
-		    	port = Integer.parseInt(txt_port.getText());
-		    	if ( port < 1 || port > 65535 ) { //invalid port number
-		    		throw new NumberFormatException("Invalid Port Number");
-		    	} else {
-		    		this.apr_port = port;
-		    	}
-		    } catch (NumberFormatException e) {
-		    	this.showServerError("Invalid Port Number");
-		    	this.initPort();
-		    }
-		} else {
-			System.exit(0);
-		}
-	}
 
 */}
