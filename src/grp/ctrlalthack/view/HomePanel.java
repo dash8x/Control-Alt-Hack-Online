@@ -63,6 +63,12 @@ public class HomePanel extends CardPanel implements ViewConstants {
 		gbc_btn_join_server.gridx = 1;
 		gbc_btn_join_server.gridy = 4;
 		add(btn_join_server, gbc_btn_join_server);
+		
+		btn_join_server.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				navigateTo(JOIN_SERVER_PANEL);
+			}
+		});
 
 	}
 

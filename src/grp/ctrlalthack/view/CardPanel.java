@@ -9,7 +9,10 @@
 package grp.ctrlalthack.view;
 
 import java.awt.CardLayout;
+
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.text.JTextComponent;
 
 public abstract class CardPanel extends JPanel {
 	
@@ -50,5 +53,24 @@ public abstract class CardPanel extends JPanel {
 	 */
 	public CardPanel getInstance() {
 		return this;
+	}
+	
+	/**
+	 * Method to get int from field
+	 */
+	public static int getTextInt(JTextComponent field) {
+		String string_val = field.getText();		
+		try {
+			return Integer.parseInt(string_val);
+		} catch (Exception e) {
+			throw new IllegalArgumentException();
+		}
+	}
+	
+	/**
+	 * Shows error
+	 */
+	public void showError(String msg) {
+		JOptionPane.showMessageDialog(null, msg, "Error!", JOptionPane.ERROR_MESSAGE);
 	}
 }

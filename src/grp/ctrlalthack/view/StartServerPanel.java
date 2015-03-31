@@ -7,6 +7,8 @@
 
 package grp.ctrlalthack.view;
 
+import grp.ctrlalthack.net.Server;
+
 import javax.swing.JPanel;
 
 import java.awt.GridBagLayout;
@@ -34,6 +36,8 @@ public class StartServerPanel extends CardPanel implements ViewConstants {
 	private JTextField txt_host_player;
 	private JButton btn_start_server;
 	private JButton btn_cancel_start_server;
+	private JTextField txt_server_name;
+	private Server server;
 	
 	/**
 	 * @wbp.parser.constructor 
@@ -71,7 +75,7 @@ public class StartServerPanel extends CardPanel implements ViewConstants {
 		gbc_lblServerName.gridy = 3;
 		add(lblServerName, gbc_lblServerName);
 		
-		JTextField txt_server_name = new JTextField("");
+		txt_server_name = new JTextField("");
 		GridBagConstraints gbc_txt_server_name = new GridBagConstraints();
 		gbc_txt_server_name.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txt_server_name.insets = new Insets(0, 0, 5, 5);
@@ -103,7 +107,7 @@ public class StartServerPanel extends CardPanel implements ViewConstants {
 		gbc_lblPort.gridy = 5;
 		add(lblPort, gbc_lblPort);
 		
-		txt_server_port = new JTextField("");
+		txt_server_port = new JTextField("2020");
 		GridBagConstraints gbc_txt_server_port = new GridBagConstraints();
 		gbc_txt_server_port.insets = new Insets(0, 0, 5, 5);
 		gbc_txt_server_port.fill = GridBagConstraints.HORIZONTAL;
@@ -168,11 +172,43 @@ public class StartServerPanel extends CardPanel implements ViewConstants {
 		
 		btn_start_server.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				getParent().add(new ServerLobbyPanel(getParent()), SERVER_LOBBY_PANEL);
-				navigateTo(SERVER_LOBBY_PANEL);
+				startServer();
 			}
 		});
 		
 	}
-
+	
+	/**
+	 * Handler for Start Server button
+	 */
+	private void startServer() {
+		//get all the values
+		String server_name = this.txt_server_name.getText();
+		String server_pass = this.txt_server_password.getText();
+		int max_players = (int) this.cmb_num_players.getSelectedItem();	
+		String host_player = this.txt_host_player.getText();
+		
+		int server_port;		
+		try {
+			server_port = getTextInt(this.txt_server_port);
+		} catch (IllegalArgumentException e) {
+			showError("Invalid Port Number!");
+			return;
+		}
+		
+		//create and start the server
+		server = new Server(server_port, max_players, server_pass, server_name);
+		Thread server_thread = new Thread(new Runnable() {			
+			@Override
+			public void run() {
+				server.runServer();				
+			}
+		});		
+		server_thread.start();
+		
+		//create a client for the 
+		getParent().add(new ServerLobbyPanel(getParent()), SERVER_LOBBY_PANEL);
+		navigateTo(SERVER_LOBBY_PANEL);
+	}
+	
 }

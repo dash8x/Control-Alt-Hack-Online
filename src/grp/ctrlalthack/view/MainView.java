@@ -57,6 +57,9 @@ public class MainView extends JFrame implements ViewConstants {
 		
 		JPanel start_server_panel = new StartServerPanel(this.cards);
 		cards.add(start_server_panel, START_SERVER_PANEL);
+		
+		JPanel join_server_panel = new JoinServerPanel(this.cards);
+		cards.add(join_server_panel, JOIN_SERVER_PANEL);
 	}
 
 }

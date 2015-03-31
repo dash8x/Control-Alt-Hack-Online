@@ -11,5 +11,5 @@ public interface ServerConstants {
 	
 	//logging constants
 	public final static String ERROR_MSG = "ERROR";
-	
+	public final static String GENERAL_MSG = "LOG";
 }

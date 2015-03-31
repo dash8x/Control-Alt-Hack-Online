@@ -30,6 +30,7 @@ public class Server implements ServerConstants {
 	private int server_port; 	//port to run server on	
 	private ServerSocket server_socket; //serversocket
 	private String password; //server password
+	private String server_name; //server name
 	private int max_players; //maximum number of players allowed
 	private ExecutorService client_threads; //thread pool to manage client threads
 	private ArrayList<ServerService> clients; //keeps track of all the clients
@@ -42,30 +43,38 @@ public class Server implements ServerConstants {
 	 * Constructor
 	 */
 	public Server(int server_port) {
-		this(server_port, ""); //blank password
+		this(server_port, 6);
 	}
 	
 	/**
 	 * Constructor
 	 */
-	public Server(int server_port, String password) {
-		this(server_port, password, 6);
+	public Server(int server_port, int max_players) {
+		this(server_port, max_players, ""); //blank password
 	}
 	
 	/**
 	 * Constructor
 	 */
-	public Server(int server_port, String password, int max_players) {
+	public Server(int server_port, int max_players, String password) {
+		this(server_port, 6, password, "");
+	}	
+	
+	/**
+	 * Constructor
+	 */
+	public Server(int server_port, int max_players, String password, String server_name) {
 		this.setPort(server_port);
 		this.setMaxPlayers(max_players);
 		this.password = password;
+		this.server_name = server_name;
 		this.client_threads = Executors.newCachedThreadPool();
 		this.clients = new ArrayList<ServerService>();
 		this.logSynchronizer = new ReentrantLock();
 		this.updatedSynchronizer = new ReentrantLock();
 		/*this.lockSynchronizer = new ReentrantLock();		
 		*/
-	}		
+	}
 	
 	/**
 	 * Sets the server port
@@ -112,6 +121,7 @@ public class Server implements ServerConstants {
 		try {			
 			this.openPort(); //open the server port			
 			this.running = true; //initialize flag
+			this.displayLog("Waiting for connections...", GENERAL_MSG);
 			while(this.isRunning()) {
 				try {
 					//new connection received
