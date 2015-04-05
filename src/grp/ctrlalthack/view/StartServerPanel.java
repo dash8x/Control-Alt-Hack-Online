@@ -7,6 +7,7 @@
 
 package grp.ctrlalthack.view;
 
+import grp.ctrlalthack.net.ClientService;
 import grp.ctrlalthack.net.Server;
 
 import javax.swing.JPanel;
@@ -36,8 +37,7 @@ public class StartServerPanel extends CardPanel implements ViewConstants {
 	private JTextField txt_host_player;
 	private JButton btn_start_server;
 	private JButton btn_cancel_start_server;
-	private JTextField txt_server_name;
-	private Server server;
+	private JTextField txt_server_name;	
 	
 	/**
 	 * @wbp.parser.constructor 
@@ -107,7 +107,7 @@ public class StartServerPanel extends CardPanel implements ViewConstants {
 		gbc_lblPort.gridy = 5;
 		add(lblPort, gbc_lblPort);
 		
-		txt_server_port = new JTextField("2020");
+		txt_server_port = new JTextField(Integer.toString(ClientService.DEFAULT_SERVER_PORT));
 		GridBagConstraints gbc_txt_server_port = new GridBagConstraints();
 		gbc_txt_server_port.insets = new Insets(0, 0, 5, 5);
 		gbc_txt_server_port.fill = GridBagConstraints.HORIZONTAL;
@@ -196,19 +196,23 @@ public class StartServerPanel extends CardPanel implements ViewConstants {
 			return;
 		}
 		
-		//create and start the server
-		server = new Server(server_port, max_players, server_pass, server_name);
-		Thread server_thread = new Thread(new Runnable() {			
-			@Override
-			public void run() {
-				server.runServer();				
-			}
-		});		
-		server_thread.start();
-		
-		//create a client for the 
-		getParent().add(new ServerLobbyPanel(getParent()), SERVER_LOBBY_PANEL);
-		navigateTo(SERVER_LOBBY_PANEL);
+		try {
+			//create and start the server
+			this.setServer(new Server(server_port, max_players, server_pass, server_name));
+			this.runServer();			
+			
+			//create a client for the host player
+			this.setClient(new ClientService("localhost", server_port, server_pass, host_player));			
+			this.runClient();
+			
+			//open server lobby
+			getParent().add(new ServerLobbyPanel(getParent()), SERVER_LOBBY_PANEL);
+			navigateTo(SERVER_LOBBY_PANEL);
+		} catch (Exception e) {
+			this.stopClient();
+			this.stopServer();
+			showError(e.getMessage());
+		}
 	}
 	
 }

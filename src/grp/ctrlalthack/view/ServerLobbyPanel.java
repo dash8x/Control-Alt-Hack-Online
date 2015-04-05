@@ -7,6 +7,8 @@
 
 package grp.ctrlalthack.view;
 
+import grp.ctrlalthack.net.ClientService;
+
 import javax.swing.JPanel;
 
 import java.awt.GridBagLayout;
@@ -30,6 +32,7 @@ import javax.swing.table.DefaultTableModel;
 
 public class ServerLobbyPanel extends CardPanel implements ViewConstants {
 //public class ServerLobbyPanel extends JPanel implements ViewConstants {
+		
 	private JButton btn_start_game;
 	private JButton btn_cancel_start_game;	
 	private JTable table;
@@ -39,7 +42,7 @@ public class ServerLobbyPanel extends CardPanel implements ViewConstants {
 	 */
 	public ServerLobbyPanel(JPanel cards) {
 		//super();
-		super(cards);
+		super(cards);		
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{30, 0, 0, 0, 0, 0, 30, 0};
 		gridBagLayout.rowHeights = new int[]{30, 0, 0, 0, 30, 0, 0, 30, 0};

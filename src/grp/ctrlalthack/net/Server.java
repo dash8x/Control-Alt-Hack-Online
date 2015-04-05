@@ -97,6 +97,31 @@ public class Server implements ServerConstants {
 	}
 	
 	/**
+	 * Returns the max number of players allowed
+	 */
+	public int getMaxPlayers() {		
+		return this.max_players;
+	}
+	
+	/**
+	 * Returns the current number of clients
+	 */
+	public int getNumClients() {		
+		int num = 0;
+		if ( this.clients != null ) {
+			num = this.clients.size();
+		}
+		return num;
+	}
+	
+	/**
+	 * Verify password
+	 */
+	public boolean verifyPassord(String pass) {				
+		return this.password.equals(pass);
+	}	
+	
+	/**
 	 * Checks if server is running
 	 */
 	public boolean isRunning() {
@@ -134,7 +159,7 @@ public class Server implements ServerConstants {
 					}
 				}
 			}			
-		} catch (IOException e) {
+		} catch (IOException e) {			
 			this.showServerError(e.getMessage());			
 		} finally {
 			this.stop();
@@ -144,14 +169,16 @@ public class Server implements ServerConstants {
 	/**
 	 * Stops the server
 	 */
-	public void stop() {	
-		this.running = false; //close the flag
-		//send the terminate signal to all clients
-		this.broadcast(new Response("TERMINATE", null));
-		try { //close the server port
-			this.server_socket.close();
-		} catch (IOException e) { //show error if cannot close the port
-			this.showServerError("Error closing the server");			
+	public void stop() {
+		if ( this.isRunning() ) {
+			//send the terminate signal to all clients
+			this.broadcast(new Response("TERMINATE", null));
+			try { //close the server port
+				this.server_socket.close();
+			} catch (IOException e) { //show error if cannot close the port
+				this.showServerError("Error closing the server");			
+			}
+			this.running = false; //close the flag
 		}
 	}
 	
@@ -159,8 +186,10 @@ public class Server implements ServerConstants {
 	 * Broadcasts response to all clients
 	 */
 	public void broadcast(Response reply) {
-		for (ServerService client : this.clients) {
-			client.sendResponse(reply);
+		if ( this.clients != null ) {
+			for (ServerService client : this.clients) {
+				client.sendResponse(reply);
+			}
 		}
 	}
 	

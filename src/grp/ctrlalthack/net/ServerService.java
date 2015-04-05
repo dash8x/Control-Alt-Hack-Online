@@ -98,17 +98,16 @@ public class ServerService implements Runnable {
     @Override
 	public void run() {
 		try {
-			Command request = null;
-			do {
-				try {
-					request = ( Command ) this.input.readObject();
+			Command request = getCommand(); //read the initial command
+			if ( this.acceptPlayer(request) ) {
+				do {
+					request = getCommand();
 					this.handleRequest(request); //perform the command
-				} catch (ClassCastException | ClassNotFoundException e) { //unkown object received				
-					this.server.showErrorLog("Unknown command object recieved from client", this); //display in the log
-					this.sendError("Unsupported object"); //send error response
-				}
-			} while (!request.getKeyword().equals("TERMINATE"));
-			this.server.showSuccessLog("TERMINATE Connection terminated by client", this);
+				} while (!request.getKeyword().equals("TERMINATE"));
+				this.server.showSuccessLog("TERMINATE Connection terminated by client", this);
+			} else {
+				this.server.showErrorLog("Client connection rejected", this);
+			}
 		} catch (IOException e) {
 			this.server.showErrorLog(e.getMessage(), this);
 		} finally {
@@ -125,12 +124,56 @@ public class ServerService implements Runnable {
 	}
 
     /**
+     * Validates the server password and verifies server is not full
+     */
+	private boolean acceptPlayer(Command request) {
+		boolean accepted = false;
+		//check for correct command
+		if ( request.getKeyword().equals("INITIATE") ) {
+			//first check if server is full
+			if ( this.server.getNumClients() > this.server.getMaxPlayers() ) {
+				//server full
+				this.sendFail(request.getKeyword(), "Server is full.");
+			} else {
+				//if not full validate password
+				String pass = request.getParam("password", "").toString();
+				if ( this.server.verifyPassord(pass) ) {
+					this.sendSuccess(request.getKeyword());
+					accepted = true;
+				} else {
+					this.sendFail(request.getKeyword(), "Invalid server password");
+				}
+			}			
+		} else { //invalid request			
+			this.sendFail(request.getKeyword(), "Client not initiated.");
+		}
+		return accepted;
+	}
+
+	/**
+	 * reads a request from the client
+	 */
+	private Command getCommand() throws IOException {
+		Command request = null;
+		try {
+			request = ( Command ) this.input.readObject();	
+			if ( !request.getKeyword().equals("DATA UPDATED") ) { //don't log data updated requests
+	    		this.server.showCommandLog(request.toString(), this);
+	    	}
+		} catch (ClassCastException | ClassNotFoundException e) { //unkown object received				
+			this.server.showErrorLog("Unknown command object recieved from client", this); //display in the log
+			this.sendError("Unsupported object"); //send error response
+		}
+		return request;
+	}
+
+    /**
      * Sends an error response to the client
      * @param message the error message
      */
 	private void sendError(String message) {
 		HashMap<String,Object> params = new HashMap<String,Object>(); 
-		params.put("error", message);
+		params.put("message", message);
 		this.sendResponse(new Response("ERROR", params));
 	}
     
@@ -174,10 +217,7 @@ public class ServerService implements Runnable {
      * @param request the Command
      */
     private void handleRequest(Command request) {    	
-    	String keyword = request.getKeyword();
-    	if ( !keyword.equals("DATA UPDATED") ) { //don't log data updated requests
-    		this.server.showCommandLog(request.toString(), this);
-    	}
+    	String keyword = request.getKeyword();    	
     	HashMap<String, Object> params = request.getParams();
     	switch(keyword) {
 			case "DATA UPDATED":

@@ -49,7 +49,16 @@ public abstract class Protocol implements Serializable {
 	 * @return command parameters map
 	 */
 	public Object getParam(String param) {		
-		return (this.getParams() == null) ? null : this.getParams().get(param);
+		return this.getParam(param, null);
+	}
+	
+	/**	
+	 * @param param to return 
+	 * @param param to fallback to
+	 * @return command parameters map
+	 */
+	public Object getParam(String param, Object fallback) {		
+		return (this.getParams() == null) ? fallback : this.getParams().get(param);
 	}
 			
 	/**

@@ -7,6 +7,8 @@
 
 package grp.ctrlalthack.view;
 
+import grp.ctrlalthack.net.ClientService;
+
 import javax.swing.JPanel;
 
 import java.awt.GridBagLayout;
@@ -34,6 +36,7 @@ public class JoinServerPanel extends CardPanel implements ViewConstants {
 	private JTextField txt_player_name;
 	private JButton btn_join_server;
 	private JButton btn_cancel_join_server;
+	private JTextField txt_server_ip;
 	
 	/**
 	 * REMOVE THIS
@@ -72,7 +75,7 @@ public class JoinServerPanel extends CardPanel implements ViewConstants {
 		gbc_lblServerName.gridy = 3;
 		add(lblServerName, gbc_lblServerName);
 		
-		JTextField txt_server_ip = new JTextField("");
+		txt_server_ip = new JTextField("");
 		GridBagConstraints gbc_txt_server_ip = new GridBagConstraints();
 		gbc_txt_server_ip.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txt_server_ip.insets = new Insets(0, 0, 5, 5);
@@ -88,7 +91,7 @@ public class JoinServerPanel extends CardPanel implements ViewConstants {
 		gbc_lblPort.gridy = 4;
 		add(lblPort, gbc_lblPort);
 		
-		txt_server_port = new JTextField("");
+		txt_server_port = new JTextField(Integer.toString(ClientService.DEFAULT_SERVER_PORT));
 		GridBagConstraints gbc_txt_server_port = new GridBagConstraints();
 		gbc_txt_server_port.insets = new Insets(0, 0, 5, 5);
 		gbc_txt_server_port.fill = GridBagConstraints.HORIZONTAL;
@@ -153,11 +156,40 @@ public class JoinServerPanel extends CardPanel implements ViewConstants {
 		
 		btn_join_server.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				getParent().add(new ServerLobbyPanel(getParent()), SERVER_LOBBY_PANEL);
-				navigateTo(SERVER_LOBBY_PANEL);
+				doJoinServer();
 			}
 		});
 		
+	}
+
+	/**
+	 * 
+	 */
+	private void doJoinServer() {
+		//get all the values
+		String server_host = this.txt_server_ip.getText();
+		String server_pass = this.txt_server_password.getText();		
+		String player_name = this.txt_player_name.getText();
+
+		int server_port;
+		try {
+			server_port = getTextInt(this.txt_server_port);
+		} catch (IllegalArgumentException e) {
+			showError("Invalid Port Number!");
+			return;
+		}
+				
+		try {			
+			//create a client for the player
+			this.setClient(new ClientService(server_host, server_port, server_pass, player_name));
+			this.runClient();
+			
+			//open server lobby
+			getParent().add(new ServerLobbyPanel(getParent()), SERVER_LOBBY_PANEL);
+			navigateTo(SERVER_LOBBY_PANEL);
+		} catch (Exception e) {			
+			showError(e.getMessage());
+		}
 	}
 
 }
