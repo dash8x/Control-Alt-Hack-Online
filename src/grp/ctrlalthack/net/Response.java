@@ -24,7 +24,7 @@ public class Response extends Protocol {
 	
 	//allowed responses
 	public static final Set<String> RESPONSES = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
-			new String[]{"DATA UPDATED", "TERMINATE", "ERROR", "SUCCESS", "FAIL", "PLAYERS"}
+			new String[]{RESP_CHECK_UPDATED, RESP_TERMINATE, RESP_ERROR, RESP_SUCCESS, RESP_FAIL, RESP_PLAYERS}
 			)));
 	
 	/**
@@ -42,17 +42,17 @@ public class Response extends Protocol {
 	@Override
 	public boolean isValidParams(String response, HashMap<String,Object> params) {
 		switch(response) {				
-			case "ERROR":
+			case RESP_ERROR:
 				return params != null && params.size() == 1 && (params.get("message") instanceof String);
-			case "SUCCESS":
+			case RESP_SUCCESS:
 				return params != null && params.size() == 1 && (params.get("operation") instanceof String);
-			case "FAIL":
+			case RESP_FAIL:
 				return params != null && params.size() == 2 && (params.get("operation") instanceof String) && (params.get("message") instanceof String);			
-			case "TERMINATE":
+			case RESP_TERMINATE:
 				return (params == null || params.size() == 0);
-			case "PLAYERS":
+			case RESP_PLAYERS:
 				return params != null && params.size() == 1 && (params.get("players") instanceof ArrayList);
-			case "DATA UPDATED":
+			case RESP_CHECK_UPDATED:
 				return params != null && params.size() == 1 && (params.get("updated") instanceof String);
 		}
 		return false;

@@ -69,21 +69,7 @@ public abstract class CardPanel extends JPanel {
 	 */
 	public ClientService getClient() {
 		return this.getParent().getClient();
-	}
-	
-	/**
-	 * @param server the server to set
-	 */
-	public void setServer(Server set_server) {
-		this.getParent().setServer(set_server);
-	}
-
-	/**
-	 * @param client the client to set
-	 */
-	public void setClient(ClientService set_client) {
-		this.getParent().setClient(set_client);
-	}
+	}	
 	
 	/**
 	 * Stops the client
@@ -98,21 +84,7 @@ public abstract class CardPanel extends JPanel {
 	public void stopServer() {
 		this.getParent().stopServer();
 	}
-	
-	/**
-	 * runs the client
-	 */
-	public void runClient() {
-		this.getParent().runClient();
-	}
-	
-	/**
-	 * runs the server
-	 */
-	public void runServer() {
-		this.getParent().runServer();
-	}		
-	
+		
 	/**
 	 * Shows error
 	 */

@@ -12,7 +12,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 
-public abstract class Protocol implements Serializable {
+public abstract class Protocol implements Serializable, ProtocolConstants {
 
 	/**
 	 * Serial Version UID

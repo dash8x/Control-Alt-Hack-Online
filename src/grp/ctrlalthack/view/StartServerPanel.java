@@ -197,13 +197,11 @@ public class StartServerPanel extends CardPanel implements ViewConstants {
 		}
 		
 		try {
-			//create and start the server
-			setServer(new Server(server_port, max_players, server_pass, server_name));
-			runServer();			
+			//start the server
+			getParent().runServer(server_port, max_players, server_pass, server_name);			
 			
-			//create a client for the host player
-			setClient(new ClientService(getParent(), "localhost", server_port, server_pass, host_player));			
-			runClient();							
+			//start the client for the host player
+			getParent().runClient("localhost", server_port, server_pass, host_player);						
 		} catch (Exception e) {
 			stopClient();
 			stopServer();

@@ -26,7 +26,7 @@ import grp.ctrlalthack.net.Response;
 import grp.ctrlalthack.view.CardPanel;
 import grp.ctrlalthack.view.CardParent;
 
-public class ClientService {
+public class ClientService implements NetworkConstants, ProtocolConstants {
 	
 	public static final int DEFAULT_SERVER_PORT = 1234;
 	
@@ -43,7 +43,7 @@ public class ClientService {
 	private ReentrantLock sendResponseCommandLock; //lock for concurrent access to send/receive data from server
 		
 	//constant for DATA UPDATED Command
-	public static final Command DATA_UPDATED_CHECKER = new Command("DATA UPDATED", null);
+	public static final Command DATA_UPDATED_CHECKER = new Command(CMD_CHECK_UPDATED, null);
 	
 	//TODO
 	//private ClientView client_gui; //client GUI
@@ -117,6 +117,7 @@ public class ClientService {
 					bacgkround_thread.start();
 					//move to the lobby
 					this.client_ui.openServerLobby();
+					this.client_ui.updatePlayers();
 					// wait until GUI is closed
 					while (this.isRunning()) {
 		
@@ -140,10 +141,7 @@ public class ClientService {
 				try {
 					String updated = wasUpdated();
 					if (!updated.equals("")) {
-						switch (updated) {
-							case "PLAYERS":
-								client_ui.updatePlayers();
-						}
+						handleUpdate(updated);
 					}					
 					Thread.sleep(500); //run every 500ms
 				} catch (InterruptedException e) {				
@@ -152,8 +150,20 @@ public class ClientService {
 					showError(e.getMessage());
 				}
 			}
-		}		
+		}
+
+			
 	}
+	
+	/**
+	 * Handle update	  
+	 */
+	private void handleUpdate(String updated) {
+		switch (updated) {
+			case FLAG_PLAYERS:
+				client_ui.updatePlayers();
+		}			
+	}	
 	
 	/**
 	 * Closes the connection to the server
@@ -186,7 +196,7 @@ public class ClientService {
 	public void stop() {
 		if ( this.isRunning() ) {
 			//notify the server that the connection is being closed
-			this.sendCommand(new Command("TERMINATE",null));
+			this.sendCommand(new Command(CMD_TERMINATE,null));
 			this.closeConnection();
 			this.running = false;
 		}
@@ -200,11 +210,11 @@ public class ClientService {
 		HashMap<String, Object> params = new HashMap<String, Object>();
 		params.put("password", this.server_password);
 		params.put("player_name", this.getPlayerName());
-		Command command = new Command("INITIATE", params);
+		Command command = new Command(CMD_INITIATE, params);
 		//send the command to the server
 		Response reply = this.sendResponseCommand(command);
 		//display error if operation wasn't successful
-		if ( !reply.getKeyword().equals("SUCCESS") ) {
+		if ( !reply.getKeyword().equals(RESP_SUCCESS) ) {
 			throw new InvalidResponseException("Invalid response received from server for " + command.getKeyword());
 		}
 		return true;
@@ -221,7 +231,7 @@ public class ClientService {
 		String was_updated = "";
 				
 		//get the result from the response
-		if ( reply.getKeyword().equals("DATA UPDATED") ) {
+		if ( reply.getKeyword().equals(RESP_CHECK_UPDATED) ) {
 			was_updated = (String) reply.getParam("updated");
 		} else {
 			throw new InvalidResponseException("Invalid response received from server for DATA UPDATED");
@@ -242,10 +252,10 @@ public class ClientService {
 			reply = this.getResponse();
 			if (reply == null) {
 				throw new NoResponseException();
-			} else if ( reply.getKeyword().equals("ERROR") ) {
+			} else if ( reply.getKeyword().equals(RESP_ERROR) ) {
 				String msg = (String)reply.getParam("message");
 				throw new ErrorResponseException(msg);
-			} else if ( reply.getKeyword().equals("FAIL") ) {
+			} else if ( reply.getKeyword().equals(RESP_FAIL) ) {
 				String msg = (String)reply.getParam("message");
 				throw new FailResponseException(msg);
 			}
@@ -282,7 +292,7 @@ public class ClientService {
 		Response reply = null;
 		try {
 			reply = ( Response ) this.input.readObject();
-			if ( reply.getKeyword().equals("TERMINATE") ) {
+			if ( reply.getKeyword().equals(RESP_TERMINATE) ) {
 				throw new ClientException("The server has closed the connection.\nThis client will now close");							
 				//TODO
 			} 
@@ -310,18 +320,31 @@ public class ClientService {
 	}
 	
 	/**
+	 * set ready to start
+	 */	
+	public void readyToStart() {
+		//send the command to the server
+		Response reply = this.sendResponseCommand(new Command(CMD_READY_TO_START, null));						
+				
+		//get the result from the response
+		if ( !reply.getKeyword().equals(RESP_SUCCESS) ) {						
+			throw new InvalidResponseException("Invalid response received from server for " + CMD_READY_TO_START);
+		}						
+	}
+	
+	/**
 	 * Returns the players array list
 	 */
 	@SuppressWarnings("unchecked")
 	public ArrayList<Player> getPlayers() {
 		//send the command to the server
-		Response reply = this.sendResponseCommand(new Command("GET PLAYERS", null));		
+		Response reply = this.sendResponseCommand(new Command(CMD_GET_PLAYERS, null));		
 				
 		//initialize output array
 		ArrayList<Player> results = new ArrayList<Player>();
 				
 		//get the result from the response
-		if ( reply.getKeyword().equals("PLAYERS") ) {
+		if ( reply.getKeyword().equals(RESP_PLAYERS) ) {
 			results = (ArrayList<Player>) reply.getParam("players");
 		} else {			
 			throw new InvalidResponseException("Invalid response received from server for GET PLAYERS");

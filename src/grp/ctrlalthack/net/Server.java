@@ -27,7 +27,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class Server implements ServerConstants {
+public class Server implements NetworkConstants {
 	
 	private int server_port; 	//port to run server on	
 	private ServerSocket server_socket; //serversocket
@@ -210,6 +210,7 @@ public class Server implements ServerConstants {
 	public void removeClient(ServerService client) {
 		this.game.removePlayer(client.getPlayer());
 		this.clients.remove(client);
+		this.setAllUpdated(FLAG_PLAYERS); //notify others the players list was updated
 	}	
 	
 	/**

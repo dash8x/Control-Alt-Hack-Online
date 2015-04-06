@@ -8,17 +8,21 @@
 
 package grp.ctrlalthack.view;
 
+import grp.ctrlalthack.model.Player;
 import grp.ctrlalthack.net.ClientService;
 import grp.ctrlalthack.net.Server;
 
 import java.awt.CardLayout;
+import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.text.JTextComponent;
 
 public class CardParent extends JPanel implements ViewConstants {
-		
+	
+	private byte ui_mode;
+	
 	private Server server;
 	private ClientService client;	
 	private Thread server_thread;
@@ -26,9 +30,9 @@ public class CardParent extends JPanel implements ViewConstants {
 	
 	//panels
 	private CardPanel home_panel;
-	private CardPanel start_server_panel;
-	private CardPanel join_server_panel;
-	private CardPanel server_lobby_panel;
+	private StartServerPanel start_server_panel;
+	private JoinServerPanel join_server_panel;
+	private ServerLobbyPanel server_lobby_panel;
 		
 	/**
 	 * Constructor
@@ -46,7 +50,32 @@ public class CardParent extends JPanel implements ViewConstants {
 		
 		join_server_panel = new JoinServerPanel(this);
 		this.add(join_server_panel, JOIN_SERVER_PANEL);
+		
+		//set to client mode by default
+		this.setMode(CLIENT_MODE);
 	}	
+	
+	/**
+	 * Sets the GUI mode
+	 */
+	private void setMode(byte mode) {
+		this.ui_mode = mode;
+	}
+
+	/**
+	 * Checks if is in server mode 
+	 */
+	public boolean inServerMode() {
+		return this.ui_mode == SERVER_MODE;
+	}
+	
+	/**
+	 * Checks if is in client mode 
+	 */
+	public boolean inClientMode() {
+		return this.ui_mode == CLIENT_MODE;
+	}
+	
 	
 	/**
 	 * Navigate to a given panel
@@ -54,15 +83,7 @@ public class CardParent extends JPanel implements ViewConstants {
 	public void navigateTo(String panel_name) {
 		CardLayout cl = (CardLayout) this.getLayout();
         cl.show(this, panel_name);
-	}
-	
-	/**
-	 * Gets a panel
-	 */
-//	public CardPanel getPanel(String panel_name) {
-//		CardLayout cl = (CardLayout) this.getLayout();
-//		this.getCom
-//	}
+	}	
 	
 	/**
 	 * Returns current instance
@@ -88,7 +109,7 @@ public class CardParent extends JPanel implements ViewConstants {
 	/**
 	 * @param server the server to set
 	 */
-	public void setServer(Server set_server) {
+	private void setServer(Server set_server) {
 		stopServer();
 		server = set_server;
 	}
@@ -96,7 +117,7 @@ public class CardParent extends JPanel implements ViewConstants {
 	/**
 	 * @param client the client to set
 	 */
-	public void setClient(ClientService set_client) {
+	private void setClient(ClientService set_client) {
 		stopClient();
 		client = set_client;
 	}
@@ -117,12 +138,15 @@ public class CardParent extends JPanel implements ViewConstants {
 		if ( getServer() != null ) {
 			getServer().stop();
 		}
+		//set back to client mode
+		setMode(CLIENT_MODE);
 	}
 	
 	/**
 	 * runs the client
 	 */
-	public void runClient() {
+	public void runClient(String server_ip, int server_port, String server_password, String player_name) {
+		setClient(new ClientService(this, server_ip, server_port, server_password, player_name));
 		if ( getClient() != null ) {
 			client_thread = new Thread(new Runnable() {				
 				@Override
@@ -131,17 +155,19 @@ public class CardParent extends JPanel implements ViewConstants {
 						getClient().runClient();
 					} catch (Exception e) {						
 						showError(e.getMessage());
+						navigateTo(HOME_PANEL);
 					}
 				}
 			});	
 			client_thread.start();
-		}
+		}		
 	}
 	
 	/**
 	 * runs the server
 	 */
-	public void runServer() {
+	public void runServer(int server_port, int max_players, String password, String server_name) {
+		setServer(new Server(server_port, max_players, password, server_name));
 		if ( getServer() != null ) {
 			server_thread = new Thread(new Runnable() {				
 				@Override
@@ -150,11 +176,13 @@ public class CardParent extends JPanel implements ViewConstants {
 						getServer().runServer();
 					} catch (Exception e) {
 						showError(e.getMessage());
+						navigateTo(HOME_PANEL);
 					}
 				}
 			});	
 			server_thread.start();
 		}
+		setMode(SERVER_MODE); //set to server mode
 	}	
 	
 	/**
@@ -168,8 +196,31 @@ public class CardParent extends JPanel implements ViewConstants {
 	 * Updates the players list
 	 */
 	public void updatePlayers() {
-		
-		//this.getLayout()
+		if ( this.server_lobby_panel != null ) {
+			try {
+				ArrayList<Player> players = this.getClient().getPlayers();
+				this.server_lobby_panel.updatePlayers(players);
+			} catch ( Exception e ) {
+				showError(e.getMessage());
+			}
+		}
+	}
+	
+	/**
+	 * Read to start
+	 */
+	public void readyToStart() {
+		try {
+			this.getClient().readyToStart();			
+		} catch (Exception e) {
+			showError(e.getMessage());
+		}
+	}	
+	
+	/**
+	 * Starts the game
+	 */
+	public void startGame() {
 		// TODO Auto-generated method stub
 		
 	}
@@ -182,4 +233,5 @@ public class CardParent extends JPanel implements ViewConstants {
 		this.add(server_lobby_panel, SERVER_LOBBY_PANEL);
 		navigateTo(SERVER_LOBBY_PANEL);	
 	}
+	
 }

@@ -7,7 +7,10 @@
 
 package grp.ctrlalthack.net;
 
-public interface ServerConstants {
+public interface NetworkConstants {
+	
+	//update flag constants
+	public final static String FLAG_PLAYERS = "PLAYERS";
 	
 	//logging constants
 	public final static String ERROR_MSG = "ERROR";

@@ -7,6 +7,7 @@
 
 package grp.ctrlalthack.view;
 
+import grp.ctrlalthack.model.Player;
 import grp.ctrlalthack.net.ClientService;
 
 import javax.swing.JPanel;
@@ -21,6 +22,7 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JTextField;
@@ -71,7 +73,11 @@ public class ServerLobbyPanel extends CardPanel implements ViewConstants {
 		table.setModel(new ClientsTableModel());
 		scrollPane.setViewportView(table);
 		
-		btn_start_game = new JButton("Start Game");
+		btn_start_game = new JButton("Ready");
+		if ( getParent().inServerMode() ) {
+			//start button for server host
+			btn_start_game.setText("Start Game");
+		}
 		GridBagConstraints gbc_btn_start_game = new GridBagConstraints();
 		gbc_btn_start_game.anchor = GridBagConstraints.WEST;
 		gbc_btn_start_game.insets = new Insets(0, 0, 5, 5);
@@ -92,11 +98,30 @@ public class ServerLobbyPanel extends CardPanel implements ViewConstants {
 				doCancel();
 			}
 		});
+		
+		btn_start_game.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				doStartGame();
+			}			
+		});
 				
 	}
-
+	
 	/**
-	 * 
+	 * Start game button handler
+	 */
+	private void doStartGame() {				
+		if ( !getParent().inServerMode() ) {
+			getParent().readyToStart();
+			//disable the ready button
+			this.btn_start_game.setEnabled(false);
+		} else {
+			getParent().startGame();
+		}
+	}
+	
+	/**
+	 * Cancel
 	 */
 	private void doCancel() {
 		stopClient();
@@ -104,6 +129,13 @@ public class ServerLobbyPanel extends CardPanel implements ViewConstants {
 		navigateTo(HOME_PANEL);
 		//getParentLayout().removeLayoutComponent(getInstance());
 		//TODO
+	}
+	
+	/**
+	 * Updates the clients table
+	 */
+	public void updatePlayers(ArrayList<Player> players) {
+		this.table.setModel(new ClientsTableModel(players));
 	}
 
 }

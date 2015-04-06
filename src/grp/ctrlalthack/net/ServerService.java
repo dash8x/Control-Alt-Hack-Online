@@ -17,10 +17,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-public class ServerService implements Runnable {
+public class ServerService implements Runnable, NetworkConstants, ProtocolConstants {
 		
 	private Socket connection; 	//socket for connection
     private ObjectOutputStream output; //output stream
@@ -61,9 +62,9 @@ public class ServerService implements Runnable {
 			this.output.writeObject(reply); 
 	        this.output.flush();
 	        this.output.reset();
-	        if ( reply.getKeyword().equals("FAIL") ) {
+	        if ( reply.getKeyword().equals(RESP_FAIL) ) {
 	        	this.server.showErrorLog( reply.toString(), this );
-	        } else if ( !reply.getKeyword().equals("DATA UPDATED") ) { //don't log data updated responses
+	        } else if ( !reply.getKeyword().equals(RESP_CHECK_UPDATED) ) { //don't log data updated responses
 	        	this.server.showResponseLog( reply.toString(), this );
 	        }
 		} catch ( IOException ioException ) {
@@ -77,7 +78,7 @@ public class ServerService implements Runnable {
 	public void setUpdated(String updated) {
 		if ( updated != null && !updated.equals("") ) {
 			this.data_updated.add(updated);		
-			this.server.showSuccessLog("DATA UPDATED Signal received for " + updated , this);
+			this.server.showSuccessLog(CMD_CHECK_UPDATED + " Signal received for " + updated , this);
 		}
 	}
 	
@@ -131,8 +132,8 @@ public class ServerService implements Runnable {
 				do {
 					request = getCommand();
 					this.handleRequest(request); //perform the command
-				} while (!request.getKeyword().equals("TERMINATE"));
-				this.server.showSuccessLog("TERMINATE Connection terminated by client", this);
+				} while (!request.getKeyword().equals(CMD_TERMINATE));
+				this.server.showSuccessLog(CMD_TERMINATE + " Connection terminated by client", this);
 			} else {
 				this.server.showErrorLog("Client connection rejected", this);
 			}
@@ -157,7 +158,7 @@ public class ServerService implements Runnable {
 	private boolean acceptPlayer(Command request) {
 		boolean accepted = false;
 		//check for correct command
-		if ( request.getKeyword().equals("INITIATE") ) {
+		if ( request.getKeyword().equals(CMD_INITIATE) ) {
 			//first check if server is full
 			if ( this.server.getNumClients() > this.server.getMaxPlayers() ) {
 				//server full
@@ -173,6 +174,7 @@ public class ServerService implements Runnable {
 						this.server.getGame().addPlayer(this.getPlayer()); //add player to the game
 						this.sendSuccess(request.getKeyword());					
 						accepted = true;
+						this.server.setAllUpdated(FLAG_PLAYERS); //notify others the players list was updated
 					} catch (Exception e) {
 						this.sendFail(request.getKeyword(), e.getMessage());
 					}
@@ -185,6 +187,13 @@ public class ServerService implements Runnable {
 		}
 		return accepted;
 	}
+	
+	/**
+	 * Wrapper method
+	 */
+	private void setAllUpdated(String msg) {
+		this.server.setAllUpdated(msg);
+	}
 
 	/**
 	 * reads a request from the client
@@ -193,7 +202,7 @@ public class ServerService implements Runnable {
 		Command request = null;
 		try {
 			request = ( Command ) this.input.readObject();	
-			if ( !request.getKeyword().equals("DATA UPDATED") ) { //don't log data updated requests
+			if ( !request.getKeyword().equals(CMD_CHECK_UPDATED) ) { //don't log data updated requests
 	    		this.server.showCommandLog(request.toString(), this);
 	    	}
 		} catch (ClassCastException | ClassNotFoundException e) { //unkown object received				
@@ -210,7 +219,7 @@ public class ServerService implements Runnable {
 	private void sendError(String message) {
 		HashMap<String,Object> params = new HashMap<String,Object>(); 
 		params.put("message", message);
-		this.sendResponse(new Response("ERROR", params));
+		this.sendResponse(new Response(RESP_ERROR, params));
 	}
     
 	/**
@@ -220,7 +229,7 @@ public class ServerService implements Runnable {
 	private void sendSuccess(String message) {
 		HashMap<String,Object> params = new HashMap<String,Object>(); 
 		params.put("operation", message);
-		this.sendResponse(new Response("SUCCESS", params));
+		this.sendResponse(new Response(RESP_SUCCESS, params));
 	}
 	
 	/**
@@ -231,7 +240,7 @@ public class ServerService implements Runnable {
 		HashMap<String,Object> params = new HashMap<String,Object>(); 
 		params.put("operation", op);
 		params.put("message", message);
-		this.sendResponse(new Response("FAIL", params));
+		this.sendResponse(new Response(RESP_FAIL, params));
 	}
 		
 	/**
@@ -241,11 +250,17 @@ public class ServerService implements Runnable {
 	private void sendDataUpdated() {
 		HashMap<String,Object> params = new HashMap<String,Object>(); 
 		params.put("updated", this.getUpdated());
-		this.sendResponse(new Response("DATA UPDATED", params));
-		//update the flag
-		if ( this.wasUpdated() ) {
-			this.setUpdated("");
-		}
+		this.sendResponse(new Response(RESP_CHECK_UPDATED, params));		
+	}
+	
+	/**
+     * Sends a PLAYERS response to the client
+     * @param courses
+     */
+	private void sendPlayers(ArrayList<Player> players) {
+		HashMap<String,Object> params = new HashMap<String,Object>(); 
+		params.put("players", players);
+		this.sendResponse(new Response(RESP_PLAYERS, params));
 	}
 	
     /**
@@ -256,16 +271,50 @@ public class ServerService implements Runnable {
     	String keyword = request.getKeyword();    	
     	HashMap<String, Object> params = request.getParams();
     	switch(keyword) {
-			case "DATA UPDATED":
+	    	case CMD_READY_TO_START:
+	    		readyToStart(keyword, params);
+				break;
+	    	case CMD_GET_PLAYERS:
+	    		getPlayers(keyword, params);
+				break;
+			case CMD_CHECK_UPDATED:
 				this.sendDataUpdated();
 				break;
-			case "TERMINATE":
+			case CMD_TERMINATE:
 				break;
 			default:
 				this.sendError("Unknown command");
     	}    	
     }
-
+    
+    /**
+	 * Process READY_TO_START
+	 */
+	private void readyToStart(String keyword, HashMap<String, Object> params) {		
+		try {	
+			this.getPlayer().setReadyToStart(true);									
+		} catch (Exception e) {
+			this.sendFail(keyword, e.getMessage());
+			return;
+		}
+		this.sendSuccess("Status set to ready");
+		setAllUpdated(FLAG_PLAYERS);
+	}
+	
+    /**
+	 * Process GET PLAYERS
+	 */
+	private void getPlayers(String keyword, HashMap<String, Object> params) {
+		ArrayList<Player> players = null;
+		try {	
+			players = this.server.getGame().getPlayers();									
+		} catch (Exception e) {
+			this.sendFail(keyword, e.getMessage());
+			return;
+		}
+		this.sendPlayers(players);
+	}
+	
 	/**
 	 * Process GET STUDENT
 	 */

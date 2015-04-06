@@ -173,8 +173,7 @@ public class JoinServerPanel extends CardPanel implements ViewConstants {
 				
 		try {			
 			//create a client for the player
-			setClient(new ClientService(getParent(), server_host, server_port, server_pass, player_name));
-			runClient();						
+			getParent().runClient(server_host, server_port, server_pass, player_name);			
 		} catch (Exception e) {			
 			showError(e.getMessage());
 		}
