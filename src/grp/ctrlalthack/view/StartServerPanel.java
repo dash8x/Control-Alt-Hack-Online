@@ -43,13 +43,13 @@ public class StartServerPanel extends CardPanel implements ViewConstants {
 	 * @wbp.parser.constructor 
 	 */
 	public StartServerPanel() {
-		this(new JPanel());
+		this(new CardParent());
 	}
 	
 	/**
 	 * Create the panel.
 	 */
-	public StartServerPanel(JPanel cards) {
+	public StartServerPanel(CardParent cards) {
 		//super();
 		super(cards);
 		GridBagLayout gridBagLayout = new GridBagLayout();
@@ -140,7 +140,7 @@ public class StartServerPanel extends CardPanel implements ViewConstants {
 		gbc_lblHostPlayerName.gridy = 7;
 		add(lblHostPlayerName, gbc_lblHostPlayerName);
 		
-		txt_host_player = new JTextField("");
+		txt_host_player = new JTextField("Player");
 		GridBagConstraints gbc_txt_host_player = new GridBagConstraints();
 		gbc_txt_host_player.insets = new Insets(0, 0, 5, 5);
 		gbc_txt_host_player.fill = GridBagConstraints.HORIZONTAL;
@@ -198,19 +198,15 @@ public class StartServerPanel extends CardPanel implements ViewConstants {
 		
 		try {
 			//create and start the server
-			this.setServer(new Server(server_port, max_players, server_pass, server_name));
-			this.runServer();			
+			setServer(new Server(server_port, max_players, server_pass, server_name));
+			runServer();			
 			
 			//create a client for the host player
-			this.setClient(new ClientService("localhost", server_port, server_pass, host_player));			
-			this.runClient();
-			
-			//open server lobby
-			getParent().add(new ServerLobbyPanel(getParent()), SERVER_LOBBY_PANEL);
-			navigateTo(SERVER_LOBBY_PANEL);
+			setClient(new ClientService(getParent(), "localhost", server_port, server_pass, host_player));			
+			runClient();							
 		} catch (Exception e) {
-			this.stopClient();
-			this.stopServer();
+			stopClient();
+			stopServer();
 			showError(e.getMessage());
 		}
 	}

@@ -26,7 +26,7 @@ public class Command extends Protocol {
 	
 	//allowed commands
 	public static final Set<String> COMMANDS = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
-			new String[]{"DATA UPDATED", "TERMINATE", "INITIATE", "SELECT CHARACTER"}
+			new String[]{"DATA UPDATED", "TERMINATE", "INITIATE", "GET PLAYERS", "SELECT CHARACTER"}
 			)));
 	
 	/**
@@ -45,9 +45,11 @@ public class Command extends Protocol {
 	public boolean isValidParams(String command, HashMap<String,Object> params) {
 		switch(command) {
 			case "INITIATE":
-				return params != null && params.size() == 1 && (params.get("password") instanceof String);	
+				return params != null && params.size() == 2 && (params.get("password") instanceof String) && (params.get("player_name") instanceof String);	
 			case "SELECT CHARACTER":
 				return params != null && params.size() == 1 && (params.get("character") instanceof HackerCard);		
+			case "GET PLAYERS":
+				return params == null || params.size() == 0;
 			case "DATA UPDATED":
 				return params == null || params.size() == 0;
 			case "TERMINATE":

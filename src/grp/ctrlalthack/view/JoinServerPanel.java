@@ -39,17 +39,9 @@ public class JoinServerPanel extends CardPanel implements ViewConstants {
 	private JTextField txt_server_ip;
 	
 	/**
-	 * REMOVE THIS
-	 * @wbp.parser.constructor 
-	 */
-	public JoinServerPanel() {
-		this(new JPanel());
-	}
-	
-	/**
 	 * Create the panel.
 	 */
-	public JoinServerPanel(JPanel cards) {
+	public JoinServerPanel(CardParent cards) {
 		//super();
 		super(cards);
 		GridBagLayout gridBagLayout = new GridBagLayout();
@@ -123,7 +115,7 @@ public class JoinServerPanel extends CardPanel implements ViewConstants {
 		gbc_lblHostPlayerName.gridy = 6;
 		add(lblHostPlayerName, gbc_lblHostPlayerName);
 		
-		txt_player_name = new JTextField("");
+		txt_player_name = new JTextField("Player");
 		GridBagConstraints gbc_txt_player_name = new GridBagConstraints();
 		gbc_txt_player_name.insets = new Insets(0, 0, 5, 5);
 		gbc_txt_player_name.fill = GridBagConstraints.HORIZONTAL;
@@ -181,12 +173,8 @@ public class JoinServerPanel extends CardPanel implements ViewConstants {
 				
 		try {			
 			//create a client for the player
-			this.setClient(new ClientService(server_host, server_port, server_pass, player_name));
-			this.runClient();
-			
-			//open server lobby
-			getParent().add(new ServerLobbyPanel(getParent()), SERVER_LOBBY_PANEL);
-			navigateTo(SERVER_LOBBY_PANEL);
+			setClient(new ClientService(getParent(), server_host, server_port, server_pass, player_name));
+			runClient();						
 		} catch (Exception e) {			
 			showError(e.getMessage());
 		}

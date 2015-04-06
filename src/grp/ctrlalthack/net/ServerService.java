@@ -11,11 +11,14 @@
 
 package grp.ctrlalthack.net;
 
+import grp.ctrlalthack.model.Player;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 public class ServerService implements Runnable {
 		
@@ -24,15 +27,18 @@ public class ServerService implements Runnable {
     private ObjectInputStream input; //input stream        
     private String ip; //client IP
     private Server server; //the server that opened this thread
+    private Player player; //the player object for the client
+    private int client_id; //id of the client
     
-    private boolean data_updated; //flag to check if data has updated since last request
+    private LinkedList<String> data_updated; //flag to check if data has updated since last request
 	
     /**
      * Constructor
      */
     public ServerService(Server server, Socket connection) {
     	this.server = server;    	
-    	this.connection = connection;    	
+    	this.connection = connection;    
+    	this.data_updated = new LinkedList<String>();
     	//get IP as a String a remove leading /
     	this.ip = this.connection.getRemoteSocketAddress().toString().replaceFirst("\\/", "");
     	//get streams
@@ -68,12 +74,21 @@ public class ServerService implements Runnable {
 	/**
 	 * Sets the updated flag
 	 */
-	public void setUpdated(boolean updated) {
-		this.data_updated = updated;
-		if (updated) {
-			this.server.showSuccessLog("DATA UPDATED Signal received", this);
+	public void setUpdated(String updated) {
+		if ( updated != null && !updated.equals("") ) {
+			this.data_updated.add(updated);		
+			this.server.showSuccessLog("DATA UPDATED Signal received for " + updated , this);
+		}
+	}
+	
+	/**
+	 * Returns the head of update queu
+	 */
+	public String getUpdated() {
+		if (this.data_updated.isEmpty()) {
+			return "";
 		} else {
-			this.server.showSuccessLog("RESPONSE DATA UPDATED Client notified", this);
+			return this.data_updated.remove();
 		}
 	}
 	
@@ -81,15 +96,28 @@ public class ServerService implements Runnable {
 	 * Returns the updated flag
 	 */
 	public boolean wasUpdated() {
-		return this.data_updated;
+		return !this.data_updated.isEmpty();
 	}
-	
 	
 	/**
 	 * Returns the IP of the client
 	 */
 	public String getIP() {
 		return this.ip;
+	}
+	
+	/**
+	 * Returns the id of the client
+	 */
+	public int getID() {
+		return this.client_id;
+	}
+	
+	/**
+	 * Returns the player of the client
+	 */
+	public Player getPlayer() {
+		return this.player;
 	}
 	
 	/**
@@ -135,11 +163,19 @@ public class ServerService implements Runnable {
 				//server full
 				this.sendFail(request.getKeyword(), "Server is full.");
 			} else {
-				//if not full validate password
+				//validate password
 				String pass = request.getParam("password", "").toString();
 				if ( this.server.verifyPassord(pass) ) {
-					this.sendSuccess(request.getKeyword());
-					accepted = true;
+					//create player instance
+					try {
+						String player_name = request.getParam("player_name", "").toString();
+						this.player = new Player(this.getIP(), player_name);
+						this.server.getGame().addPlayer(this.getPlayer()); //add player to the game
+						this.sendSuccess(request.getKeyword());					
+						accepted = true;
+					} catch (Exception e) {
+						this.sendFail(request.getKeyword(), e.getMessage());
+					}
 				} else {
 					this.sendFail(request.getKeyword(), "Invalid server password");
 				}
@@ -204,11 +240,11 @@ public class ServerService implements Runnable {
      */
 	private void sendDataUpdated() {
 		HashMap<String,Object> params = new HashMap<String,Object>(); 
-		params.put("updated", this.wasUpdated());
+		params.put("updated", this.getUpdated());
 		this.sendResponse(new Response("DATA UPDATED", params));
 		//update the flag
 		if ( this.wasUpdated() ) {
-			this.setUpdated(false);
+			this.setUpdated("");
 		}
 	}
 	

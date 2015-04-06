@@ -7,17 +7,12 @@
 
 package grp.ctrlalthack.net;
 
-public class ResponseException extends NetworkException {
-	
-	/**
-	 * Serial Version UID
-	 */
-	private static final long serialVersionUID = 4565739940253206909L;
+public class ClientException extends NetworkException {	
 
 	/**
 	 * Empty Constructor
 	 */
-	public ResponseException(){
+	public ClientException(){
 		super();
 	}
 	
@@ -25,7 +20,7 @@ public class ResponseException extends NetworkException {
 	 * Constructor
 	 * @param message error message
 	 */
-	public ResponseException(String message){
+	public ClientException(String message){
 		super(message);
 	}
 }

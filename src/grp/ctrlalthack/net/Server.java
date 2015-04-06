@@ -13,6 +13,8 @@
 
 package grp.ctrlalthack.net;
 
+import grp.ctrlalthack.controller.Game;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.SocketException;
@@ -34,6 +36,7 @@ public class Server implements ServerConstants {
 	private int max_players; //maximum number of players allowed
 	private ExecutorService client_threads; //thread pool to manage client threads
 	private ArrayList<ServerService> clients; //keeps track of all the clients
+	private Game game; //the game object
 	private boolean running; //flag to run the server
 	
 	private ReentrantLock logSynchronizer; //allows concurrent writes to the log
@@ -70,6 +73,7 @@ public class Server implements ServerConstants {
 		this.server_name = server_name;
 		this.client_threads = Executors.newCachedThreadPool();
 		this.clients = new ArrayList<ServerService>();
+		this.game = new Game();
 		this.logSynchronizer = new ReentrantLock();
 		this.updatedSynchronizer = new ReentrantLock();
 		/*this.lockSynchronizer = new ReentrantLock();		
@@ -90,7 +94,7 @@ public class Server implements ServerConstants {
 	 * Sets the maximum number of players
 	 */
 	private void setMaxPlayers(int num_players) {
-		if ( num_players < 3 || num_players > 6 ) { //max players should be between 3-6
+		if ( num_players < Game.MIN_PLAYERS || num_players > Game.MAX_PLAYERS ) { //max players should be between 3-6
     		throw new IllegalArgumentException("Maximum number of players should be between 3 and 6");
     	} 
 		this.max_players = num_players;
@@ -191,7 +195,7 @@ public class Server implements ServerConstants {
 				client.sendResponse(reply);
 			}
 		}
-	}
+	}	
 	
 	/**
 	 * Adds a client from the list of clients
@@ -204,13 +208,14 @@ public class Server implements ServerConstants {
 	 * Removes a client from the list of clients
 	 */
 	public void removeClient(ServerService client) {
+		this.game.removePlayer(client.getPlayer());
 		this.clients.remove(client);
 	}	
 	
 	/**
 	 * Sets the updated flag of all clients
 	 */
-	public void setAllUpdated(boolean updated) {
+	public void setAllUpdated(String updated) {
 		this.updatedSynchronizer.lock();
 		try {
 			for (ServerService client : this.clients) {
@@ -219,6 +224,13 @@ public class Server implements ServerConstants {
 		} finally {
 			this.updatedSynchronizer.unlock();
 		}
+	}	
+	
+	/**
+	 * Returns the game object
+	 */
+	public Game getGame() {
+		return this.game;
 	}
 	
 	//logging

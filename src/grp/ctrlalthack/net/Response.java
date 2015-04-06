@@ -8,6 +8,7 @@
 
 package grp.ctrlalthack.net;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,7 +24,7 @@ public class Response extends Protocol {
 	
 	//allowed responses
 	public static final Set<String> RESPONSES = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
-			new String[]{"DATA UPDATED", "TERMINATE", "ERROR", "SUCCESS", "FAIL"}
+			new String[]{"DATA UPDATED", "TERMINATE", "ERROR", "SUCCESS", "FAIL", "PLAYERS"}
 			)));
 	
 	/**
@@ -49,8 +50,10 @@ public class Response extends Protocol {
 				return params != null && params.size() == 2 && (params.get("operation") instanceof String) && (params.get("message") instanceof String);			
 			case "TERMINATE":
 				return (params == null || params.size() == 0);
+			case "PLAYERS":
+				return params != null && params.size() == 1 && (params.get("players") instanceof ArrayList);
 			case "DATA UPDATED":
-				return params != null && params.size() == 1 && (params.get("updated") instanceof Boolean);
+				return params != null && params.size() == 1 && (params.get("updated") instanceof String);
 		}
 		return false;
 	}

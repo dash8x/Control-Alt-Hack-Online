@@ -19,16 +19,12 @@ import javax.swing.text.JTextComponent;
 
 public abstract class CardPanel extends JPanel {
 	
-	private JPanel cards;
-	private Server server;
-	private ClientService client;	
-	private Thread server_thread;
-	private Thread client_thread;
+	private CardParent cards;
 
 	/**
 	 * Constructor
 	 */
-	public CardPanel(JPanel cards) {
+	public CardPanel(CardParent cards) {
 		super();
 		this.cards = cards;
 	}
@@ -36,7 +32,7 @@ public abstract class CardPanel extends JPanel {
 	/**
 	 * Get cards
 	 */
-	public JPanel getParent() {
+	public CardParent getParent() {
 		return this.cards;
 	}
 	
@@ -51,8 +47,7 @@ public abstract class CardPanel extends JPanel {
 	 * Navigate to a given panel
 	 */
 	public void navigateTo(String panel_name) {
-		CardLayout cl = this.getParentLayout();
-        cl.show(this.getParent(), panel_name);
+		this.getParent().navigateTo(panel_name);;
 	}
 	
 	/**
@@ -66,86 +61,63 @@ public abstract class CardPanel extends JPanel {
 	 * @return the server
 	 */
 	public Server getServer() {
-		return this.server;
+		return this.getParent().getServer();
 	}
 
 	/**
 	 * @return the client
 	 */
 	public ClientService getClient() {
-		return this.client;
+		return this.getParent().getClient();
 	}
 	
 	/**
 	 * @param server the server to set
 	 */
-	public void setServer(Server server) {
-		//this.stopServer();
-		this.server = server;
+	public void setServer(Server set_server) {
+		this.getParent().setServer(set_server);
 	}
 
 	/**
 	 * @param client the client to set
 	 */
-	public void setClient(ClientService client) {
-		this.stopClient();
-		this.client = client;
+	public void setClient(ClientService set_client) {
+		this.getParent().setClient(set_client);
 	}
 	
 	/**
 	 * Stops the client
 	 */
 	public void stopClient() {
-		if ( this.getClient() != null ) {
-			this.getClient().stop();
-		}
+		this.getParent().stopClient();
 	}
 	
 	/**
 	 * Stops the server
 	 */
 	public void stopServer() {
-		if ( this.getServer() != null ) {
-			this.getServer().stop();
-		}
+		this.getParent().stopServer();
 	}
 	
 	/**
 	 * runs the client
 	 */
 	public void runClient() {
-		if ( this.getClient() != null ) {
-			this.client_thread = new Thread(new Runnable() {				
-				@Override
-				public void run() {
-					try {
-						getClient().runClient();
-					} catch (Exception e) {						
-						showError(e.getMessage());
-					}
-				}
-			});	
-			this.client_thread.start();
-		}
+		this.getParent().runClient();
 	}
 	
 	/**
 	 * runs the server
 	 */
 	public void runServer() {
-		if ( this.getServer() != null ) {
-			this.server_thread = new Thread(new Runnable() {				
-				@Override
-				public void run() {
-					try {
-						getServer().runServer();
-					} catch (Exception e) {
-						showError(e.getMessage());
-					}
-				}
-			});	
-			this.server_thread.start();
-		}
+		this.getParent().runServer();
+	}		
+	
+	/**
+	 * Shows error
+	 */
+	public void showError(String msg) {
+		this.getParent().showError(msg);
 	}
 	
 	/**
@@ -158,12 +130,5 @@ public abstract class CardPanel extends JPanel {
 		} catch (Exception e) {
 			throw new IllegalArgumentException();
 		}
-	}
-	
-	/**
-	 * Shows error
-	 */
-	public void showError(String msg) {
-		JOptionPane.showMessageDialog(null, msg, "Error!", JOptionPane.ERROR_MESSAGE);
 	}
 }

@@ -40,7 +40,7 @@ public class ServerLobbyPanel extends CardPanel implements ViewConstants {
 	/**
 	 * Create the panel.
 	 */
-	public ServerLobbyPanel(JPanel cards) {
+	public ServerLobbyPanel(CardParent cards) {
 		//super();
 		super(cards);		
 		GridBagLayout gridBagLayout = new GridBagLayout();
@@ -68,15 +68,7 @@ public class ServerLobbyPanel extends CardPanel implements ViewConstants {
 		add(scrollPane, gbc_scrollPane);
 		
 		table = new JTable();
-		table.setModel(new DefaultTableModel(
-			new Object[][] {
-				{null, null},
-				{null, null},
-			},
-			new String[] {
-				"New column", "New column"
-			}
-		));
+		table.setModel(new ClientsTableModel());
 		scrollPane.setViewportView(table);
 		
 		btn_start_game = new JButton("Start Game");
@@ -97,11 +89,21 @@ public class ServerLobbyPanel extends CardPanel implements ViewConstants {
 		
 		btn_cancel_start_game.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				navigateTo(HOME_PANEL);
-				getParentLayout().removeLayoutComponent(getInstance());
+				doCancel();
 			}
 		});
-		
+				
+	}
+
+	/**
+	 * 
+	 */
+	private void doCancel() {
+		stopClient();
+		stopServer();
+		navigateTo(HOME_PANEL);
+		//getParentLayout().removeLayoutComponent(getInstance());
+		//TODO
 	}
 
 }

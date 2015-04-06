@@ -7,14 +7,11 @@
 
 package grp.ctrlalthack.view;
 
-import javax.swing.JPanel;
 
 import java.awt.GridBagLayout;
 
 import javax.swing.JLabel;
 
-import java.awt.CardLayout;
-import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -27,7 +24,7 @@ public class HomePanel extends CardPanel implements ViewConstants {
 	/**
 	 * Create the panel.
 	 */
-	public HomePanel(JPanel cards) {
+	public HomePanel(CardParent cards) {
 		super(cards);
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{30, 0, 30, 0};

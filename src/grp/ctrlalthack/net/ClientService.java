@@ -13,14 +13,18 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.JOptionPane;
 
+import grp.ctrlalthack.model.Player;
 import grp.ctrlalthack.net.Command;
 import grp.ctrlalthack.net.InvalidResponseException;
 import grp.ctrlalthack.net.Response;
+import grp.ctrlalthack.view.CardPanel;
+import grp.ctrlalthack.view.CardParent;
 
 public class ClientService {
 	
@@ -31,11 +35,12 @@ public class ClientService {
 	private Socket client; //socket for connection
 	private String player_name; //name of the player
 	private String server_password; //server password
+	private CardParent client_ui;
 	//object streams
 	private ObjectOutputStream output;
 	private ObjectInputStream input;		
 	private boolean running; 	//flag to keep class running	
-	private ReentrantLock sendResponseCommandLock; //lock for concurrent access to send/receive data from server	
+	private ReentrantLock sendResponseCommandLock; //lock for concurrent access to send/receive data from server
 		
 	//constant for DATA UPDATED Command
 	public static final Command DATA_UPDATED_CHECKER = new Command("DATA UPDATED", null);
@@ -46,10 +51,11 @@ public class ClientService {
 	/**
 	 * Constructor
 	 */
-	public ClientService(String server_ip, int server_port, String server_password, String player_name) {
+	public ClientService(CardParent client_ui, String server_ip, int server_port, String server_password, String player_name) {
+		this.client_ui = client_ui;
 		this.server_ip = server_ip;
 		this.setPort(server_port);
-		this.player_name = player_name;
+		this.setPlayerName(player_name);
 		this.server_password = server_password;
 		this.sendResponseCommandLock = new ReentrantLock();		
 	}	
@@ -60,6 +66,17 @@ public class ClientService {
 	public String getPlayerName() {
 		return this.player_name;
 	}
+	
+	/**
+	 * set the player_name
+	 */
+	private void setPlayerName(String name) {
+		if (name == null || name.equals("")) {
+			throw new IllegalArgumentException("Player name cannot be empty");
+		} else {
+			this.player_name = name;
+		}
+	}	
 
 	/**
 	 * Sets the server port
@@ -86,8 +103,8 @@ public class ClientService {
 				this.output.flush();
 				connected = true;
 			} catch (IOException e) { //abort if connection cannot be initialized				
-				this.showError("Error connecting to server");
-				this.stop();				
+				this.closeConnection();
+				throw new ClientException("Error connecting to server");							
 			}
 			
 			//run the client
@@ -98,6 +115,8 @@ public class ClientService {
 					// initialize update listener, checks for new updates in the data
 					Thread bacgkround_thread = new Thread(new UpdateListener());
 					bacgkround_thread.start();
+					//move to the lobby
+					this.client_ui.openServerLobby();
 					// wait until GUI is closed
 					while (this.isRunning()) {
 		
@@ -119,9 +138,12 @@ public class ClientService {
 		public void run() {			
 			while(isRunning()) {
 				try {
-					//reset the cache and update the results table if there were updates
-					if (wasUpdated()) {
-						//TODO
+					String updated = wasUpdated();
+					if (!updated.equals("")) {
+						switch (updated) {
+							case "PLAYERS":
+								client_ui.updatePlayers();
+						}
 					}					
 					Thread.sleep(500); //run every 500ms
 				} catch (InterruptedException e) {				
@@ -137,18 +159,17 @@ public class ClientService {
 	 * Closes the connection to the server
 	 */
 	private void closeConnection() {
-		try {
-			//notify the server that the connection is being closed
-			this.sendCommand(new Command("TERMINATE",null));
+		try {			
 			//close the connections
 			this.input.close();			
 			this.output.close();
-			this.client.close();
+			this.client.close();			
 		} catch (NullPointerException | SocketException e) { //abort on any error
 			return;
 		} catch (IOException e) {			
-			this.showError("Error closing connection with server");
-			return;
+			throw new ClientException("Error closing connection with server");			
+		} finally {
+			this.running = false;
 		}
 	}
 			
@@ -164,6 +185,8 @@ public class ClientService {
 	 */
 	public void stop() {
 		if ( this.isRunning() ) {
+			//notify the server that the connection is being closed
+			this.sendCommand(new Command("TERMINATE",null));
 			this.closeConnection();
 			this.running = false;
 		}
@@ -176,6 +199,7 @@ public class ClientService {
 		//build the params map
 		HashMap<String, Object> params = new HashMap<String, Object>();
 		params.put("password", this.server_password);
+		params.put("player_name", this.getPlayerName());
 		Command command = new Command("INITIATE", params);
 		//send the command to the server
 		Response reply = this.sendResponseCommand(command);
@@ -189,16 +213,16 @@ public class ClientService {
 	/**
 	 * Check if data was updated since last request
 	 */
-	public boolean wasUpdated() {
+	public String wasUpdated() {
 		//send commad to server and get back response
 		Response reply = this.sendResponseCommand(DATA_UPDATED_CHECKER);		
 				
 		//initialize output value
-		boolean was_updated = false;
+		String was_updated = "";
 				
 		//get the result from the response
 		if ( reply.getKeyword().equals("DATA UPDATED") ) {
-			was_updated = (boolean) reply.getParam("updated");
+			was_updated = (String) reply.getParam("updated");
 		} else {
 			throw new InvalidResponseException("Invalid response received from server for DATA UPDATED");
 		}
@@ -242,12 +266,12 @@ public class ClientService {
 	        this.output.reset();
 		} catch ( SocketException e ) { //give up if can't talk to server
 			if (this.isRunning()) {
-				this.showError("Connection to server lost.\nThis client will now close");
-				this.stop();
+				this.closeConnection();
+				throw new ClientException("Connection to server lost.\nThis client will now close");				
 				//TODO
 			}
 		} catch ( IOException e ) {			
-			this.showError("Error sending request to server\n" + request.toString() + "\n" + e.getMessage());					
+			throw new ClientException("Error sending request to server\n" + request.toString() + "\n" + e.getMessage());					
 	    }
 	}
 	
@@ -259,21 +283,22 @@ public class ClientService {
 		try {
 			reply = ( Response ) this.input.readObject();
 			if ( reply.getKeyword().equals("TERMINATE") ) {
-				this.showError("The server has closed the connection.\nThis client will now close");			
-				this.stop();
+				throw new ClientException("The server has closed the connection.\nThis client will now close");							
 				//TODO
 			} 
 		} catch ( SocketException e ) { //give up if can't talk to server
 			if (this.isRunning()) {
-				this.showError("Connection to server lost.\nThis client will now close");
-				this.stop();
+				throw new ClientException("Connection to server lost.\nThis client will now close");				
 				//TODO
 			}
 		} catch ( IOException e ) {
-        	this.showError("Error reading response from server\n" + e.getMessage());        
+        	throw new ClientException("Error reading response from server\n" + e.getMessage());        
         } catch ( ClassCastException | ClassNotFoundException e ) {
-        	this.showError("Unknown response received from server");        	
-        }		
+        	throw new ClientException("Unknown response received from server");        	
+        } catch ( ClientException e ) {
+        	this.closeConnection();
+        	throw e;
+        }
 		return reply;
 	}
 	
@@ -283,5 +308,25 @@ public class ClientService {
 	public void showError(String message) {
 		JOptionPane.showMessageDialog(null, message, "Network Error!", JOptionPane.ERROR_MESSAGE);
 	}
-		
+	
+	/**
+	 * Returns the players array list
+	 */
+	@SuppressWarnings("unchecked")
+	public ArrayList<Player> getPlayers() {
+		//send the command to the server
+		Response reply = this.sendResponseCommand(new Command("GET PLAYERS", null));		
+				
+		//initialize output array
+		ArrayList<Player> results = new ArrayList<Player>();
+				
+		//get the result from the response
+		if ( reply.getKeyword().equals("PLAYERS") ) {
+			results = (ArrayList<Player>) reply.getParam("players");
+		} else {			
+			throw new InvalidResponseException("Invalid response received from server for GET PLAYERS");
+		}
+				
+		return results;
+	}
 }

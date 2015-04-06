@@ -12,9 +12,9 @@ import java.awt.CardLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
-public class MainView extends JFrame implements ViewConstants {	
+public class MainView extends JFrame {	
 
-	private JPanel cards;
+	private CardParent cards;
 
 	/**
 	 * Launch the application.
@@ -48,18 +48,8 @@ public class MainView extends JFrame implements ViewConstants {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new CardLayout(0, 0));
 		
-		cards = new JPanel();
-		getContentPane().add(cards, "name_1322188755735631");
-		cards.setLayout(new CardLayout(0, 0));
-		
-		JPanel home_panel = new HomePanel(this.cards);
-		cards.add(home_panel, HOME_PANEL);				
-		
-		JPanel start_server_panel = new StartServerPanel(this.cards);
-		cards.add(start_server_panel, START_SERVER_PANEL);
-		
-		JPanel join_server_panel = new JoinServerPanel(this.cards);
-		cards.add(join_server_panel, JOIN_SERVER_PANEL);
+		cards = new CardParent();
+		getContentPane().add(cards, "name_1322188755735631");		
 	}
 
 }
