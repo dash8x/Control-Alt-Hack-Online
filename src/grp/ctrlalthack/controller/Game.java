@@ -7,6 +7,7 @@
 
 package grp.ctrlalthack.controller;
 
+import grp.ctrlalthack.data.DataIO;
 import grp.ctrlalthack.model.EntropyCard;
 import grp.ctrlalthack.model.HackerCard;
 import grp.ctrlalthack.model.MissionCard;
@@ -41,7 +42,7 @@ public class Game {
 		this.entropy_discard = new ArrayList<EntropyCard>();
 		this.missions_deck = new ArrayList<MissionCard>();
 		this.missions_played = new ArrayList<MissionCard>();
-		this.hacker_cards = new ArrayList<HackerCard>();
+		this.hacker_cards = DataIO.readHackerCards();
 	}
 	
 	/**

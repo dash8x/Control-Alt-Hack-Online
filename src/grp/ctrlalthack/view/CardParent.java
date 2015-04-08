@@ -153,7 +153,7 @@ public class CardParent extends JPanel implements ViewConstants {
 				public void run() {
 					try {
 						getClient().runClient();
-					} catch (Exception e) {						
+					} catch (Exception e) {									
 						showError(e.getMessage());
 						navigateTo(HOME_PANEL);
 					}
@@ -174,7 +174,7 @@ public class CardParent extends JPanel implements ViewConstants {
 				public void run() {
 					try {
 						getServer().runServer();
-					} catch (Exception e) {
+					} catch (Exception e) {						
 						showError(e.getMessage());
 						navigateTo(HOME_PANEL);
 					}

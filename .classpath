@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="C:/Users/Arushad/Dropbox/Nottingham/Year 2/Full Year/Software Engineering Group Project (G52GRP)/Group Files/Software/Control-Alt-Hack-Online/json-20140107.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -1,0 +1,278 @@
+[	
+	{
+		"name": "Iva",
+		"kitchen_sink": 8,
+		"skills": [
+				{ "skill": "hardware_hacking", "value": 10 },
+				{ "skill": "network_ninja", "value": 11 },
+				{ "skill": "social_engineering", "value":  10 },
+				{ "skill": "software_wizardry", "value":  10 },
+				{ "skill": "cryptanalysis", "value":  12 }					
+			],		
+		"desc": "If Iva's learned nothing else from all her time rock climbing, she's learned the value of perseverance.",
+		"perk": {
+			"type": "free_reroll",
+			"cond": "entropy_card_discard"
+		}		
+	},		
+	{
+		"name": "Alexei",
+		"kitchen_sink": 10,
+		"skills": [
+			{ "skill": "hardware_hacking", "value":  10 },
+			{ "skill": "network_ninja", "value":  9 },
+			{ "skill": "social_engineering", "value":  12 },
+			{ "skill": "software_wizardry", "value":  10 },
+			{ "skill": "cryptanalysis", "value":  11 },
+			{ "skill": "connections", "value": 11 }			
+		],		
+		"desc": "Alexei lives life in the fast lane; he's fast on his motorcycle and thinks quick on his feet.",
+		"perk": {
+			"type": "free_reroll",
+			"cond": null
+		}
+	},
+	{
+		"name": "Mike",
+		"kitchen_sink": 10,
+		"skills": [
+			{ "skill": "hardware_hacking", "value": 14 },
+			{ "skill": "network_ninja", "value": 12 },
+			{ "skill": "social_engineering", "value": 12 },
+			{ "skill": "software_wizardry", "value": 11 },
+			{ "skill": "cryptanalysis", "value": 10 }			
+		],	
+		"desc": "Mike was a bit of a child prodigy-filing a groundbreaking patent on reducing CPU power consumption-so he's become very familiar with the meaning of \"high expectations.\"",
+		"perk": {
+			"type": "hacker_cred_penalty"			
+		}		
+	},
+	{
+		"name": "Dan",
+		"kitchen_sink": 9,
+		"skills": [
+			{ "skill": "hardware_hacking", "value": 11 },
+			{ "skill": "network_ninja", "value": 13 },
+			{ "skill": "social_engineering", "value": 11 },
+			{ "skill": "software_wizardry", "value": 10 },
+			{ "skill": "cryptanalysis", "value": 10 },
+			{ "skill": "lockpicking", "value": null }			
+		],	
+		"desc": "Dan loves working with his hands; he's a prolific painter and an artist with a lockpick."		
+	},
+	{
+		"name": "Anya",
+		"kitchen_sink": 10,
+		"skills": [
+			{ "skill": "hardware_hacking", "value": 9 },
+			{ "skill": "network_ninja", "value": 9 },
+			{ "skill": "social_engineering", "value": 14 },
+			{ "skill": "software_wizardry", "value": 10 },
+			{ "skill": "cryptanalysis", "value": 11 }			
+		],		
+		"desc": "As a former bartender, Anya knows that it pays to tip well. She's carried that lesson into all aspects of her life; be generous with your money, and you'll uncover hidden opportunities.",
+		"perk": {
+			"type": "draw_entropy",
+			"cond": "cash"			
+		}
+	},
+	{
+		"name": "Deborah",
+		"kitchen_sink": 9,
+		"skills": [
+			{ "skill": "hardware_hacking", "value": 12 },
+			{ "skill": "network_ninja", "value": 10 },
+			{ "skill": "social_engineering", "value": 11 },
+			{ "skill": "software_wizardry", "value": 10 },
+			{ "skill": "cryptanalysis", "value": 10 },
+			{ "skill": "search_fu", "value": 11 }			
+		],		
+		"desc": "As a connoisseur of relaxation (theres nothing better than a lazy nap on a Saturday afternoon!), Deb knows better than to face a challenge head-on when there's a workaround",
+		"perk": {
+			"type": "subsitute_skill"
+		}
+	},
+	{
+		"name": "Mei",
+		"kitchen_sink": 10,
+		"skills": [
+			{ "skill": "hardware_hacking", "value": 10 },
+			{ "skill": "network_ninja", "value": 14 },
+			{ "skill": "social_engineering", "value": 9 },
+			{ "skill": "software_wizardry", "value": 10 },
+			{ "skill": "cryptanalysis", "value": 11 },
+			{ "skill": "search_fu", "value": 11 }
+		],		
+		"desc": "Mei's known among her friends as the go-to computer network fix-it person. They may not ppay her, but they give her a lot of inside deals.",
+		"perk": {
+			"type": "draw_entropy",
+			"cond": "roll",
+			"amount": -3,
+			"skill": "network_ninja"			
+		}		
+	},
+	{
+		"name": "Tope",
+		"kitchen_sink": 10,
+		"skills": [
+			{ "skill": "hardware_hacking", "value": 11 },
+			{ "skill": "network_ninja", "value": 11 },
+			{ "skill": "social_engineering", "value": 11 },
+			{ "skill": "software_wizardry", "value": 11 },
+			{ "skill": "cryptanalysis", "value": 9 },
+			{ "skill": "barista", "value": 12 }	
+		],		
+		"desc": "Tope is as passionate about music as he is about elegant code. He has regular gigs playing the acoustic guitar at local lounges.",
+		"perk": {
+			"type": "start_cash",
+			"amount": 3000
+		}
+	},		
+	{
+		"name": "Karl",
+		"kitchen_sink": 10,
+		"skills": [
+			{ "skill": "hardware_hacking", "value": 13 },
+			{ "skill": "network_ninja", "value": 10 },
+			{ "skill": "social_engineering", "value": 9 },
+			{ "skill": "software_engineering", "value": 9 },
+			{ "skill": "software_wizardry", "value": 13 },
+			{ "skill": "cryptanalysis", "value": 11 },
+			{ "skill": "forensics", "value": 12 }			
+		],		
+		"desc": "Karl may spend most of his time staring at machine code, but he's also naturally charismatic. Given the right training, he'd be a genius at programming people, too.",
+		"perk": {
+			"type": "auto_success",
+			"cond": "bag_of_tricks_acting_class_in_play",
+			"skill": "social_engineering"
+		}
+	},
+	{
+		"name": "Gabriel",
+		"kitchen_sink": 8,
+		"skills": [
+			{ "skill": "hardware_hacking", "value": 13 },
+			{ "skill": "network_ninja", "value": 10 },
+			{ "skill": "social_engineering", "value": 8 },
+			{ "skill": "software_wizardry", "value": 10 },
+			{ "skill": "cryptanalysis", "value": 8 },
+			{ "skill": "lockpicking", "value": 14 }		
+		],		
+		"desc": "Baking, cheesemaking, brewing, grilling-Gabe's crazy about food. He's always bringing his latest creation by the office, and gets an awful lot of goodwill in return.",
+		"perk": {
+			"type": "draw_double"
+		} 
+	},		
+	{
+		"name": "Roxana",
+		"kitchen_sink": 9,
+		"skills": [
+			{ "skill": "hardware_hacking", "value": 11 },
+			{ "skill": "network_ninja", "value": 11 },
+			{ "skill": "social_engineering", "value": 10 },
+			{ "skill": "software_wizardry", "value": 11 },
+			{ "skill": "cryptanalysis", "value": 14 }			
+		],		
+		"desc": "A big fan of elegant math and detective stories. Roxana's always more than happy to turn any problem into a math puzzle.",		
+		"perk": {
+			"type": "subsitute_skill",
+			"skills_to_substitute": [
+				"cryptanalysis"
+			],
+			"skills_substituted_for": [
+				"hardware_hacking",
+				"social_engineering"
+			]
+		}		
+	},
+	{
+		"name": "Tammy",
+		"kitchen_sink": 11,
+		"skills": [
+			{ "skill": "hardware_hacking", "value": 12 },
+			{ "skill": "network_ninja", "value": 12 },
+			{ "skill": "social_engineering", "value": 11 },
+			{ "skill": "software_wizardry", "value": 8 },
+			{ "skill": "cryptanalysis", "value": 13 },
+			{ "skill": "web_procurement", "value": 13 }			
+		],		
+		"desc": "Reading, arts and crafts, games, dancing-Tammmy has more hobbies than there are hours in the day. She may not have the patience to spend long hours writing software, but she definitely got the memo on diversification."		
+	},
+	{
+		"name": "Miro ",
+		"kitchen_sink": 10,
+		"skills": [
+			{ "skill": "hardware_hacking", "value": 9 },
+			{ "skill": "network_ninja", "value": 11 },
+			{ "skill": "social_engineering", "value": 12 },
+			{ "skill": "software_wizardry", "value": 11 },
+			{ "skill": "cryptanalysis", "value": 11 },
+			{ "skill": "forensics", "value": 12 },
+			{ "skill": "barista", "value": 12 }		
+		],	
+		"desc": "As an avid soccer player, Miro knows that there's more than one way to approach a goal...although it sometimes requires a little fancy footwork.",
+		"perk": {
+			"type": "subsitute_skill",
+			"skills_to_substitute": [
+				"hardware_hacking",
+				"network_ninja",
+				"social_engineering",
+				"software_wizardry",
+				"cryptanalysis",				
+				"lockpicking",
+				"search_fu",
+				"web_procurement",
+				"connections"	
+			]				
+		}		
+	},
+	{
+		"name": "Sidhant",
+		"kitchen_sink": 9,
+		"skills": [
+			{ "skill": "hardware_hacking", "value": 12 },
+			{ "skill": "network_ninja", "value": 12 },
+			{ "skill": "social_engineering", "value": 10 },
+			{ "skill": "software_wizardry", "value": 11 },
+			{ "skill": "cryptanalysis", "value": 10 },
+			{ "skill": "web_procurement", "value": 12 }		
+		],		
+		"desc": "Sid's always been passionate about physics and electronics, so it's no surprise that his hardware blog now has a readership in the millions.",
+		"perk": {
+			"type": "hacker_cred_bonus",
+			"cond": "skill",
+			"skill": "hardware_hacking"
+		}		
+	},
+	{
+		"name": "Franzi",
+		"kitchen_sink": 10,
+		"skills": [
+			{ "skill": "hardware_hacking", "value": 12 },
+			{ "skill": "network_ninja", "value": 12 },
+			{ "skill": "social_engineering", "value": 8 },
+			{ "skill": "software_wizardry", "value": null },
+			{ "skill": "cryptanalysis", "value": 9 },
+			{ "skill": "connections", "value": 12 },
+			{ "skill": "barista", "value": 8 }			
+		],	
+		"desc": "When not working as the company's resident software wizard, Franzi spends her time travelling to new places and meeting new people. Her current record is 13 countries in one year."		
+	},
+	{
+		"name": "Cynthia",
+		"kitchen_sink": 10,
+		"skills": [
+			{ "skill": "hardware_hacking", "value": 11 },
+			{ "skill": "network_ninja", "value": 12 },
+			{ "skill": "social_engineering", "value": 11 },
+			{ "skill": "software_wizardry", "value": 12 },
+			{ "skill": "cryptanalysis", "value": 12 },
+			{ "skill": "connections", "value": 12 }			
+		],		
+		"desc": "Cynthia,s off-work hours are spent developing for an open source robotics project. She may spend a pretty penny on her hardware, but...ROBOTS.",
+		"perk": {
+			"type": "start_cash",
+			"amount": 1000
+		}
+	}
+]

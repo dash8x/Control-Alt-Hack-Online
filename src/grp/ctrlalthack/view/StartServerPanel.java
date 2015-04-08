@@ -202,7 +202,7 @@ public class StartServerPanel extends CardPanel implements ViewConstants {
 			
 			//start the client for the host player
 			getParent().runClient("localhost", server_port, server_pass, host_player);						
-		} catch (Exception e) {
+		} catch (Exception e) {			
 			stopClient();
 			stopServer();
 			showError(e.getMessage());
