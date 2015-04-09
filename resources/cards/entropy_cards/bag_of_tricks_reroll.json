@@ -1,0 +1,38 @@
+[
+	{
+		"card_title": "Awesome Antenna",
+		"card_desc": "No sir, that's not a directional Wi-Fi antenna on my car. I'm not going to join your wireless network from the parking lot. I'm just listening to the radio and eating a sandwich.",
+		"cost": 1000,
+		"skills": [{"skill": "network_ninja"}]
+	},
+	{
+		"card_title": "Hot Tub",
+		"card_desc": "It may have been expensive at the time, but if every time you sit back in your new hot tub and admire the stars, creative inspiration strikes.",
+		"cost": 4000,
+		"skills": [{"skill": "software_wizardry"}]
+	},
+	{
+		"card_title": "Shiny New Lab",
+		"card_desc": "Time to upgrade your hardware lab. You buy a new bench, better lighting, and an ergonomic chair.",
+		"cost": 5000,
+		"skills": [{"skill": "hardware_hacking"}]
+	},
+	{
+		"card_title": "Magic Lessons",
+		"card_desc": "Sleight of hand, distractions, bluffs, fakes-magic has a lot to teach about misdirection to con people.",
+		"cost": 2000,
+		"skills": [{"skill": "social_engineering"}]
+	},
+	{
+		"card_title": "The Couch Surfer",
+		"card_desc": "Your friend may be staying at your place free of charge, but his experience working ar the NSA sure comes in handy.",
+		"cost": 4000,
+		"skills": [{"skill": "cryptanalysis"}, {"skill": "search_fu"}]
+	},
+	{
+		"card_title": "Lockpicking Toolchest",
+		"card_desc": "Pick gun, bump key, impression kit...hook, half diamond, and snake rake picks...who knew that there were so many types of lockpicking tools?",
+		"cost": 1000,
+		"skills": [{"skill": "lockpicking"}]
+	}
+]

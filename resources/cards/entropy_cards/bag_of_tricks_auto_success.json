@@ -1,0 +1,45 @@
+[
+	{
+		"card_title": "Friendly Advice",
+		"card_desc": "You pay our old roommate a visit for some expert hardware advice. Unfortunately, your car gets rear-ended on the way back. Hardware problem solved, but your wallet is a bit lighter.",
+		"cost": 2000,
+		"skill": "hardware_hacking"
+	},
+	{
+		"card_title": "Hobby Supplies",
+		"card_desc": "Fishing...woodworking...gardening...cooking...what's your new hobby? You may be spending a lot on supplies, but your ming is more rested and creative.",
+		"cost": 1000,
+		"skill": "network_ninja"
+	},
+	{
+		"card_title": "Proprietary Documentation Available",
+		"card_desc": "Turns out that the manufacturer offers documentation for their proprietary protocol for sale on their web site. Makes finding a vulnerability that much easier-no reverse engineering necessary!",
+		"cost": 1000,
+		"skill": "cryptanalysis"
+	},
+	{
+		"card_title": "Hiring Help",
+		"card_desc": "Whether it's to provide a distraction, corroborate your story, or play Bad Cop, sometimes having an extra body around makes all the difference.",
+		"cost": 1000,
+		"skill": "social_engineering"
+	},
+	{
+		"card_title": "Trial Software",
+		"card_desc": "The advanced hacking course you enrolled in included some powerful reverse engineering software. Too bad it's just a trial version.",
+		"cost": 2000,
+		"skill": "software_wizardry"
+	},
+	{
+		"card_title": "Party of the Year",
+		"card_desc": "Chocolate fountain, open bar, and a hovering chandelier. You throw the best parties, and everybody who's anybody is there.",
+		"cost": 1000,
+		"skill": "connections"
+	},
+	{
+		"card_title": "Dumpster Diving",
+		"card_desc": "You don't mind getting dirty. You're happy to dig through a company's garbage to look for un-shredded specs, documentation, and inter-office memos. This time the client's guards are vigilant. Hire a garbage truck, then go through your haul off-site.",
+		"cost": 4000,
+		"skill": "hardware_hacking"
+	}
+
+]

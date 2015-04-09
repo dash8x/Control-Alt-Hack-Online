@@ -18,7 +18,17 @@ public class BoTSkillModCard extends BagOfTricksCard {
 	 * Constructor
 	 */
 	public BoTSkillModCard(String title, String desc, int cost, ArrayList<SkillModifier> skill_mods) {
-		super(title, desc, cost);	
+		super(title, desc, false, cost);	
+		setSkillMods(skill_mods);
+	}
+
+	/**
+	 * @param skill_mods
+	 */
+	private void setSkillMods(ArrayList<SkillModifier> skill_mods) {
+		if ( skill_mods == null || skill_mods.size() == 0 || skill_mods.size() > 2 ) {
+			throw new IllegalArgumentException("Skill modifiers cannot be empty or more than 2");
+		}
 		this.skill_mods = skill_mods;
 	}		
 	

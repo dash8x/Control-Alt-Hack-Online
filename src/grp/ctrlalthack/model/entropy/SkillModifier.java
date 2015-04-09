@@ -52,10 +52,11 @@ public class SkillModifier {
 	 * returns the task title
 	 */
 	public String toString() {
-		String ret = HackerCard.getSkillName(getSkill());
+		String ret = "";
 		if ( getSkillModifier() != 0 ) {
-			ret += " " + getSkillModifier();
-		}		
+			ret += "+" + getSkillModifier() + " ";
+		}
+		ret += HackerCard.getSkillName(getSkill());			
 		return ret;
 	}
 		

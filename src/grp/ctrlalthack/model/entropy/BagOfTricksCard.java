@@ -15,8 +15,8 @@ public abstract class BagOfTricksCard extends EntropyCard {
 	/**
 	 * Constructor
 	 */
-	public BagOfTricksCard(String title, String desc, int cost) {
-		super(title, desc, false);
+	public BagOfTricksCard(String title, String desc, boolean discard, int cost) {
+		super(title, desc, discard);
 		this.cost = cost;
 	}		
 	

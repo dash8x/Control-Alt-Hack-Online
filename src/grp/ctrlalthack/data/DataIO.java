@@ -9,6 +9,8 @@ package grp.ctrlalthack.data;
 
 import grp.ctrlalthack.model.GameConstants;
 import grp.ctrlalthack.model.HackerCard;
+import grp.ctrlalthack.model.entropy.BoTAutoSuccessCard;
+import grp.ctrlalthack.model.entropy.BoTFreeRerollCard;
 import grp.ctrlalthack.model.entropy.BoTSkillModCard;
 import grp.ctrlalthack.model.entropy.SkillModifier;
 import grp.ctrlalthack.model.mission.MissionCard;
@@ -102,6 +104,72 @@ public class DataIO implements GameConstants {
 				
 				//create the card object
 				BoTSkillModCard card = new BoTSkillModCard(title, desc, cost, skills_mods);
+				cards.add(card);
+			}
+		} catch (JSONException e) {		
+			System.out.println(json_obj);
+			e.printStackTrace();
+		}	
+		return cards;
+	}
+	
+	/**
+	 * reads BoT skill modifier cards
+	 */
+	public static ArrayList<BoTFreeRerollCard> readBoTFreeRerollCards() {
+		ArrayList<BoTFreeRerollCard> cards = new ArrayList<BoTFreeRerollCard>(); 
+		JSONObject json_obj = null;
+		try {
+			String contents = readFile(ENTROPY_CARDS + "/bag_of_tricks_reroll.json");
+			JSONArray json_array = new JSONArray(contents);			
+			for ( int i = 0; i < json_array.length(); i++ ) {
+				json_obj = (JSONObject) json_array.get(i);
+				
+				//fields
+				String title = json_obj.getString("card_title");
+				String desc = json_obj.getString("card_desc");
+				int cost = json_obj.getInt("cost");				
+				
+				//get the skills
+				ArrayList<String> skills = new ArrayList<String>();
+				JSONArray skills_json = json_obj.getJSONArray("skills");
+				for ( int x = 0; x < skills_json.length(); x++ ) {
+					JSONObject skill_obj = (JSONObject) skills_json.get(x);
+					String skill = skill_obj.getString("skill");													
+					skills.add(skill);
+				}
+				
+				//create the card object
+				BoTFreeRerollCard card = new BoTFreeRerollCard(title, desc, cost, skills);
+				cards.add(card);
+			}
+		} catch (JSONException e) {		
+			System.out.println(json_obj);
+			e.printStackTrace();
+		}	
+		return cards;
+	}
+	
+	/**
+	 * reads BoT skill modifier cards
+	 */
+	public static ArrayList<BoTAutoSuccessCard> readBoTAutoSuccessCards() {
+		ArrayList<BoTAutoSuccessCard> cards = new ArrayList<BoTAutoSuccessCard>(); 
+		JSONObject json_obj = null;
+		try {
+			String contents = readFile(ENTROPY_CARDS + "/bag_of_tricks_auto_success.json");
+			JSONArray json_array = new JSONArray(contents);			
+			for ( int i = 0; i < json_array.length(); i++ ) {
+				json_obj = (JSONObject) json_array.get(i);
+				
+				//fields
+				String title = json_obj.getString("card_title");
+				String desc = json_obj.getString("card_desc");
+				int cost = json_obj.getInt("cost");				
+				String skill = json_obj.getString("skill");
+				
+				//create the card object
+				BoTAutoSuccessCard card = new BoTAutoSuccessCard(title, desc, cost, skill);
 				cards.add(card);
 			}
 		} catch (JSONException e) {		
