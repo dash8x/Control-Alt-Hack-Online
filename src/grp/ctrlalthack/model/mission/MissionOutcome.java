@@ -60,6 +60,11 @@ public abstract class MissionOutcome {
 	 */
 	public int getEntropyCards() {
 		return Math.abs(entropy_cards);
-	}		
+	}	
+	
+	/**
+	 * returns the title
+	 */
+	public abstract String getTitle();
 		
 }

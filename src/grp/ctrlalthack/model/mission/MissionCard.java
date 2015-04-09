@@ -76,8 +76,8 @@ public class MissionCard {
 	 * @param tasks the tasks to set
 	 */
 	public void setTasks(ArrayList<MissionTask> tasks) {
-		if ( tasks == null ) {
-			throw new IllegalArgumentException("Tasks cannot be null");
+		if ( tasks == null || tasks.size() > 3 ) {
+			throw new IllegalArgumentException("Tasks cannot be null or more than 3 tasks per mission");
 		}
 		this.tasks = tasks;
 	}

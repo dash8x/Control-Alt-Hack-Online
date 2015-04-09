@@ -103,9 +103,16 @@ public class MissionTask {
 	 * returns the task title
 	 */
 	public String getTitle() {
-		String ret = HackerCard.getSkillName(getSkill()) + " " + getSkillModifier();
+		String ret = HackerCard.getSkillName(getSkill());
+		if ( getSkillModifier() != 0 ) {
+			ret += " " + getSkillModifier();
+		}
 		if ( hasAltSkill() ) {
-			ret += " OR " + HackerCard.getSkillName(getAltSkill()) + " " + getAltSkillModifier();
+			ret += " OR " + HackerCard.getSkillName(getAltSkill());
+			if ( getAltSkillModifier() != 0 ) {
+				ret += " " + getAltSkillModifier();
+			}
+				
 		}
 		return ret;
 	}

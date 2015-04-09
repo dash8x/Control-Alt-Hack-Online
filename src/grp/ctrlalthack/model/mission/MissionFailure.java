@@ -16,4 +16,15 @@ public class MissionFailure extends MissionOutcome {
 		super(desc, hacker_creds, cash, entropy_cards, all_players);		
 	}
 		
+	@Override
+	public String getTitle() {
+		String ret = "";
+		if ( getHackerCreds() > 0 ) {
+			ret += "-" + getHackerCreds() + " Hacker Creds ";
+		}
+		if ( getCash() > 0 ) {
+			ret += "-$" + getCash();
+		}
+		return ret;
+	}
 }

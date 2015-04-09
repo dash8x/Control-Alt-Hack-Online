@@ -135,7 +135,7 @@
 				"desc": "You suspect foul play. Use your network savvy to reconstruct the most likely avenue of attack."
 			}
 		],
-		"success": { "hacker_cred": 1, "cash": 2000, "desc": "You receive one of the "limited edition" meme sweaters-now a collectible! +1 Hacker Cred and get $2K."},
+		"success": { "hacker_cred": 1, "cash": 2000, "desc": "You receive one of the \"limited edition\" meme sweaters-now a collectible! +1 Hacker Cred and get $2K."},
 		"failure": { "hacker_cred": 1, "desc": "-1 Hacker Cred"}
 	},
 	{
