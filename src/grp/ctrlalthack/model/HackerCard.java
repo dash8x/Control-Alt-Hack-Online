@@ -97,6 +97,17 @@ public class HackerCard implements GameConstants {
 	}
 	
 	/**
+	 * @return perk text
+	 */
+	public String getPerkText() {
+		String text = "";
+		if ( getPerk() != null ) {
+			text = getPerk().toString();
+		}
+		return text;
+	}
+	
+	/**
 	 * @return the skills
 	 */
 	public HashMap<String, Integer> getSkills() {
@@ -153,26 +164,37 @@ public class HackerCard implements GameConstants {
 		switch (skill) {						
 			case HARDWARE:
 				name = "Hardware Hacking";
+				break;
 			case NETWORK:
 				name = "Network Ninja";
+				break;
 			case SOCIAL:
 				name = "Social Engineering";
+				break;
 			case SOFTWARE:
 				name = "Software Wizardry";
+				break;
 			case CRYPT:
 				name = "Cryptanalysis";
+				break;
 			case LOCKPICK:
 				name = "Lockpicking";
+				break;
 			case SEARCH:
 				name = "Search Fu";
+				break;
 			case FORENSICS:
 				name = "Forensics";
+				break;
 			case BARISTA:
 				name = "Barista";
+				break;
 			case WEB:
 				name = "Web Procurement";
+				break;
 			case CONNECTIONS:
 				name = "Connections";
+				break;
 		}
 		return name;
 	}
