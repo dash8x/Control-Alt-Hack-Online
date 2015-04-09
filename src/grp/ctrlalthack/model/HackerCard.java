@@ -198,5 +198,12 @@ public class HackerCard implements GameConstants {
 		}
 		return name;
 	}
+	
+	/**
+	 * Validates a skill slug
+	 */
+	public static boolean isSkill(String name) {
+		return name != null && VALID_SKILLS.contains(name);
+	}
 
 }

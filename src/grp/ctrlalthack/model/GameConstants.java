@@ -7,6 +7,11 @@
 
 package grp.ctrlalthack.model;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 public interface GameConstants {
 		
 	//skill names
@@ -22,6 +27,10 @@ public interface GameConstants {
 	public static final String WEB = "web_procurement";
 	public static final String CONNECTIONS = "connections";
 	
+	public static final Set<String> VALID_SKILLS = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+			new String[]{HARDWARE, NETWORK, SOCIAL, SOFTWARE, CRYPT,
+		LOCKPICK, SEARCH, SEARCH, SEARCH, FORENSICS, BARISTA, WEB, CONNECTIONS}))); 
+			
 	//misc
 	public static final int INFINITE_SKILL = -1;
 	public static final int START_CASH = 2000;
