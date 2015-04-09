@@ -9,6 +9,10 @@ package grp.ctrlalthack.data;
 
 import grp.ctrlalthack.model.GameConstants;
 import grp.ctrlalthack.model.HackerCard;
+import grp.ctrlalthack.model.mission.MissionCard;
+import grp.ctrlalthack.model.mission.MissionFailure;
+import grp.ctrlalthack.model.mission.MissionSuccess;
+import grp.ctrlalthack.model.mission.MissionTask;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -27,7 +31,7 @@ public class DataIO implements GameConstants {
 	private static final String CARDS = "/cards";
 	
 	/**
-	 * Constructor
+	 * reads hacker cards
 	 */
 	public static ArrayList<HackerCard> readHackerCards() {
 		ArrayList<HackerCard> cards = new ArrayList<HackerCard>(); 
@@ -55,6 +59,79 @@ public class DataIO implements GameConstants {
 				
 				//create the card object
 				HackerCard card = new HackerCard(name, desc, skills, kitchen_sink);
+				cards.add(card);
+			}
+		} catch (JSONException e) {		
+			System.out.println(json_obj);
+			e.printStackTrace();
+		}	
+		return cards;
+	}
+	
+	/**
+	 * reads mission cards
+	 */
+	public static ArrayList<MissionCard> readMissionCards() {
+		ArrayList<MissionCard> cards = new ArrayList<MissionCard>(); 
+		JSONObject json_obj = null;
+		try {
+			String contents = readFile(CARDS + "/mission_cards.json");
+			JSONArray json_array = new JSONArray(contents);			
+			for ( int i = 0; i < json_array.length(); i++ ) {
+				json_obj = (JSONObject) json_array.get(i);
+				
+				//fields
+				boolean newb = json_obj.optBoolean("newb_mission", false);
+				String title = json_obj.getString("mission_title");				
+				String desc = json_obj.getString("mission_desc");
+				
+				//get the tasks
+				ArrayList<MissionTask> tasks = new ArrayList<MissionTask>();
+				JSONArray tasks_json = json_obj.getJSONArray("tasks");
+				for ( int x = 0; x < tasks_json.length(); x++ ) {
+					JSONObject task_obj = (JSONObject) tasks_json.get(x);
+					String t_desc = task_obj.getString("desc");
+					String skill = task_obj.getString("skill");					
+					int skill_mod = task_obj.optInt("mod", 0);
+
+					//alt skill
+					JSONObject alt_obj = task_obj.optJSONObject("alt");
+					String alt_skill = null;
+					int alt_mod = 0;
+					if (alt_obj != null) {
+						alt_skill = alt_obj.optString("skill", null);
+						alt_mod = alt_obj.optInt("mod", 0);
+					}
+					
+					//creat task
+					MissionTask task = new MissionTask(t_desc, skill, skill_mod, alt_skill, alt_mod);
+					tasks.add(task);
+				}
+				
+				//get success
+				JSONObject success_obj = json_obj.getJSONObject("success");
+				boolean success_all = success_obj.optBoolean("all", false);
+				int success_cred = success_obj.optInt("hacker_cred", 0);
+				int success_cash = success_obj.optInt("cash", 0);
+				int success_entropy = success_obj.optInt("entropy_card", 0);
+				String success_desc = success_obj.optString("desc", "");
+				
+				//create success object
+				MissionSuccess success = new MissionSuccess(success_desc, success_cred, success_cash, success_entropy, success_all);
+				
+				//get failure
+				JSONObject failure_obj = json_obj.getJSONObject("failure");
+				boolean failure_all = failure_obj.optBoolean("all", false);
+				int failure_cred = failure_obj.optInt("hacker_cred", 0);
+				int failure_cash = failure_obj.optInt("cash", 0);
+				int failure_entropy = failure_obj.optInt("entropy_card", 0);
+				String failure_desc = failure_obj.optString("desc", "");
+				
+				//create failure object
+				MissionFailure failure = new MissionFailure(failure_desc, failure_cred, failure_cash, failure_entropy, failure_all);
+				
+				//create the card object
+				MissionCard card = new MissionCard(title, desc, tasks, success, failure, newb);
 				cards.add(card);
 			}
 		} catch (JSONException e) {		
