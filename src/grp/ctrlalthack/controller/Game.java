@@ -8,9 +8,9 @@
 package grp.ctrlalthack.controller;
 
 import grp.ctrlalthack.data.DataIO;
-import grp.ctrlalthack.model.EntropyCard;
 import grp.ctrlalthack.model.HackerCard;
 import grp.ctrlalthack.model.Player;
+import grp.ctrlalthack.model.entropy.EntropyCard;
 import grp.ctrlalthack.model.mission.MissionCard;
 
 import java.util.ArrayList;

@@ -7,8 +7,12 @@
 
 package grp.ctrlalthack.model;
 
+import grp.ctrlalthack.model.entropy.EntropyCard;
+import grp.ctrlalthack.model.entropy.SkillModifier;
+
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Player implements Serializable {
 	
@@ -24,6 +28,12 @@ public class Player implements Serializable {
 	private int cash; //number of player money
 	private HackerCard character; //character card of the player
 	private ArrayList<EntropyCard> entropy_cards; //entropy cards on hand
+	
+	//entropy cards in play
+	private ArrayList<EntropyCard> entropy_in_play = new ArrayList<EntropyCard>();
+	
+	//skill modifier
+	private HashMap<String,Integer> bot_skill_modifiers = new HashMap<String,Integer>(); //skill modifiers from BoT cards
 	
 	//status values
 	private boolean ready_to_start; //indicates if is ready to start game
@@ -128,6 +138,50 @@ public class Player implements Serializable {
 	 */
 	public void setCharacter(HackerCard hacker) {
 		this.character = hacker;
+	}
+	
+	/**
+	 * Get skill modifier
+	 */
+	public HashMap<String, Integer> getBoTSkillModifiers() {
+		return bot_skill_modifiers;
+	}
+	
+	/**
+	 * get single skill modifier
+	 */
+	public int getBoTSkillModifier(String skill) {		
+		Integer skill_val = this.bot_skill_modifiers.get(skill);
+		return (  skill_val == null ) ? 0 : skill_val;
+	}
+	
+	/**
+	 * Adds a skill
+	 */
+	private void addSkillModifier(SkillModifier skill_mod) {
+		if ( skill_mod != null ) {
+			//get current modify value
+			Integer curr = this.bot_skill_modifiers.get(skill_mod.getSkill());
+			//add modify value to current value
+			if ( curr != null ) {
+				curr += skill_mod.getSkillModifier();
+			} else {
+				curr = skill_mod.getSkillModifier();
+			}
+		}
+	}
+	
+	
+	/**
+	 * @return the value for a specific skill
+	 */
+	public int getSkill(String skill) {		
+		//first get unmodified value
+		int orig = this.getCharacter().getSkill(skill);
+		//bot skill modifier
+		int bot_mod = this.getBoTSkillModifier(skill);
+		//return modified val
+		return orig + bot_mod;
 	}
 	
 	//status values

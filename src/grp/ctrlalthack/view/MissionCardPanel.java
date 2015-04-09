@@ -57,7 +57,7 @@ public class MissionCardPanel extends JPanel {
 	private JLabel lbl_name;
 
 	
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -70,7 +70,7 @@ public class MissionCardPanel extends JPanel {
 				}
 			}
 		});
-	}
+	}*/
 	
 	/**
 	 * Create the panel.

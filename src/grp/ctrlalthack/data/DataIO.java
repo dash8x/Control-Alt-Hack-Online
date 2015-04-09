@@ -9,6 +9,8 @@ package grp.ctrlalthack.data;
 
 import grp.ctrlalthack.model.GameConstants;
 import grp.ctrlalthack.model.HackerCard;
+import grp.ctrlalthack.model.entropy.BoTSkillModCard;
+import grp.ctrlalthack.model.entropy.SkillModifier;
 import grp.ctrlalthack.model.mission.MissionCard;
 import grp.ctrlalthack.model.mission.MissionFailure;
 import grp.ctrlalthack.model.mission.MissionSuccess;
@@ -29,6 +31,7 @@ public class DataIO implements GameConstants {
 	//constants
 	private static final String RESOURCES = "/resources";
 	private static final String CARDS = "/cards";
+	private static final String ENTROPY_CARDS = CARDS + "/entropy_cards";
 	
 	/**
 	 * reads hacker cards
@@ -59,6 +62,46 @@ public class DataIO implements GameConstants {
 				
 				//create the card object
 				HackerCard card = new HackerCard(name, desc, skills, kitchen_sink);
+				cards.add(card);
+			}
+		} catch (JSONException e) {		
+			System.out.println(json_obj);
+			e.printStackTrace();
+		}	
+		return cards;
+	}
+	
+	/**
+	 * reads BoT skill modifier cards
+	 */
+	public static ArrayList<BoTSkillModCard> readBoTSkillModCards() {
+		ArrayList<BoTSkillModCard> cards = new ArrayList<BoTSkillModCard>(); 
+		JSONObject json_obj = null;
+		try {
+			String contents = readFile(ENTROPY_CARDS + "/bag_of_tricks_skill_mod.json");
+			JSONArray json_array = new JSONArray(contents);			
+			for ( int i = 0; i < json_array.length(); i++ ) {
+				json_obj = (JSONObject) json_array.get(i);
+				
+				//fields
+				String title = json_obj.getString("card_title");
+				String desc = json_obj.getString("card_desc");
+				int cost = json_obj.getInt("cost");				
+				
+				//get the skill modifiers
+				ArrayList<SkillModifier> skills_mods = new ArrayList<SkillModifier>();
+				JSONArray skills_json = json_obj.getJSONArray("skills");
+				for ( int x = 0; x < skills_json.length(); x++ ) {
+					JSONObject skill_obj = (JSONObject) skills_json.get(x);
+					String skill = skill_obj.getString("skill");
+					int val = skill_obj.getInt("mod");
+					
+					SkillModifier skill_mod = new SkillModifier(skill, val);					
+					skills_mods.add(skill_mod);
+				}
+				
+				//create the card object
+				BoTSkillModCard card = new BoTSkillModCard(title, desc, cost, skills_mods);
 				cards.add(card);
 			}
 		} catch (JSONException e) {		

@@ -62,7 +62,7 @@ public class HackerCardPanel extends JPanel {
 	private ArrayList<SkillLabel> skill_labels;
 	private ArrayList<SkillLabel> skill_values;
 	
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -75,7 +75,7 @@ public class HackerCardPanel extends JPanel {
 				}
 			}
 		});
-	}
+	}*/
 	
 	/**
 	 * Create the panel.
