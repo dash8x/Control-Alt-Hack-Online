@@ -11,6 +11,7 @@
 
 package grp.ctrlalthack.net;
 
+import grp.ctrlalthack.model.HackerCard;
 import grp.ctrlalthack.model.Player;
 
 import java.io.IOException;
@@ -263,6 +264,16 @@ public class ServerService implements Runnable, NetworkConstants, ProtocolConsta
 		this.sendResponse(new Response(RESP_PLAYERS, params));
 	}
 	
+	/**
+     * Sends a CHARACTER_CHOICES response to the client
+     * @param courses
+     */
+	private void sendCharacterChoices(HackerCard[] cards) {
+		HashMap<String,Object> params = new HashMap<String,Object>(); 
+		params.put("characters", cards);
+		this.sendResponse(new Response(RESP_CHARACTER_CHOICES, params));
+	}
+	
     /**
      * Handles commands
      * @param request the Command
@@ -273,6 +284,12 @@ public class ServerService implements Runnable, NetworkConstants, ProtocolConsta
     	switch(keyword) {
 	    	case CMD_READY_TO_START:
 	    		readyToStart(keyword, params);
+				break;
+	    	case CMD_START_GAME:
+	    		handleStartGame(keyword, params);
+				break;
+	    	case CMD_GET_CHARACTER_CHOICES:
+	    		getCharacterChoices(keyword, params);
 				break;
 	    	case CMD_GET_PLAYERS:
 	    		getPlayers(keyword, params);
@@ -288,6 +305,40 @@ public class ServerService implements Runnable, NetworkConstants, ProtocolConsta
     }
     
     /**
+     * Character choices
+     */
+    private void getCharacterChoices(String keyword, HashMap<String, Object> params) {
+		if ( this.server.getGame().inChooseCharacter() ) {
+			try {
+				this.sendCharacterChoices(this.getPlayer().getCharacterChoices());
+			} catch ( Exception e ) {
+				this.sendFail(keyword, e.getMessage());
+				return;
+			}
+		} else {
+			this.sendFail(keyword, "Game not in character choosing stage.");
+		}
+	}
+
+	/**
+     * start game
+     */
+    private void handleStartGame(String keyword, HashMap<String, Object> params) {
+		if ( !this.getPlayer().isHost() ) {
+			this.sendFail(keyword, "Only the host can start the game.");
+		} else {
+			try {
+				this.server.getGame().startGame();
+				this.sendSuccess("Starting the game now");
+				setAllUpdated(FLAG_CHOOSE_CHARACTERS);
+			} catch ( Exception e ) {
+				this.sendFail(keyword, e.getMessage());
+				return;
+			}
+		}
+	}
+
+	/**
 	 * Process READY_TO_START
 	 */
 	private void readyToStart(String keyword, HashMap<String, Object> params) {		

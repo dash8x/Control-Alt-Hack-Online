@@ -12,6 +12,7 @@ import grp.ctrlalthack.model.HackerCard;
 import grp.ctrlalthack.model.entropy.BoTAutoSuccessCard;
 import grp.ctrlalthack.model.entropy.BoTFreeRerollCard;
 import grp.ctrlalthack.model.entropy.BoTSkillModCard;
+import grp.ctrlalthack.model.entropy.EntropyCard;
 import grp.ctrlalthack.model.entropy.SkillModifier;
 import grp.ctrlalthack.model.mission.MissionCard;
 import grp.ctrlalthack.model.mission.MissionFailure;
@@ -70,6 +71,18 @@ public class DataIO implements GameConstants {
 			System.out.println(json_obj);
 			e.printStackTrace();
 		}	
+		return cards;
+	}
+	
+	/**
+	 * reads all entropy cards
+	 */
+	public static ArrayList<EntropyCard> readEntropyCards() {
+		ArrayList<EntropyCard> cards = new ArrayList<EntropyCard>(); 
+		//all bag of tricks cards
+		cards.addAll(readBoTSkillModCards());
+		cards.addAll(readBoTFreeRerollCards());
+		cards.addAll(readBoTAutoSuccessCards());
 		return cards;
 	}
 	

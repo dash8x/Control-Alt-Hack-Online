@@ -5,7 +5,7 @@
  * @arthor_uri http://arushad.org  
  */
 
-package grp.ctrlalthack.net;
+package grp.ctrlalthack.net.exception;
 
 public class ResponseException extends NetworkException {
 	

@@ -8,6 +8,7 @@
 package grp.ctrlalthack.controller;
 
 import grp.ctrlalthack.data.DataIO;
+import grp.ctrlalthack.model.GameConstants;
 import grp.ctrlalthack.model.HackerCard;
 import grp.ctrlalthack.model.Player;
 import grp.ctrlalthack.model.entropy.EntropyCard;
@@ -15,7 +16,9 @@ import grp.ctrlalthack.model.mission.MissionCard;
 
 import java.util.ArrayList;
 
-public class Game {
+import javax.xml.crypto.Data;
+
+public class Game implements GameConstants {
 		
 	public static final int MAX_PLAYERS = 6; //absolute max number of players allowed
 	public static final int MIN_PLAYERS = 3; //absolute min number of players allowed
@@ -29,8 +32,11 @@ public class Game {
 	private int round; //round number of the game
 	private int phase; //phase of the game
 	
+	//autonumber generator
+	private int last_id = 0;
+	
 	//status values
-	private boolean has_started;
+	private int game_status;
 	
 	/**
 	 * Constructor
@@ -38,11 +44,12 @@ public class Game {
 	public Game() {
 		this.round = 1;
 		this.players = new ArrayList<Player>();
-		this.entropy_deck = new ArrayList<EntropyCard>();
+		this.entropy_deck = DataIO.readEntropyCards();
 		this.entropy_discard = new ArrayList<EntropyCard>();
-		this.missions_deck = new ArrayList<MissionCard>();
+		this.missions_deck = DataIO.readMissionCards();
 		this.missions_played = new ArrayList<MissionCard>();
 		this.hacker_cards = DataIO.readHackerCards();
+		this.setGameStatus(STATUS_WAITING_TO_START);
 	}
 	
 	/**
@@ -112,14 +119,18 @@ public class Game {
 	public void addPlayer(Player new_player) {
 		//check if game has started
 		if (this.hasStarted()) {
-			throw new IllegalArgumentException("Game has already started");
+			throw new GameException("Game has already started");
 		} else {
 			//check if game is full
 			if (this.getNumPlayers() == MAX_PLAYERS) {
-				throw new IllegalArgumentException("Game is full");
+				throw new GameException("Game is full");
 			} else {		
-				//set the id of the player
-				new_player.setPlayerID(this.getNumPlayers() + 1);
+				//if first player, set as host
+				if ( last_id == 0 ) {
+					new_player.setHost(true);
+				}				
+				//set the id of the player			
+				new_player.setPlayerID(this.last_id + 1);
 				this.players.add(new_player);				
 			}
 		}
@@ -139,21 +150,110 @@ public class Game {
 	/**
 	 * Method to get a random object from an ArrayList
 	 */
-	public static Object getRandomElement(ArrayList<Object> list) {
+	public static Object getRandomElement(ArrayList list) {
 		Object elem = null;
-		if ( list != null ) {
+		if ( list != null || list.size() != 0 ) {
 			elem = list.get((int)(Math.random() * list.size()));
+		} else {
+			throw new IndexOutOfBoundsException("List is empty, cannot get random choice.");
 		}
 		return elem;
 	}
 	
+	/**
+	 * pop a hacker card
+	 */
+	private HackerCard getHackerCard() {
+		return (HackerCard) getRandomElement(this.hacker_cards);
+	}
+	
+	/**
+	 * pop an entropy card
+	 */
+	private EntropyCard getEntropyCard() {
+		return (EntropyCard) getRandomElement(this.entropy_deck);
+	}
+	
+	/**
+	 * Starts the game
+	 */
+	public void startGame() {
+		//check if game has started
+		if (this.hasStarted()) {
+			throw new GameException("Game has already started");
+		} else if (this.getNumPlayers() < MIN_PLAYERS) {
+			throw new GameException("Not enough players.");
+		} else {
+			//check if all players are ready to start
+			for ( Player p : this.getPlayers() ) {
+				if ( !p.isReadyToStart() ) {
+					throw new GameException(p.getPlayerName() + " is not ready.");					
+				}
+			}
+			//start the game
+			this.setGameStatus(STATUS_CHOOSE_CHARACTER);
+			//assign character card choices to the players
+			this.distributeCharacters();
+		}
+	}
+	
+	/**
+	 * Distributes character cards
+	 */
+	private void distributeCharacters() {
+		if ( inChooseCharacter() ) {
+			//choose number of cards to give
+			int num_cards = (this.getNumPlayers() == MAX_PLAYERS) ? 2 : 3;			
+			for ( Player p : this.getPlayers() ) {
+				//reset entropy cards
+				p.emptyEntropyCards();
+				//give cash and creds
+				p.emptyCash();
+				p.emptyHackerCreds();
+				p.addHackerCreds(START_CREDS);
+				//distribute the cards
+				HackerCard[] cards = new HackerCard[num_cards];
+				for ( int i = 0; i < cards.length; i++) {
+					cards[i] = getHackerCard();					
+				}
+				p.setCharacterChoices(cards);
+				//give entropy cards
+				for ( int i = 0; i < 3; i++ ) {
+					p.addEntropyCard(this.getEntropyCard());
+				}
+			}
+		} else {
+			throw new GameException("Not in choose character stage");
+		}
+		
+	}
+
 	//status values
+	/**
+	 * Sets the game status
+	 */
+	public void setGameStatus(int status) {
+		this.game_status = status;
+	}
+	
+	/**
+	 * Returns the game status
+	 */
+	public int getGameStatus() {
+		return this.game_status;
+	}
 	
 	/**
 	 * checks if game has started
 	 */
 	public boolean hasStarted() {
-		return this.has_started;
+		return this.getGameStatus() != STATUS_WAITING_TO_START;
 	}
 	
+	/**
+	 * checks if game is int choose character stage
+	 */
+	public boolean inChooseCharacter() {
+		return this.getGameStatus() == STATUS_CHOOSE_CHARACTER;
+	}
 }

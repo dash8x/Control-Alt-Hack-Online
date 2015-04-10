@@ -7,7 +7,9 @@
 
 package grp.ctrlalthack.model.entropy;
 
-public abstract class EntropyCard {	
+import java.io.Serializable;
+
+public abstract class EntropyCard implements Serializable {	
 	
 	//common fields
 	protected String title; //card title

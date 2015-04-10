@@ -11,6 +11,7 @@ public interface NetworkConstants {
 	
 	//update flag constants
 	public final static String FLAG_PLAYERS = "PLAYERS";
+	public final static String FLAG_CHOOSE_CHARACTERS = "CHOOSE_CHARACTERS";
 	
 	//logging constants
 	public final static String ERROR_MSG = "ERROR";

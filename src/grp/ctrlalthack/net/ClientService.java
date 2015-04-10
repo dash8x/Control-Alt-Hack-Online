@@ -19,10 +19,13 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.JOptionPane;
 
+import grp.ctrlalthack.model.HackerCard;
 import grp.ctrlalthack.model.Player;
-import grp.ctrlalthack.net.Command;
-import grp.ctrlalthack.net.InvalidResponseException;
-import grp.ctrlalthack.net.Response;
+import grp.ctrlalthack.net.exception.ClientException;
+import grp.ctrlalthack.net.exception.ErrorResponseException;
+import grp.ctrlalthack.net.exception.FailResponseException;
+import grp.ctrlalthack.net.exception.InvalidResponseException;
+import grp.ctrlalthack.net.exception.NoResponseException;
 import grp.ctrlalthack.view.CardPanel;
 import grp.ctrlalthack.view.CardParent;
 
@@ -162,6 +165,10 @@ public class ClientService implements NetworkConstants, ProtocolConstants {
 		switch (updated) {
 			case FLAG_PLAYERS:
 				client_ui.updatePlayers();
+				break;
+			case FLAG_CHOOSE_CHARACTERS:
+				client_ui.openChooseCharacter(getCharacterChoices());
+				break;
 		}			
 	}	
 	
@@ -330,6 +337,34 @@ public class ClientService implements NetworkConstants, ProtocolConstants {
 		if ( !reply.getKeyword().equals(RESP_SUCCESS) ) {						
 			throw new InvalidResponseException("Invalid response received from server for " + CMD_READY_TO_START);
 		}						
+	}
+	
+	/**
+	 * send start game command
+	 */	
+	public void startGame() {
+		//send the command to the server
+		Response reply = this.sendResponseCommand(new Command(CMD_START_GAME, null));						
+				
+		//get the result from the response
+		if ( !reply.getKeyword().equals(RESP_SUCCESS) ) {						
+			throw new InvalidResponseException("Invalid response received from server for " + CMD_READY_TO_START);
+		}						
+	}
+	
+	/**
+	 * get character choices
+	 */	
+	public HackerCard[] getCharacterChoices() {
+		//send the command to the server
+		Response reply = this.sendResponseCommand(new Command(CMD_GET_CHARACTER_CHOICES, null));						
+				
+		//get the result from the response
+		if ( !reply.getKeyword().equals(RESP_CHARACTER_CHOICES) ) {						
+			throw new InvalidResponseException("Invalid response received from server for " + CMD_READY_TO_START);
+		}	
+		
+		return (HackerCard[]) reply.getParam("characters");
 	}
 	
 	/**

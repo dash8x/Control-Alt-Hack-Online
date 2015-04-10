@@ -1,18 +1,18 @@
 /**
- * Superclass for all Network related Exceptions
+ * Superclass for all Response related Exceptions
  * 
  * @author Arushad Ahmed
  * @arthor_uri http://arushad.org  
  */
 
-package grp.ctrlalthack.net;
+package grp.ctrlalthack.net.exception;
 
-public class NetworkException extends RuntimeException {
-	
+public class ServerException extends NetworkException {	
+
 	/**
 	 * Empty Constructor
 	 */
-	public NetworkException(){
+	public ServerException(){
 		super();
 	}
 	
@@ -20,7 +20,7 @@ public class NetworkException extends RuntimeException {
 	 * Constructor
 	 * @param message error message
 	 */
-	public NetworkException(String message){
+	public ServerException(String message){
 		super(message);
 	}
 }

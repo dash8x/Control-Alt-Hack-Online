@@ -80,9 +80,15 @@ public class HackerCardPanel extends JPanel {
 	/**
 	 * Create the panel.
 	 */
+	public HackerCardPanel() {
+		this(null);
+	}
+	
+	/**
+	 * Create the panel.
+	 */
 	public HackerCardPanel(HackerCard card) {
-		
-		this.card = card;
+				
 		this.skill_labels = new ArrayList<SkillLabel>();
 		this.skill_values = new ArrayList<SkillLabel>();
 		
@@ -288,9 +294,17 @@ public class HackerCardPanel extends JPanel {
 		skill_values.add(lbl_val_8);
 		
 		//fill in the values
-		populateFields();
+		this.setCard(card);		
 	}
 	
+	/**
+	 * Sets the card
+	 */
+	public void setCard(HackerCard card) {
+		this.card = card;
+		populateFields();
+	}
+
 	/**
 	 * Populate the fields
 	 */
@@ -319,6 +333,9 @@ public class HackerCardPanel extends JPanel {
 			    	val.setVisible(false);
 			    }
 		    }
+		    this.setVisible(true);
+		} else {
+			this.setVisible(false);
 		}
 	}
 

@@ -7,9 +7,11 @@
 
 package grp.ctrlalthack.model.entropy;
 
+import java.io.Serializable;
+
 import grp.ctrlalthack.model.HackerCard;
 
-public class SkillModifier {	
+public class SkillModifier implements Serializable {	
 	
 	//fields
 	private String skill; //the skill to roll for

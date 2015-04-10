@@ -34,5 +34,10 @@ public interface GameConstants {
 	//misc
 	public static final int INFINITE_SKILL = -1;
 	public static final int START_CASH = 2000;
+	public static final int START_CREDS = 6;
+	
+	//game status
+	public static final int STATUS_WAITING_TO_START = 0;
+	public static final int STATUS_CHOOSE_CHARACTER = 1;
 
 }

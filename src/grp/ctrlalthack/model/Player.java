@@ -36,7 +36,11 @@ public class Player implements Serializable {
 	private HashMap<String,Integer> bot_skill_modifiers = new HashMap<String,Integer>(); //skill modifiers from BoT cards
 	
 	//status values
+	private boolean is_host = false;
 	private boolean ready_to_start; //indicates if is ready to start game
+	
+	//hacker card choices
+	private HackerCard[] character_choices;
 	
 	/**
 	 * Constructor
@@ -54,6 +58,23 @@ public class Player implements Serializable {
 	}	
 
 	/**
+	 * Sets the character choices
+	 */
+	public void setCharacterChoices(HackerCard[] cards) {
+		if ( cards == null || cards.length > 3 ) {
+			throw new IllegalArgumentException("Invalid number of character choices.");
+		}
+		this.character_choices = cards;
+	}
+	
+	/**
+	 * returns the character choices
+	 */
+	public HackerCard[] getCharacterChoices() {		
+		return this.character_choices;
+	}
+	
+	/**
 	 * @return the name
 	 */
 	public String getPlayerName() {
@@ -65,6 +86,20 @@ public class Player implements Serializable {
 	 */
 	public String getPlayerIP() {
 		return ip;
+	}
+	
+	/**
+	 * Sets the host flag
+	 */
+	public void setHost(boolean is_host) {
+		this.is_host = is_host;
+	}
+	
+	/**
+	 * Checks if is host player
+	 */
+	public boolean isHost() {
+		return this.is_host;
 	}
 	
 	/**
@@ -110,13 +145,67 @@ public class Player implements Serializable {
 	}		
 	
 	/**
+	 * @return the entropy_cards in play
+	 */
+	public ArrayList<EntropyCard> getEntropyCardsInPlay() {
+		return entropy_in_play;
+	}
+	
+	/**
 	 * Adds an entropy card
 	 */
 	public void addEntropyCard(EntropyCard card) {
 		if ( card == null ) {
-			throw new NullPointerException("Entropy card cannot be null");
+			throw new IllegalArgumentException("Entropy card cannot be null");
 		}
 		this.entropy_cards.add(card);
+	}
+	
+	/**
+	 * Empty the entropy cards 
+	 */
+	public ArrayList<EntropyCard> emptyEntropyCards() {
+		ArrayList<EntropyCard> purge = new ArrayList<EntropyCard>();
+		purge.addAll(this.getEntropyCards());
+		purge.addAll(this.getEntropyCardsInPlay());
+		//reset the entropy cards
+		this.entropy_cards = new ArrayList<EntropyCard>();
+		this.entropy_in_play = new ArrayList<EntropyCard>();
+		this.bot_skill_modifiers = new HashMap<String, Integer>();
+		
+		return purge;
+	}
+	
+	/**
+	 * Empty the cash
+	 */
+	public int emptyCash() {
+		int curr_cash = this.getCash();
+		this.cash = 0;
+		return curr_cash;
+	}
+	
+	/**
+	 * remove cash
+	 */
+	public void removeCash(int amount) {
+		this.cash = Math.max(0, this.getCash() - amount);
+	}
+	
+	/**
+	 * Empty the hacker creds
+	 */
+	public int emptyHackerCreds() {
+		int curr_creds = this.getHackerCreds();
+		this.hacker_creds = 0;
+		return curr_creds;
+	}
+	
+	/**
+	 * remove creds
+	 */
+	public void removeHackerCreds(int amount) {
+		this.hacker_creds = Math.max(0, this.getHackerCreds() - amount);
 	}
 	
 	/**

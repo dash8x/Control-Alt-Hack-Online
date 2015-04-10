@@ -12,9 +12,10 @@ import grp.ctrlalthack.model.perks.HackerCredPenalty;
 import grp.ctrlalthack.model.perks.Perk;
 import grp.ctrlalthack.model.perks.StartCash;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
-public class HackerCard implements GameConstants {
+public class HackerCard implements GameConstants, Serializable {
 	
 	private String name; //name of the character
 	private String desc; //character description

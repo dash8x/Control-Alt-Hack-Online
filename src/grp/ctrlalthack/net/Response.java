@@ -8,6 +8,8 @@
 
 package grp.ctrlalthack.net;
 
+import grp.ctrlalthack.model.HackerCard;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -24,7 +26,8 @@ public class Response extends Protocol {
 	
 	//allowed responses
 	public static final Set<String> RESPONSES = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
-			new String[]{RESP_CHECK_UPDATED, RESP_TERMINATE, RESP_ERROR, RESP_SUCCESS, RESP_FAIL, RESP_PLAYERS}
+			new String[]{RESP_CHECK_UPDATED, RESP_TERMINATE, RESP_ERROR, RESP_SUCCESS,
+					RESP_FAIL, RESP_PLAYERS, RESP_CHARACTER_CHOICES}
 			)));
 	
 	/**
@@ -41,7 +44,9 @@ public class Response extends Protocol {
 	 */
 	@Override
 	public boolean isValidParams(String response, HashMap<String,Object> params) {
-		switch(response) {				
+		switch(response) {	
+			case RESP_CHARACTER_CHOICES:
+				return params != null && params.size() == 1 && (params.get("characters") instanceof HackerCard[]);
 			case RESP_ERROR:
 				return params != null && params.size() == 1 && (params.get("message") instanceof String);
 			case RESP_SUCCESS:

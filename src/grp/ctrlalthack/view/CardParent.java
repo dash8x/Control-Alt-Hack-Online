@@ -8,6 +8,7 @@
 
 package grp.ctrlalthack.view;
 
+import grp.ctrlalthack.model.HackerCard;
 import grp.ctrlalthack.model.Player;
 import grp.ctrlalthack.net.ClientService;
 import grp.ctrlalthack.net.Server;
@@ -33,7 +34,8 @@ public class CardParent extends JPanel implements ViewConstants {
 	private StartServerPanel start_server_panel;
 	private JoinServerPanel join_server_panel;
 	private ServerLobbyPanel server_lobby_panel;
-		
+	private ChooseCharacterPanel choose_character_panel;
+	
 	/**
 	 * Constructor
 	 */
@@ -221,8 +223,12 @@ public class CardParent extends JPanel implements ViewConstants {
 	 * Starts the game
 	 */
 	public void startGame() {
-		// TODO Auto-generated method stub
-		
+		this.readyToStart();
+		try {
+			this.getClient().startGame();			
+		} catch (Exception e) {
+			showError(e.getMessage());
+		}
 	}
 	
 	/**
@@ -234,4 +240,12 @@ public class CardParent extends JPanel implements ViewConstants {
 		navigateTo(SERVER_LOBBY_PANEL);	
 	}
 	
+	/**
+	 * Creates the choose character
+	 */
+	public void openChooseCharacter(HackerCard[] cards) {
+		choose_character_panel = new ChooseCharacterPanel(this, cards);
+		this.add(choose_character_panel, CHOOSE_CHARACTER_PANLE);
+		navigateTo(CHOOSE_CHARACTER_PANLE);	
+	}
 }
