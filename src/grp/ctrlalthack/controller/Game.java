@@ -9,6 +9,7 @@ package grp.ctrlalthack.controller;
 
 import grp.ctrlalthack.data.DataIO;
 import grp.ctrlalthack.model.GameConstants;
+import grp.ctrlalthack.model.GameStats;
 import grp.ctrlalthack.model.HackerCard;
 import grp.ctrlalthack.model.Player;
 import grp.ctrlalthack.model.entropy.EntropyCard;
@@ -31,6 +32,7 @@ public class Game implements GameConstants {
 	private ArrayList<HackerCard> hacker_cards; //available hacker cards	
 	private int round; //round number of the game
 	private int phase; //phase of the game
+	private Player current_player; //the current player 
 	
 	//autonumber generator
 	private int last_id = 0;
@@ -64,6 +66,24 @@ public class Game implements GameConstants {
 	 */
 	public int getPhase() {
 		return this.phase;
+	}
+	
+	/**
+	 * Returns the current player
+	 */
+	public Player getCurrentPlayer() {
+		return this.current_player;
+	}
+	
+	/**
+	 * return game stats
+	 */
+	public GameStats getGameStats() {
+		String player = "";
+		if ( getCurrentPlayer() != null ) {
+			player = getCurrentPlayer().getPlayerName();
+		}
+		return new GameStats(getTotalHackerCreds(), getTotalCash(), getRound(), getPhase(), player);
 	}
 	
 	/**
