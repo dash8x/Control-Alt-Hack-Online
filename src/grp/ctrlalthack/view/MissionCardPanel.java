@@ -22,6 +22,7 @@ import java.awt.GridBagLayout;
 
 import javax.swing.JLabel;
 
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -89,6 +90,7 @@ public class MissionCardPanel extends JPanel {
 		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		setLayout(gridBagLayout);
 		Border lbl_perk_padding = BorderFactory.createEmptyBorder(10,10,10,10);
+		setPreferredSize(new Dimension(250, 350));
 		
 		lbl_name = new JLabel("MISSION");
 		lbl_name.setHorizontalAlignment(SwingConstants.CENTER);
