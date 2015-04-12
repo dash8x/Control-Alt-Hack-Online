@@ -245,6 +245,14 @@ public class MissionCardPanel extends JPanel {
 	}
 	
 	/**
+	 * Set card
+	 */
+	public void setCard(MissionCard card) {
+		this.card = card;
+		populateFields();
+	}
+	
+	/**
 	 * Populate the fields
 	 */
 	private void populateFields() {
@@ -274,6 +282,9 @@ public class MissionCardPanel extends JPanel {
 				} catch (IndexOutOfBoundsException e) {					
 				}
 		    }
+		    this.setVisible(true);
+		} else {
+			this.setVisible(false);
 		}
 	}
 

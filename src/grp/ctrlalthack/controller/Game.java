@@ -30,8 +30,8 @@ public class Game implements GameConstants {
 	private ArrayList<MissionCard> missions_deck; //unplayed missions
 	private ArrayList<MissionCard> missions_played; //played missions
 	private ArrayList<HackerCard> hacker_cards; //available hacker cards	
-	private int round; //round number of the game
-	private int phase; //phase of the game
+	private int round = 0; //round number of the game
+	private int phase = 0; //phase of the game
 	private Player current_player; //the current player 
 	
 	//autonumber generator
@@ -44,7 +44,6 @@ public class Game implements GameConstants {
 	 * Constructor
 	 */
 	public Game() {
-		this.round = 1;
 		this.players = new ArrayList<Player>();
 		this.entropy_deck = DataIO.readEntropyCards();
 		this.entropy_discard = new ArrayList<EntropyCard>();
@@ -195,6 +194,13 @@ public class Game implements GameConstants {
 	}
 	
 	/**
+	 * pop a mission card
+	 */
+	private MissionCard getMissionCard() {
+		return (MissionCard) getRandomElement(this.missions_deck);
+	}
+	
+	/**
 	 * Starts the game
 	 */
 	public void startGame() {
@@ -216,6 +222,74 @@ public class Game implements GameConstants {
 			this.distributeCharacters();
 		}
 	}
+	
+	/**
+	 * Check if everyone choose the characters
+	 */
+	public boolean allCharactersChosen() {		
+		//check if game has started
+		if (this.hasStarted()) {			
+			//check if all players are ready to start
+			for ( Player p : this.getPlayers() ) {
+				if ( !p.characterChosen() ) {
+					return false;					
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Check if round has finished
+	 */
+	public boolean hasRoundFinished() {		
+		//check if game has started
+		if (this.hasStarted() && this.getPhase() == 7) {			
+			//check if all players are ready to start
+			for ( Player p : this.getPlayers() ) {
+				if ( !p.hasPlayed() ) {
+					return false;					
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Start a new round
+	 */
+	public void startRound() {
+		if (this.hasStarted()) {
+			//reset current player
+			this.current_player = null;
+			this.setPhase(1);
+			this.round++;
+			//reset all players for the round
+			for ( Player p : this.getPlayers() ) {
+				//remove the mission
+				MissionCard ms = p.removeMission();
+				if ( ms != null ) {
+					this.missions_played.add(ms);
+				}
+				p.resetRound();	
+				//give cash
+				p.addCash(p.getCharacter().getStartCash());
+				//give entropy card
+				p.addEntropyCard(getEntropyCard());
+				//give mission
+				p.setMission(getMissionCard());
+			}
+		} else {
+			throw new GameException("Game has not started yet");
+		}
+	}
+	
+	/**
+	 * Determine a start player
+	 */
+	//TODO
 	
 	/**
 	 * Distributes character cards

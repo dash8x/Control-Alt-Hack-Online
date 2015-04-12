@@ -182,7 +182,7 @@ public class ChooseCharacterPanel extends CardPanel implements ViewConstants {
 	 * Choose the card
 	 */
 	private void chooseCard(int card_id) {
-		
+		this.getParent().chooseCharacter(card_id);
 	}
 	
 	/**

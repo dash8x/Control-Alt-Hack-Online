@@ -9,6 +9,8 @@ package grp.ctrlalthack.model;
 
 import grp.ctrlalthack.model.entropy.EntropyCard;
 import grp.ctrlalthack.model.entropy.SkillModifier;
+import grp.ctrlalthack.model.mission.MissionCard;
+import grp.ctrlalthack.model.mission.MissionTask;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -27,7 +29,7 @@ public class Player implements Serializable {
 	private int hacker_creds; //number of hacker creds
 	private int cash; //number of player money
 	private HackerCard character; //character card of the player
-	private ArrayList<EntropyCard> entropy_cards; //entropy cards on hand
+	private ArrayList<EntropyCard> entropy_cards; //entropy cards on hand	
 	
 	//entropy cards in play
 	private ArrayList<EntropyCard> entropy_in_play = new ArrayList<EntropyCard>();
@@ -36,11 +38,19 @@ public class Player implements Serializable {
 	private HashMap<String,Integer> bot_skill_modifiers = new HashMap<String,Integer>(); //skill modifiers from BoT cards
 	
 	//status values
+	private boolean attending = false; 
 	private boolean is_host = false;
+	private boolean has_played = false;
 	private boolean ready_to_start; //indicates if is ready to start game
+	private boolean character_chosen = false;
+	private boolean is_my_turn; //checks if is player's turn
 	
 	//hacker card choices
 	private HackerCard[] character_choices;
+	
+	//mission to play
+	private MissionCard mission;
+	private int curr_task; //current task to play
 	
 	/**
 	 * Constructor
@@ -56,7 +66,105 @@ public class Player implements Serializable {
 		//status values
 		this.setReadyToStart(false);
 	}	
+	
+	/**
+	 * Check if played in the current phase
+	 */
+	public boolean hasPlayed() {
+		return this.has_played;
+	}
+	
+	/**
+	 * Set played to true
+	 */
+	public void setPlayed() {
+		this.has_played = true;
+	}
+	
+	/**
+	 * Check if is attending
+	 */
+	public void setAttending(boolean val) {
+		this.attending = val;
+	}
+	
+	/**
+	 * Check if is attending
+	 */
+	public boolean isAttending() {
+		return this.attending;
+	}
+	
+	/**
+	 * Reset for phase
+	 */
+	public void resetPhase() {
+		this.has_played = false;
+	}
+	
+	/**
+	 * Reset for round
+	 */
+	public void resetRound() {
+		resetPhase();
+		this.curr_task = -1;
+		this.setMission(null);
+		this.setAttending(false);
+	}
+	
+	/**
+	 * Sets the mission
+	 */
+	public void setMission(MissionCard mission) {
+		this.mission = mission;		
+	}
 
+	/**
+	 * Gets the mission
+	 */
+	public MissionCard getMission() {
+		return this.mission;		
+	}
+	
+	/**
+	 * Roll for a task
+	 */
+	public boolean playTask(int num) {
+		boolean success = false;
+		if (this.hasPlayed()) {
+			throw new PlayerException(this.getPlayerName() + " already played");
+		} else if ( this.isMyTurn() ) {
+			this.curr_task++;
+			MissionTask task = this.getMission().getTasks().get(this.curr_task);
+			//try if has infinite skill
+			if ( this.getSkill(task.getSkill()) == GameConstants.INFINITE_SKILL ) {
+				success = true;
+			} else {
+				//try main task
+				int number_to_beat = this.getSkill(task.getSkill()) - task.getSkillModifier();
+				if ( num <= number_to_beat) {
+					success = true;
+				} else if ( task.hasAltSkill() ) {
+					//try alt task
+					if ( this.getSkill(task.getAltSkill()) == GameConstants.INFINITE_SKILL ) {
+						success = true;
+					} else {						
+						number_to_beat = this.getSkill(task.getAltSkill()) - task.getAltSkillModifier();
+						if ( num <= number_to_beat) {
+							success = true;
+						}
+					}
+				}
+			}
+			//if failed end turn
+			
+			//check if last task
+		} else {
+			throw new PlayerException("Not " + this.getPlayerName() + "'s turn");
+		}
+		return success;
+	}
+	
 	/**
 	 * Sets the character choices
 	 */
@@ -73,6 +181,7 @@ public class Player implements Serializable {
 	public HackerCard[] getCharacterChoices() {		
 		return this.character_choices;
 	}
+	
 	
 	/**
 	 * @return the name
@@ -193,6 +302,15 @@ public class Player implements Serializable {
 	}
 	
 	/**
+	 * Remove the mission
+	 */
+	public MissionCard removeMission() {
+		MissionCard mission = this.getMission();
+		this.setMission(null);
+		return mission;
+	}
+	
+	/**
 	 * Empty the hacker creds
 	 */
 	public int emptyHackerCreds() {
@@ -273,6 +391,25 @@ public class Player implements Serializable {
 		return orig + bot_mod;
 	}
 	
+	/**
+	 * choose a character
+	 */
+	public void chooseCharacter(int i) {
+		if ( this.characterChosen() ) {
+			throw new PlayerException("Character already chosen for " + this.getPlayerName());
+		} else if ( this.getCharacterChoices() == null ) {
+			throw new PlayerException("Character choosing over");
+		} else {
+			try {
+				this.character = this.getCharacterChoices()[i];
+				this.character_choices = null;
+				this.character_chosen = true;
+			} catch (ArrayIndexOutOfBoundsException e) {
+				throw new PlayerException("Invalid character choice");
+			}
+		}
+	}
+	
 	//status values
 	/**
 	 * @return the ready_to_start
@@ -280,12 +417,33 @@ public class Player implements Serializable {
 	public boolean isReadyToStart() {
 		return ready_to_start;
 	}
-
+	
+	/**
+	 * get character choosen
+	 */
+	public boolean characterChosen() {
+		return this.character_chosen && this.getCharacter() != null;
+	}
+	
 	/**
 	 * @param ready_to_start the ready_to_start to set
 	 */
 	public void setReadyToStart(boolean ready_to_start) {
 		this.ready_to_start = ready_to_start;
+	}
+
+	/**
+	 * @return the is_my_turn
+	 */
+	public boolean isMyTurn() {
+		return is_my_turn;
+	}
+
+	/**
+	 * @param is_my_turn the is_my_turn to set
+	 */
+	public void setMyTurn(boolean is_my_turn) {
+		this.is_my_turn = is_my_turn;
 	}
 	
 }

@@ -28,7 +28,7 @@ public class Command extends Protocol {
 	public static final Set<String> COMMANDS = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
 			new String[]{CMD_CHECK_UPDATED, CMD_TERMINATE, CMD_INITIATE, CMD_GET_PLAYERS,
 					CMD_SELECT_CHARACTER, CMD_READY_TO_START, CMD_GET_CHARACTER_CHOICES,
-					CMD_START_GAME}
+					CMD_START_GAME, CMD_GET_MESSAGE, CMD_GET_GAME_STATS}
 			)));
 	
 	/**
@@ -55,6 +55,10 @@ public class Command extends Protocol {
 			case CMD_READY_TO_START:
 				return params == null || params.size() == 0;
 			case CMD_GET_PLAYERS:
+				return params == null || params.size() == 0;
+			case CMD_GET_GAME_STATS:
+				return params == null || params.size() == 0;
+			case CMD_GET_MESSAGE:
 				return params == null || params.size() == 0;
 			case CMD_CHECK_UPDATED:
 				return params == null || params.size() == 0;

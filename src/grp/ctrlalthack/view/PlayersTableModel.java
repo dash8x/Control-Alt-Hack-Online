@@ -67,7 +67,7 @@ public class PlayersTableModel extends AbstractTableModel {
 	 */
 	@Override
 	public Object getValueAt(int row, int col) {
-		Player player = this.players.get(row);
+		Player player = getRow(row);
 		//return the corresponding field
 		switch(col) {
 			case 0:
@@ -82,6 +82,13 @@ public class PlayersTableModel extends AbstractTableModel {
 		return null;
 	}
 		
+	/**
+	 * Returns the row
+	 */
+	public Player getRow(int row) {
+		return this.players.get(row);		
+	}
+	
 	/**
 	 * Returns the name of a given column
 	 */

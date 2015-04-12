@@ -19,7 +19,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.JOptionPane;
 
+import grp.ctrlalthack.model.GameStats;
 import grp.ctrlalthack.model.HackerCard;
+import grp.ctrlalthack.model.Message;
 import grp.ctrlalthack.model.Player;
 import grp.ctrlalthack.net.exception.ClientException;
 import grp.ctrlalthack.net.exception.ErrorResponseException;
@@ -163,11 +165,17 @@ public class ClientService implements NetworkConstants, ProtocolConstants {
 	 */
 	private void handleUpdate(String updated) {
 		switch (updated) {
+			case FLAG_MESSAGE:
+				client_ui.showMessage();
+				break;
 			case FLAG_PLAYERS:
 				client_ui.updatePlayers();
 				break;
+			case FLAG_GAME_STATS:
+				client_ui.updateGameStats();
+				break;
 			case FLAG_CHOOSE_CHARACTERS:
-				client_ui.openChooseCharacter(getCharacterChoices());
+				client_ui.openChooseCharacter();
 				break;
 		}			
 	}	
@@ -361,10 +369,64 @@ public class ClientService implements NetworkConstants, ProtocolConstants {
 				
 		//get the result from the response
 		if ( !reply.getKeyword().equals(RESP_CHARACTER_CHOICES) ) {						
-			throw new InvalidResponseException("Invalid response received from server for " + CMD_READY_TO_START);
+			throw new InvalidResponseException("Invalid response received from server for " + CMD_GET_CHARACTER_CHOICES);
 		}	
 		
 		return (HackerCard[]) reply.getParam("characters");
+	}
+	
+	/**
+	 * choose character
+	 */	
+	public void chooseCharacter(int i) {
+		//build params
+		HashMap<String, Object> params = new HashMap<String, Object>();
+		params.put("character", i);
+		
+		//send the command to the server
+		Response reply = this.sendResponseCommand(new Command(CMD_SELECT_CHARACTER, params));						
+				
+		//get the result from the response
+		if ( !reply.getKeyword().equals(RESP_SUCCESS) ) {						
+			throw new InvalidResponseException("Invalid response received from server for " + CMD_SELECT_CHARACTER);
+		}	
+		
+	}
+	
+	/**
+	 * Gets a message from the server
+	 */
+	public Message getMessage() {
+		//send the command to the server
+		Response reply = this.sendResponseCommand(new Command(CMD_GET_MESSAGE, null));		
+				
+		//initialize output array
+		Message message = null;
+				
+		//get the result from the response
+		if ( reply.getKeyword().equals(RESP_MESSAGE) ) {
+			message = (Message) reply.getParam("message");
+		} else {			
+			throw new InvalidResponseException("Invalid response received from server for GET MESSAGE");
+		}
+				
+		return message;
+	}
+	
+	/**
+	 * Gets game stats
+	 */
+	public GameStats getGameStats() {
+		//send the command to the server
+		Response reply = this.sendResponseCommand(new Command(CMD_GET_GAME_STATS, null));							
+				
+		//get the result from the response
+		if ( reply.getKeyword().equals(RESP_GAME_STATS) ) {
+			return (GameStats) reply.getParam("stats");
+		} else {			
+			throw new InvalidResponseException("Invalid response received from server for GET MESSAGE");
+		}
+
 	}
 	
 	/**

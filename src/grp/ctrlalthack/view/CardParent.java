@@ -8,7 +8,9 @@
 
 package grp.ctrlalthack.view;
 
+import grp.ctrlalthack.model.GameStats;
 import grp.ctrlalthack.model.HackerCard;
+import grp.ctrlalthack.model.Message;
 import grp.ctrlalthack.model.Player;
 import grp.ctrlalthack.net.ClientService;
 import grp.ctrlalthack.net.Server;
@@ -35,6 +37,9 @@ public class CardParent extends JPanel implements ViewConstants {
 	private JoinServerPanel join_server_panel;
 	private ServerLobbyPanel server_lobby_panel;
 	private ChooseCharacterPanel choose_character_panel;
+	private GamePanel game_panel;
+
+	private boolean game_open = false;
 	
 	/**
 	 * Constructor
@@ -56,6 +61,13 @@ public class CardParent extends JPanel implements ViewConstants {
 		//set to client mode by default
 		this.setMode(CLIENT_MODE);
 	}	
+	
+	/**
+	 * Check if game is open
+	 */
+	public boolean isGameOpen() {
+		return this.game_open && this.game_panel != null;
+	}
 	
 	/**
 	 * Sets the GUI mode
@@ -198,10 +210,26 @@ public class CardParent extends JPanel implements ViewConstants {
 	 * Updates the players list
 	 */
 	public void updatePlayers() {
-		if ( this.server_lobby_panel != null ) {
+		try {			
+			ArrayList<Player> players = this.getClient().getPlayers();					
+			if ( this.isGameOpen() ) {
+				this.game_panel.updatePlayers(players);
+			} else if ( this.server_lobby_panel != null ) {
+				this.server_lobby_panel.updatePlayers(players);	
+			}
+		} catch ( Exception e ) {
+			showError(e.getMessage());
+		}
+	}
+	
+	/**
+	 * Updates the players list
+	 */
+	public void updateGameStats() {
+		if ( this.isGameOpen() ) {						
 			try {
-				ArrayList<Player> players = this.getClient().getPlayers();
-				this.server_lobby_panel.updatePlayers(players);
+				GameStats stats = this.getClient().getGameStats();
+				this.game_panel.updateGameStats(stats);				
 			} catch ( Exception e ) {
 				showError(e.getMessage());
 			}
@@ -232,6 +260,46 @@ public class CardParent extends JPanel implements ViewConstants {
 	}
 	
 	/**
+	 * Choose character
+	 */
+	public void chooseCharacter(int i) {		
+		try {
+			this.getClient().chooseCharacter(i);	
+			openGamePanel();
+		} catch (Exception e) {
+			showError(e.getMessage());
+		}
+	}
+	
+	/**
+	 * Shows a message from the server
+	 */
+	public void showMessage() {
+		try {
+			Message message = this.getClient().getMessage();		
+			if ( message != null && !message.getMessage().equals("") ) {
+				if ( isGameOpen() ) {
+					this.game_panel.displayLog(message.getMessage(), message.getContext());
+					//update main panel
+					switch (message.getContext()) {
+						case Message.CONTEXT_ROUND:
+						case Message.CONTEXT_PHASE:
+							this.game_panel.updateStatus(message.getMessage());
+							break;
+						
+						case Message.CONTEXT_ROLL:
+							this.game_panel.updateRollMessage(message.getMessage());
+							break;
+					}
+				}
+			}
+		} catch (Exception e) {
+			showError(e.getMessage());
+		}
+	}
+	
+	
+	/**
 	 * Creates the server lobby
 	 */
 	public void openServerLobby() {
@@ -243,9 +311,26 @@ public class CardParent extends JPanel implements ViewConstants {
 	/**
 	 * Creates the choose character
 	 */
-	public void openChooseCharacter(HackerCard[] cards) {
-		choose_character_panel = new ChooseCharacterPanel(this, cards);
-		this.add(choose_character_panel, CHOOSE_CHARACTER_PANLE);
-		navigateTo(CHOOSE_CHARACTER_PANLE);	
+	public void openChooseCharacter() {
+		try {
+			HackerCard[] cards = this.getClient().getCharacterChoices();		
+			choose_character_panel = new ChooseCharacterPanel(this, cards);
+			this.add(choose_character_panel, CHOOSE_CHARACTER_PANEL);
+			navigateTo(CHOOSE_CHARACTER_PANEL);	
+		} catch (Exception e) {
+			showError(e.getMessage());
+		}		
+	}
+	
+	/**
+	 * Creates the game panel
+	 */
+	public void openGamePanel() {
+		game_panel = new GamePanel(this);
+		this.add(game_panel, GAME_PANEL);
+		game_panel.updateStatus("Waiting for all players to choose characters.");
+		game_panel.updateRollMessage("");
+		navigateTo(GAME_PANEL);	
+		this.game_open  = true;
 	}
 }

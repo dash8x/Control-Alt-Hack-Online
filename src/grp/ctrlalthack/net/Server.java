@@ -14,6 +14,7 @@
 package grp.ctrlalthack.net;
 
 import grp.ctrlalthack.controller.Game;
+import grp.ctrlalthack.model.Message;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -41,6 +42,7 @@ public class Server implements NetworkConstants {
 	
 	private ReentrantLock logSynchronizer; //allows concurrent writes to the log
 	private ReentrantLock updatedSynchronizer; //allows concurrent access to updated flag setter
+	private ReentrantLock messageSynchronizer; //allows concurrent access to message sender
 	
 	/**
 	 * Constructor
@@ -76,6 +78,7 @@ public class Server implements NetworkConstants {
 		this.game = new Game();
 		this.logSynchronizer = new ReentrantLock();
 		this.updatedSynchronizer = new ReentrantLock();
+		this.messageSynchronizer = new ReentrantLock();
 		/*this.lockSynchronizer = new ReentrantLock();		
 		*/
 	}
@@ -212,6 +215,28 @@ public class Server implements NetworkConstants {
 		this.clients.remove(client);
 		this.setAllUpdated(FLAG_PLAYERS); //notify others the players list was updated
 	}	
+	
+	/**
+	 * Sends a messgae to all clients
+	 */
+	public void broadcastMessage(String message) {
+		broadcastMessage(new Message(message));
+	}
+	
+	/**
+	 * Sends a messgae to all clients
+	 */
+	public void broadcastMessage(Message message) {
+		this.messageSynchronizer.lock();
+		try {
+			for (ServerService client : this.clients) {
+				client.setUpdated(FLAG_MESSAGE);
+				client.addMessage(message);
+			}
+		} finally {
+			this.messageSynchronizer.unlock();
+		}
+	}
 	
 	/**
 	 * Sets the updated flag of all clients

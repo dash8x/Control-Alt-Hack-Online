@@ -16,6 +16,7 @@ public interface ViewConstants {
 	public static final String START_SERVER_PANEL = "start_server_panel";
 	public static final String JOIN_SERVER_PANEL = "join_server_panel";
 	public static final String SERVER_LOBBY_PANEL = "server_lobby_panel";
-	public static final String CHOOSE_CHARACTER_PANLE = "choose_character_panel";
+	public static final String CHOOSE_CHARACTER_PANEL = "choose_character_panel";
+	public static final String GAME_PANEL = "game_panel";
 	
 }

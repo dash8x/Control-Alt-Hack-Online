@@ -11,7 +11,9 @@
 
 package grp.ctrlalthack.net;
 
+import grp.ctrlalthack.model.GameStats;
 import grp.ctrlalthack.model.HackerCard;
+import grp.ctrlalthack.model.Message;
 import grp.ctrlalthack.model.Player;
 
 import java.io.IOException;
@@ -32,15 +34,15 @@ public class ServerService implements Runnable, NetworkConstants, ProtocolConsta
     private Player player; //the player object for the client
     private int client_id; //id of the client
     
-    private LinkedList<String> data_updated; //flag to check if data has updated since last request
+    private LinkedList<String> data_updated = new LinkedList<String>(); //flag to check if data has updated since last request
+    private LinkedList<Message> messages = new LinkedList<Message>(); //messages for the client
 	
     /**
      * Constructor
      */
     public ServerService(Server server, Socket connection) {
     	this.server = server;    	
-    	this.connection = connection;    
-    	this.data_updated = new LinkedList<String>();
+    	this.connection = connection;        	
     	//get IP as a String a remove leading /
     	this.ip = this.connection.getRemoteSocketAddress().toString().replaceFirst("\\/", "");
     	//get streams
@@ -73,6 +75,36 @@ public class ServerService implements Runnable, NetworkConstants, ProtocolConsta
 	    } 
 	}		
     
+	/**
+	 * Adds a message
+	 */
+	public void addMessage(String message) {
+		if ( message != null && !message.equals("") ) {
+			this.addMessage(new Message(message));
+		}
+	}
+	
+	/**
+	 * Adds a message
+	 */
+	public void addMessage(Message message) {
+		if ( message != null ) {
+			this.messages.add(message);		
+			this.server.showSuccessLog("MESSAGE Signal received for " + message , this);
+		}
+	}
+	
+	/**
+	 * Returns the head of messages queu
+	 */
+	public Message getMessage() {
+		if (this.messages.isEmpty()) {
+			return new Message("");
+		} else {
+			return this.messages.remove();
+		}
+	}
+	
 	/**
 	 * Sets the updated flag
 	 */
@@ -195,7 +227,21 @@ public class ServerService implements Runnable, NetworkConstants, ProtocolConsta
 	private void setAllUpdated(String msg) {
 		this.server.setAllUpdated(msg);
 	}
-
+	
+	/**
+	 * Wrapper method
+	 */
+	private void broadcastMessage(Message msg) {
+		this.server.broadcastMessage(msg);
+	}
+	
+	/**
+	 * Wrapper method
+	 */
+	private void broadcastMessage(String msg) {
+		this.server.broadcastMessage(msg);
+	}
+	
 	/**
 	 * reads a request from the client
 	 */
@@ -240,7 +286,7 @@ public class ServerService implements Runnable, NetworkConstants, ProtocolConsta
 	private void sendFail(String op, String message) {
 		HashMap<String,Object> params = new HashMap<String,Object>(); 
 		params.put("operation", op);
-		params.put("message", message);
+		params.put("message", "" + message);
 		this.sendResponse(new Response(RESP_FAIL, params));
 	}
 		
@@ -252,6 +298,16 @@ public class ServerService implements Runnable, NetworkConstants, ProtocolConsta
 		HashMap<String,Object> params = new HashMap<String,Object>(); 
 		params.put("updated", this.getUpdated());
 		this.sendResponse(new Response(RESP_CHECK_UPDATED, params));		
+	}
+	
+	/**
+     * Sends a MESSAGE to the client
+     * Notify the client whether data was changed since last request
+     */
+	private void sendMessage() {
+		HashMap<String,Object> params = new HashMap<String,Object>(); 
+		params.put("message", this.getMessage());
+		this.sendResponse(new Response(RESP_MESSAGE, params));		
 	}
 	
 	/**
@@ -274,6 +330,16 @@ public class ServerService implements Runnable, NetworkConstants, ProtocolConsta
 		this.sendResponse(new Response(RESP_CHARACTER_CHOICES, params));
 	}
 	
+	/**
+     * Sends a GAME_STATS response to the client
+     * @param courses
+     */
+	private void sendGameStats(GameStats stats) {
+		HashMap<String,Object> params = new HashMap<String,Object>(); 
+		params.put("stats", stats);
+		this.sendResponse(new Response(RESP_GAME_STATS, params));
+	}
+	
     /**
      * Handles commands
      * @param request the Command
@@ -291,8 +357,17 @@ public class ServerService implements Runnable, NetworkConstants, ProtocolConsta
 	    	case CMD_GET_CHARACTER_CHOICES:
 	    		getCharacterChoices(keyword, params);
 				break;
+	    	case CMD_SELECT_CHARACTER:
+	    		chooseCharacter(keyword, params);
+	    		break;
 	    	case CMD_GET_PLAYERS:
 	    		getPlayers(keyword, params);
+				break;
+	    	case CMD_GET_GAME_STATS:
+	    		getGameStats(keyword, params);
+				break;
+	    	case CMD_GET_MESSAGE:
+				this.sendMessage();
 				break;
 			case CMD_CHECK_UPDATED:
 				this.sendDataUpdated();
@@ -305,6 +380,43 @@ public class ServerService implements Runnable, NetworkConstants, ProtocolConsta
     }
     
     /**
+     * Get game stats
+     */
+    private void getGameStats(String keyword, HashMap<String, Object> params) {
+    	GameStats stats = null;
+		try {	
+			stats = this.server.getGame().getGameStats();									
+		} catch (Exception e) {
+			this.sendFail(keyword, e.getMessage());
+			return;
+		}
+		this.sendGameStats(stats);
+	}
+
+	/**
+     * Choose a character
+     */
+    private void chooseCharacter(String keyword, HashMap<String, Object> params) {
+    	if ( this.server.getGame().inChooseCharacter() ) {
+			try {
+				int id = (Integer) params.get("character");
+				this.getPlayer().chooseCharacter(id);
+				this.sendSuccess("Character chosen");
+				this.setAllUpdated(FLAG_GAME_STATS);
+				this.setAllUpdated(FLAG_PLAYERS);
+				String msg = this.getPlayer().getPlayerName() + " chose " + this.getPlayer().getCharacter().getName();
+				this.broadcastMessage(new Message(msg, Message.CONTEXT_CHARACTER_CHOOSE));
+				//check if all players finished choosing
+			} catch ( Exception e ) {
+				this.sendFail(keyword, e.getMessage());
+				return;
+			}
+		} else {
+			this.sendFail(keyword, "Game not in character choosing stage.");
+		}
+	}
+
+	/**
      * Character choices
      */
     private void getCharacterChoices(String keyword, HashMap<String, Object> params) {

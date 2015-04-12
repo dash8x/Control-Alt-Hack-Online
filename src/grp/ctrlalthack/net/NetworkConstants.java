@@ -10,7 +10,9 @@ package grp.ctrlalthack.net;
 public interface NetworkConstants {
 	
 	//update flag constants
+	public final static String FLAG_MESSAGE = "MESSAGE";
 	public final static String FLAG_PLAYERS = "PLAYERS";
+	public final static String FLAG_GAME_STATS = "GAME_STATS";
 	public final static String FLAG_CHOOSE_CHARACTERS = "CHOOSE_CHARACTERS";
 	
 	//logging constants

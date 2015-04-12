@@ -32,11 +32,15 @@ import javax.swing.JButton;
 
 public class PlayMissionPanel extends JPanel {
 	
-	private GameStats stats;	
+	//modes
+	private boolean mission_mode = false;
+		
 	private MissionCard card;
 	private MissionCardPanel mission_panel;
 	private JButton btn_roll;
 	private JLabel lbl_roll;
+
+	private JLabel lbl_status;
 
 	
 	public static void main(String[] args) {
@@ -78,7 +82,7 @@ public class PlayMissionPanel extends JPanel {
 		gbc_mission_panel.gridy = 0;
 		add(mission_panel, gbc_mission_panel);
 		
-		JLabel lbl_status = new JLabel("Arushad playing");
+		lbl_status = new JLabel("Arushad playing");
 		lbl_status.setForeground(new Color(0, 0, 0));
 		lbl_status.setFont(new Font("Tahoma", Font.BOLD, 13));
 		lbl_status.setBorder(new CompoundBorder(null, new EmptyBorder(10, 10, 10, 10)));
@@ -107,25 +111,66 @@ public class PlayMissionPanel extends JPanel {
 		add(btn_roll, gbc_btn_roll);
 		
 		//fill in the values
-		setStats(stats);
+		setMission(card);
 	}
 	
 	/**
 	 * Populate the fields
 	 */
-	public void setStats(GameStats stats) {
-		this.stats = stats;
+	public void setMission(MissionCard card) {
+		this.card = card;
 		populateFields();
+	}		
+	
+	/**
+	 * Check which mode
+	 */
+	public boolean inMissionMode() {
+		return this.mission_mode && this.card != null;
+	}
+	
+	/**
+	 * Set mission mode
+	 */
+	public void setMissionMode() {
+		this.mission_mode = true;
+		this.mission_panel.setVisible(true);
+		populateFields();
+	}
+	
+	/**
+	 * unset mission mode
+	 */
+	public void unsetMissionMode() {
+		this.mission_mode = false;
+		this.mission_panel.setVisible(false);
+	}
+	
+	/**
+	 * Display title message
+	 */
+	public void displayStatusMessage(String msg) {
+		this.lbl_status.setText(msg);
+	}
+	
+	/**
+	 * Display title message
+	 */
+	public void displayRollMessage(String msg) {
+		this.lbl_roll.setText(msg);
 	}
 	
 	/**
 	 * Populate the fields
 	 */
 	private void populateFields() {
-		if ( this.stats != null ) {									
-			
+		if ( this.card != null ) {		
+			this.mission_panel.setCard(card);			
+		} else {
+			this.mission_panel.setCard(null);
 		}
 	}
-
+	
+	
 
 }
