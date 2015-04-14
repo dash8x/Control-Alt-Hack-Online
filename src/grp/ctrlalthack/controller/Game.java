@@ -16,6 +16,7 @@ import grp.ctrlalthack.model.entropy.EntropyCard;
 import grp.ctrlalthack.model.mission.MissionCard;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.xml.crypto.Data;
 
@@ -23,6 +24,8 @@ public class Game implements GameConstants {
 		
 	public static final int MAX_PLAYERS = 6; //absolute max number of players allowed
 	public static final int MIN_PLAYERS = 3; //absolute min number of players allowed
+	public static final int MAX_DICE = 18; //absolute max number on dice roll
+	public static final int MIN_DICE = 3; //absolute min number on dice roll
 	
 	private ArrayList<Player> players; //the players in the game
 	private ArrayList<EntropyCard> entropy_deck; //unplayed entropy cards
@@ -32,13 +35,14 @@ public class Game implements GameConstants {
 	private ArrayList<HackerCard> hacker_cards; //available hacker cards	
 	private int round = 0; //round number of the game
 	private int phase = 0; //phase of the game
-	private Player current_player; //the current player 
+	private int current_player; //the current player 
 	
 	//autonumber generator
 	private int last_id = 0;
 	
 	//status values
 	private int game_status;
+	private static Random rand = new Random();
 	
 	/**
 	 * Constructor
@@ -71,7 +75,11 @@ public class Game implements GameConstants {
 	 * Returns the current player
 	 */
 	public Player getCurrentPlayer() {
-		return this.current_player;
+		try {
+			return this.players.get(this.current_player);
+		} catch ( IndexOutOfBoundsException e ) {
+			return null;
+		}
 	}
 	
 	/**
@@ -132,6 +140,7 @@ public class Game implements GameConstants {
 		this.players.remove(new_player);
 	}
 	
+	
 	/**
 	 * Adds a player to the game
 	 */
@@ -187,9 +196,22 @@ public class Game implements GameConstants {
 	}
 	
 	/**
+	 * Add entropy card
+	 */
+	public void addEntropyCard(EntropyCard card) {
+		if ( card != null ) {
+			this.entropy_deck.add(card);
+		}
+	}
+	
+	/**
 	 * pop an entropy card
 	 */
 	private EntropyCard getEntropyCard() {
+		if (this.entropy_deck.isEmpty()) {
+			this.entropy_deck.addAll(this.entropy_discard);
+			this.entropy_discard.clear();
+		}
 		return (EntropyCard) getRandomElement(this.entropy_deck);
 	}
 	
@@ -197,6 +219,10 @@ public class Game implements GameConstants {
 	 * pop a mission card
 	 */
 	private MissionCard getMissionCard() {
+		if (this.missions_deck.isEmpty()) {
+			this.missions_deck.addAll(this.missions_played);
+			this.missions_played.clear();
+		}
 		return (MissionCard) getRandomElement(this.missions_deck);
 	}
 	
@@ -263,7 +289,7 @@ public class Game implements GameConstants {
 	public void startRound() {
 		if (this.hasStarted()) {
 			//reset current player
-			this.current_player = null;
+			this.current_player = -1;
 			this.setPhase(1);
 			this.round++;
 			//reset all players for the round
@@ -281,6 +307,9 @@ public class Game implements GameConstants {
 				//give mission
 				p.setMission(getMissionCard());
 			}
+			//set current player
+			this.current_player = 0;
+			this.getCurrentPlayer().setMyTurn(true);
 		} else {
 			throw new GameException("Game has not started yet");
 		}
@@ -290,6 +319,14 @@ public class Game implements GameConstants {
 	 * Determine a start player
 	 */
 	//TODO
+	
+	/**
+	 * End the round
+	 */
+	public void endRound() {
+		//TODO
+		this.startRound();
+	}
 	
 	/**
 	 * Distributes character cards
@@ -322,6 +359,33 @@ public class Game implements GameConstants {
 		
 	}
 
+	/**
+	 * Makes a simulated roll
+	 */
+	public static int rollDice() {
+		// nextInt is normally exclusive of the top value,
+	    // so add 1 to make it inclusive
+	    int randomNum = rand.nextInt((MAX_DICE - MIN_DICE) + 1) + MIN_DICE;
+	    return randomNum;
+	}
+	
+	/**
+	 * Move to next player
+	 */
+	public boolean nextPlayer() {
+		boolean next = false;
+		if ( getCurrentPlayer() != null ) {
+			//end current player's turn
+			getCurrentPlayer().endTurn();
+			this.current_player = (this.current_player + 1) % this.getPlayers().size(); //advance to next player
+			if ( getCurrentPlayer() != null && !getCurrentPlayer().hasPlayed() ) {
+				next = true;
+				getCurrentPlayer().setMyTurn(true);
+			}
+		}
+		return next;
+	}
+	
 	//status values
 	/**
 	 * Sets the game status
@@ -345,9 +409,30 @@ public class Game implements GameConstants {
 	}
 	
 	/**
-	 * checks if game is int choose character stage
+	 * checks if game is in choose character stage
 	 */
 	public boolean inChooseCharacter() {
 		return this.getGameStatus() == STATUS_CHOOSE_CHARACTER;
+	}
+	
+	/**
+	 * checks if game is in attendance stage
+	 */
+	public boolean inAttendance() {
+		return this.getGameStatus() == STATUS_ATTENDANCE;
+	}
+	
+	/**
+	 * checks if game is in meeting stage
+	 */
+	public boolean inMeeting() {
+		return this.getGameStatus() == STATUS_MEETING;
+	}
+	
+	/**
+	 * Checks if game in playing
+	 */
+	public boolean inPlaying() {
+		return this.getGameStatus() == STATUS_PLAYING;
 	}
 }

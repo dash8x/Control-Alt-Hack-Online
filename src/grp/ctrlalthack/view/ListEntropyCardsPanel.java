@@ -33,13 +33,15 @@ import javax.swing.JScrollPane;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 
 public class ListEntropyCardsPanel extends JPanel {
 	
 	private GameStats stats;	
 	private ArrayList<EntropyCard> cards;
-
+	private CardParent parent;
 	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -56,11 +58,18 @@ public class ListEntropyCardsPanel extends JPanel {
 		});
 	}
 	
+	/**
+	 * Create the panel.
+	 */
+	public ListEntropyCardsPanel(ArrayList<EntropyCard> cards) {
+		this(null, cards);
+	}
 	
 	/**
 	 * Create the panel.
 	 */
-	public ListEntropyCardsPanel(ArrayList<EntropyCard> cards) {				
+	public ListEntropyCardsPanel(CardParent parent, ArrayList<EntropyCard> cards) {				
+		this.parent = parent;
 		this.cards = cards;
 		setBorder(new EmptyBorder(5, 5, 5, 5));
 		setBackground(new Color(204, 204, 255));
@@ -82,11 +91,11 @@ public class ListEntropyCardsPanel extends JPanel {
 		JPanel body = new JPanel();
 		body.setOpaque(false);
 		scrollPane.setViewportView(body);	
-		int rows = cards.size() / 2;
-		body.setLayout(new GridLayout(rows, 2, 5, 5));
+		//int rows = cards.size() / 2;
+		body.setLayout(new GridLayout(0, 2, 5, 5));
 		
 		for (int i = 0; i < cards.size(); i++) {				
-			ActionableEntropyCardPanel panel = new ActionableEntropyCardPanel(i, cards.get(i));
+			ActionableEntropyCardPanel panel = new ActionableEntropyCardPanel(this.parent, i, cards.get(i));			
 	        body.add(panel);
 	    }
 		

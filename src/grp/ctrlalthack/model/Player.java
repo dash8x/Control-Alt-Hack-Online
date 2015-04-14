@@ -7,6 +7,10 @@
 
 package grp.ctrlalthack.model;
 
+import grp.ctrlalthack.model.entropy.BagOfTricksCard;
+import grp.ctrlalthack.model.entropy.BoTAutoSuccessCard;
+import grp.ctrlalthack.model.entropy.BoTFreeRerollCard;
+import grp.ctrlalthack.model.entropy.BoTSkillModCard;
 import grp.ctrlalthack.model.entropy.EntropyCard;
 import grp.ctrlalthack.model.entropy.SkillModifier;
 import grp.ctrlalthack.model.mission.MissionCard;
@@ -15,6 +19,8 @@ import grp.ctrlalthack.model.mission.MissionTask;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class Player implements Serializable {
 	
@@ -36,6 +42,8 @@ public class Player implements Serializable {
 	
 	//skill modifier
 	private HashMap<String,Integer> bot_skill_modifiers = new HashMap<String,Integer>(); //skill modifiers from BoT cards
+	private HashMap<String,Boolean> bot_reroll = new HashMap<String,Boolean>(); //bot free reroll skill
+	private ArrayList<String> bot_autosuccess = new ArrayList<String>(); //bot auto success 
 	
 	//status values
 	private boolean attending = false; 
@@ -44,6 +52,7 @@ public class Player implements Serializable {
 	private boolean ready_to_start; //indicates if is ready to start game
 	private boolean character_chosen = false;
 	private boolean is_my_turn; //checks if is player's turn
+	private boolean free_reroll = false; //check if has free reroll
 	
 	//hacker card choices
 	private HackerCard[] character_choices;
@@ -110,6 +119,13 @@ public class Player implements Serializable {
 		this.curr_task = -1;
 		this.setMission(null);
 		this.setAttending(false);
+		this.setFreeReroll(true);
+		//reset rerolls
+		Iterator it = this.bot_reroll.entrySet().iterator();
+	    if (it.hasNext()) {
+	    	Map.Entry pair = (Map.Entry)it.next();
+	    	pair.setValue(true);    
+	    }
 	}
 	
 	/**
@@ -127,38 +143,96 @@ public class Player implements Serializable {
 	}
 	
 	/**
+	 * Get the current task
+	 */
+	public MissionTask getTask() {
+		if ( getMission() != null && this.curr_task >= 0  ) {
+			try {
+				return getMission().getTasks().get(curr_task);
+			} catch ( IndexOutOfBoundsException | NullPointerException e) {				
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Sets the free reroll
+	 */
+	public void setFreeReroll(boolean roll) {
+		this.free_reroll = roll;
+	}
+	
+	/**
+	 * Has free reroll
+	 */
+	public boolean hasFreeReroll() {
+		if ( this.free_reroll ) {
+			setFreeReroll(false);
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	/**
+	 * Has free reroll
+	 */
+	public boolean hasFreeReroll(String skill) {
+		if ( this.bot_reroll.get(skill) != null && this.bot_reroll.get(skill)  ) {
+			this.bot_reroll.put(skill, false);
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	/**
+	 * Check if last task
+	 */
+	public boolean isLastTask() {
+		return (this.getMission() != null) && this.curr_task >= (this.getMission().getTasks().size());
+	}
+	
+	/**
+	 * Move to next task
+	 */
+	public void nextTask() {
+		this.curr_task++;
+	}
+	
+	/**
 	 * Roll for a task
 	 */
 	public boolean playTask(int num) {
 		boolean success = false;
 		if (this.hasPlayed()) {
 			throw new PlayerException(this.getPlayerName() + " already played");
-		} else if ( this.isMyTurn() ) {
-			this.curr_task++;
-			MissionTask task = this.getMission().getTasks().get(this.curr_task);
-			//try if has infinite skill
-			if ( this.getSkill(task.getSkill()) == GameConstants.INFINITE_SKILL ) {
-				success = true;
+		} else if ( this.isMyTurn() ) {			
+			MissionTask task = this.getTask();			
+			if ( task == null ) {
+				//turn over
 			} else {
-				//try main task
-				int number_to_beat = this.getSkill(task.getSkill()) - task.getSkillModifier();
-				if ( num <= number_to_beat) {
+				//try if has infinite skill
+				if ( this.getSkill(task.getSkill()) == GameConstants.INFINITE_SKILL ) {
 					success = true;
-				} else if ( task.hasAltSkill() ) {
-					//try alt task
-					if ( this.getSkill(task.getAltSkill()) == GameConstants.INFINITE_SKILL ) {
+				} else {
+					//try main task
+					int number_to_beat = this.getSkill(task.getSkill()) - task.getSkillModifier();
+					if ( num <= number_to_beat) {
 						success = true;
-					} else {						
-						number_to_beat = this.getSkill(task.getAltSkill()) - task.getAltSkillModifier();
-						if ( num <= number_to_beat) {
+					} else if ( task.hasAltSkill() ) {
+						//try alt task
+						if ( this.getSkill(task.getAltSkill()) == GameConstants.INFINITE_SKILL ) {
 							success = true;
+						} else {						
+							number_to_beat = this.getSkill(task.getAltSkill()) - task.getAltSkillModifier();
+							if ( num <= number_to_beat) {
+								success = true;
+							}
 						}
 					}
 				}
 			}
-			//if failed end turn
-			
-			//check if last task
 		} else {
 			throw new PlayerException("Not " + this.getPlayerName() + "'s turn");
 		}
@@ -271,6 +345,45 @@ public class Player implements Serializable {
 	}
 	
 	/**
+	 * Buy a bag of tricks card
+	 */
+	public void buyBagOfTricks(int index) {		
+		BagOfTricksCard card;
+		if ( !isMyTurn() ) {
+			throw new PlayerException("You can only buy cards during your turn");
+		}
+		try {
+			card = (BagOfTricksCard) this.getEntropyCards().get(index);			
+		} catch (Exception e) {
+			throw new PlayerException("Invalid Bag of Tricks card");
+		}
+		if ( card != null ) {
+			if ( card.getCost() > this.getCash() ) {
+				throw new PlayerException("You do not have enough cash to buy this card");
+			} else {
+				this.entropy_in_play.add(this.entropy_cards.remove(index));
+				this.removeCash(card.getCost());
+				if ( card instanceof BoTFreeRerollCard ) {
+					this.addFreeReroll(((BoTFreeRerollCard) card).getSkills());
+				} else if (card instanceof BoTSkillModCard) {
+					this.addSkillModifier((((BoTSkillModCard) card).getSkillModifiers()));
+				}					
+			}
+		}
+	}
+	
+	/**
+	 * Add multiple skill modifiers
+	 */
+	private void addSkillModifier(ArrayList<SkillModifier> skill_mods) {
+		if ( skill_mods != null ) {
+			for ( SkillModifier skill_mod : skill_mods ) {
+				this.addSkillModifier(skill_mod);
+			}
+		}
+	}
+
+	/**
 	 * Empty the entropy cards 
 	 */
 	public ArrayList<EntropyCard> emptyEntropyCards() {
@@ -355,6 +468,21 @@ public class Player implements Serializable {
 	}
 	
 	/**
+	 * get bot autosucce
+	 */
+	public EntropyCard getBoTAutoSuccess(String skill) {		
+		for ( EntropyCard card : this.getEntropyCardsInPlay() ) {
+			if ( card instanceof BoTAutoSuccessCard ) {
+				if ( ((BoTAutoSuccessCard) card).getSkill().equals(skill) ) {
+					this.entropy_in_play.remove(card);
+					return card;
+				}
+			}
+		}
+		return null;
+	}
+	
+	/**
 	 * get single skill modifier
 	 */
 	public int getBoTSkillModifier(String skill) {		
@@ -378,6 +506,17 @@ public class Player implements Serializable {
 		}
 	}
 	
+	/**
+	 * Adds a skill
+	 */
+	private void addFreeReroll(ArrayList<String> skills) {
+		if ( skills != null) {
+			for (String skill : skills) {
+				this.bot_reroll.put(skill, true);
+			}
+		}
+	}		
+	
 	
 	/**
 	 * @return the value for a specific skill
@@ -385,8 +524,13 @@ public class Player implements Serializable {
 	public int getSkill(String skill) {		
 		//first get unmodified value
 		int orig = this.getCharacter().getSkill(skill);
+		if ( orig == GameConstants.INFINITE_SKILL ) {
+			return GameConstants.INFINITE_SKILL;
+		}
+			
 		//bot skill modifier
 		int bot_mod = this.getBoTSkillModifier(skill);
+		
 		//return modified val
 		return orig + bot_mod;
 	}
@@ -436,7 +580,7 @@ public class Player implements Serializable {
 	 * @return the is_my_turn
 	 */
 	public boolean isMyTurn() {
-		return is_my_turn;
+		return is_my_turn && this.getMission() != null && this.getTask() != null;
 	}
 
 	/**
@@ -444,6 +588,39 @@ public class Player implements Serializable {
 	 */
 	public void setMyTurn(boolean is_my_turn) {
 		this.is_my_turn = is_my_turn;
+		if ( is_my_turn ) {
+			this.curr_task = 0;
+			this.has_played = false;
+		}
+	}
+	
+	/**
+	 * ends the turn
+	 */
+	public void endTurn() {
+		this.setMyTurn(false);
+		this.has_played = true;
+		this.curr_task = -1;
+	}
+
+	/**
+	 * Applies the failure
+	 */
+	public void applyFailure() {
+		if ( this.getMission() != null && this.getMission().getFailure() != null ) {
+			this.removeCash(this.getMission().getFailure().getCash());
+			this.removeHackerCreds(this.getMission().getFailure().getHackerCreds());
+		}
+	}
+	
+	/**
+	 * Applies the success
+	 */
+	public void applySuccess() {
+		if ( this.getMission() != null && this.getMission().getSuccess() != null ) {
+			this.addCash(this.getMission().getFailure().getCash());
+			this.addHackerCreds(this.getMission().getFailure().getHackerCreds());
+		}
 	}
 	
 }

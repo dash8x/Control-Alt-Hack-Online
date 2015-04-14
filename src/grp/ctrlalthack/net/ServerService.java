@@ -11,10 +11,14 @@
 
 package grp.ctrlalthack.net;
 
+import grp.ctrlalthack.controller.Game;
 import grp.ctrlalthack.model.GameStats;
 import grp.ctrlalthack.model.HackerCard;
 import grp.ctrlalthack.model.Message;
 import grp.ctrlalthack.model.Player;
+import grp.ctrlalthack.model.entropy.EntropyCard;
+import grp.ctrlalthack.model.mission.MissionCard;
+import grp.ctrlalthack.model.mission.MissionTask;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -340,6 +344,46 @@ public class ServerService implements Runnable, NetworkConstants, ProtocolConsta
 		this.sendResponse(new Response(RESP_GAME_STATS, params));
 	}
 	
+	/**
+     * Sends a MISSION response to the client
+     * @param courses
+     */
+	private void sendMission(MissionCard card) {
+		HashMap<String,Object> params = new HashMap<String,Object>(); 
+		params.put("mission", card);
+		this.sendResponse(new Response(RESP_MISSION, params));
+	}
+	
+	/**
+     * Sends a PLAYER response to the client
+     * @param courses
+     */
+	private void sendPlayer(Player player) {
+		HashMap<String,Object> params = new HashMap<String,Object>(); 
+		params.put("player", player);
+		this.sendResponse(new Response(RESP_PLAYER, params));
+	}
+	
+	/**
+     * Sends a CHECK_TURN response to the client
+     * @param courses
+     */
+	private void sendCheckTurn(boolean turn) {
+		HashMap<String,Object> params = new HashMap<String,Object>(); 
+		params.put("your_turn", turn);
+		this.sendResponse(new Response(RESP_CHECK_TURN, params));
+	}
+	
+	/**
+     * Sends a ROLL_TASK response
+     * @param courses
+     */
+	private void sendRollTask(boolean success) {
+		HashMap<String,Object> params = new HashMap<String,Object>(); 
+		params.put("result", success);
+		this.sendResponse(new Response(RESP_ROLL_TASK, params));
+	}
+	
     /**
      * Handles commands
      * @param request the Command
@@ -360,8 +404,29 @@ public class ServerService implements Runnable, NetworkConstants, ProtocolConsta
 	    	case CMD_SELECT_CHARACTER:
 	    		chooseCharacter(keyword, params);
 	    		break;
+	    	case CMD_BUY_BAG_OF_TRICKS:
+	    		buyBagOfTricks(keyword, params);
+	    		break;
 	    	case CMD_GET_PLAYERS:
 	    		getPlayers(keyword, params);
+				break;
+	    	case CMD_ATTEND:
+	    		attend(keyword, params);
+				break;
+	    	case CMD_GET_CURR_MISSION:
+	    		getCurrMission(keyword, params);
+				break;
+	    	case CMD_GET_CURR_PLAYER:
+	    		getCurrPlayer(keyword, params);
+				break;
+	    	case CMD_GET_MY_PLAYER:
+	    		getMyPlayer(keyword, params);
+				break;
+	    	case CMD_CHECK_TURN:
+	    		checkTurn(keyword, params);
+				break;
+	    	case CMD_ROLL_TASK:
+	    		rollTask(keyword, params);
 				break;
 	    	case CMD_GET_GAME_STATS:
 	    		getGameStats(keyword, params);
@@ -378,6 +443,144 @@ public class ServerService implements Runnable, NetworkConstants, ProtocolConsta
 				this.sendError("Unknown command");
     	}    	
     }
+    
+    /**
+     * Check if it's the player's turn
+     */
+    private void rollTask(String keyword, HashMap<String, Object> params) {
+    	if ( !this.server.getGame().inPlaying() ) {
+    		this.sendFail(keyword, "No mission is being played right now");
+    		return;    		
+    	}
+    	boolean success = false;
+    	try {
+			MissionTask task = this.getPlayer().getTask();
+			int dice = Game.rollDice();
+			success = this.getPlayer().playTask(dice);
+			String roll_text = this.getPlayer().getPlayerName() + " rolled " + dice + " on the " + task.getTitle() + " roll.";
+			if ( success ) {
+				this.broadcastMessage(new Message(roll_text + " " + this.getPlayer().getPlayerName() + " succeeded the task.", Message.CONTEXT_ROLL));								
+			} else {
+				//TODO
+				this.broadcastMessage(new Message(roll_text + " " + this.getPlayer().getPlayerName() + " failed the task.", Message.CONTEXT_ROLL));
+				//check for fee rerolls
+				if ( this.getPlayer().hasFreeReroll() || this.getPlayer().hasFreeReroll(task.getSkill()) || (task.hasAltSkill() && this.getPlayer().hasFreeReroll(task.getAltSkill())) ) {
+					this.broadcastMessage(new Message(this.getPlayer().getPlayerName() + " rerolling.", Message.CONTEXT_ROLL));
+				} else {
+					EntropyCard auto_success_card = null;
+					auto_success_card = this.getPlayer().getBoTAutoSuccess(task.getSkill());
+					if ( auto_success_card == null && task.hasAltSkill() ) {
+						auto_success_card = this.getPlayer().getBoTAutoSuccess(task.getAltSkill());
+					}					
+					if ( auto_success_card != null ) {
+						this.server.getGame().addEntropyCard(auto_success_card);
+						this.setAllUpdated(FLAG_PLAYERS);
+						this.broadcastMessage(new Message(this.getPlayer().getPlayerName() + " used autosuccess card.", Message.CONTEXT_ROLL));						
+						success = true;
+					} else {																				
+						this.player.applyFailure();
+						this.setAllUpdated(FLAG_PLAYERS);
+						this.setAllUpdated(FLAG_GAME_STATS);
+						this.broadcastMessage(new Message(this.getPlayer().getPlayerName() + " failed the mission.", Message.CONTEXT_ROLL));
+						//end the turn
+						if ( this.server.getGame().nextPlayer() ) {
+							//inform next player	
+							this.setAllUpdated(FLAG_NEW_TURN);
+						} else {
+							this.newRound();
+						}
+					}
+				}
+			}
+			if ( success ) {
+				this.getPlayer().nextTask();				
+				//check if was last task
+				if ( this.getPlayer().isLastTask() ) {
+					this.player.applySuccess();
+					this.setAllUpdated(FLAG_PLAYERS);
+					this.setAllUpdated(FLAG_GAME_STATS);
+					this.broadcastMessage(new Message(this.getPlayer().getPlayerName() + " succeeded the mission.", Message.CONTEXT_ROLL));
+					//end the turn
+					if ( this.server.getGame().nextPlayer() ) {
+						//inform next player	
+						this.setAllUpdated(FLAG_NEW_TURN);
+						//TODO
+					} else {
+						this.newRound();
+					}
+				}
+			}
+			
+		} catch (Exception e) {			
+			this.sendFail(keyword, e.getMessage());
+			return;
+		}
+		this.sendRollTask(success);
+	}
+
+    /**
+     * New round
+     */
+    private void newRound() {
+    	this.server.newRound();
+    }
+    
+	/**
+     * Sends the current mission card
+     */
+    private void getCurrMission(String keyword, HashMap<String, Object> params) {
+    	MissionCard card = null;
+		try {	
+			card = this.server.getGame().getCurrentPlayer().getMission();									
+		} catch (Exception e) {
+			this.sendFail(keyword, e.getMessage());
+			return;
+		}
+		this.sendMission(card);
+	}
+
+    /**
+     * Sends the current mission card
+     */
+    private void getCurrPlayer(String keyword, HashMap<String, Object> params) {
+    	Player player = null;
+		try {	
+			player = this.server.getGame().getCurrentPlayer();									
+		} catch (Exception e) {
+			this.sendFail(keyword, e.getMessage());
+			return;
+		}
+		this.sendPlayer(player);
+	}
+    
+    /**
+     * Sends the current mission card
+     */
+    private void getMyPlayer(String keyword, HashMap<String, Object> params) {
+    	Player player = null;
+		try {	
+			player = this.getPlayer();									
+		} catch (Exception e) {
+			this.sendFail(keyword, e.getMessage());
+			return;
+		}
+		this.sendPlayer(player);
+	}
+    
+	/**
+     * Check turn
+     */
+    private void checkTurn(String keyword, HashMap<String, Object> params) {
+    	boolean turn = false;
+		try {	
+			turn = this.getPlayer().equals(this.server.getGame().getCurrentPlayer());	
+			//TODO
+		} catch (Exception e) {
+			this.sendFail(keyword, e.getMessage());
+			return;
+		}
+		this.sendCheckTurn(turn);
+	}
     
     /**
      * Get game stats
@@ -407,12 +610,53 @@ public class ServerService implements Runnable, NetworkConstants, ProtocolConsta
 				String msg = this.getPlayer().getPlayerName() + " chose " + this.getPlayer().getCharacter().getName();
 				this.broadcastMessage(new Message(msg, Message.CONTEXT_CHARACTER_CHOOSE));
 				//check if all players finished choosing
-			} catch ( Exception e ) {
+				if ( this.server.getGame().allCharactersChosen() ) {
+					this.newRound();
+				}
+			} catch ( Exception e ) {				
 				this.sendFail(keyword, e.getMessage());
 				return;
 			}
 		} else {
 			this.sendFail(keyword, "Game not in character choosing stage.");
+		}
+	}
+    
+    /**
+     * attend
+     */
+    private void attend(String keyword, HashMap<String, Object> params) {
+    	if ( this.server.getGame().inAttendance() ) {
+			try {
+				this.getPlayer().setAttending(true);
+				this.getPlayer().setFreeReroll(false);
+				this.sendSuccess("You are attending");
+			} catch ( Exception e ) {				
+				this.sendFail(keyword, e.getMessage());
+				return;
+			}
+		} else {
+			this.sendFail(keyword, "Game not in attendance stage.");
+		}
+	}
+    
+    /**
+     * Choose a character
+     */
+    private void buyBagOfTricks(String keyword, HashMap<String, Object> params) {
+    	if ( this.server.getGame().hasStarted() ) {
+			try {
+				int id = (Integer) params.get("card");
+				this.getPlayer().buyBagOfTricks(id);
+				this.sendSuccess("Bag of Tricks card bought");			
+				this.setAllUpdated(FLAG_PLAYERS);
+				this.setAllUpdated(FLAG_GAME_STATS);
+			} catch ( Exception e ) {
+				this.sendFail(keyword, e.getMessage());
+				return;
+			}
+		} else {
+			this.sendFail(keyword, "Game has not started.");
 		}
 	}
 

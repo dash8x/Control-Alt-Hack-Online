@@ -39,5 +39,8 @@ public interface GameConstants {
 	//game status
 	public static final int STATUS_WAITING_TO_START = 0;
 	public static final int STATUS_CHOOSE_CHARACTER = 1;
-
+	public static final int STATUS_ATTENDANCE = 2;
+	public static final int STATUS_MEETING = 3;
+	public static final int STATUS_PLAYING = 4;
+	
 }

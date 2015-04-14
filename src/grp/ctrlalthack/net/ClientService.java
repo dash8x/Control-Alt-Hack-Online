@@ -23,6 +23,7 @@ import grp.ctrlalthack.model.GameStats;
 import grp.ctrlalthack.model.HackerCard;
 import grp.ctrlalthack.model.Message;
 import grp.ctrlalthack.model.Player;
+import grp.ctrlalthack.model.mission.MissionCard;
 import grp.ctrlalthack.net.exception.ClientException;
 import grp.ctrlalthack.net.exception.ErrorResponseException;
 import grp.ctrlalthack.net.exception.FailResponseException;
@@ -167,6 +168,15 @@ public class ClientService implements NetworkConstants, ProtocolConstants {
 		switch (updated) {
 			case FLAG_MESSAGE:
 				client_ui.showMessage();
+				break;
+			case FLAG_NEW_ROUND:
+				client_ui.newRound();
+				break;
+			case FLAG_ATTENDANCE:
+				client_ui.setToAttendance();
+				break;
+			case FLAG_NEW_TURN:
+				client_ui.newTurn();
 				break;
 			case FLAG_PLAYERS:
 				client_ui.updatePlayers();
@@ -361,6 +371,19 @@ public class ClientService implements NetworkConstants, ProtocolConstants {
 	}
 	
 	/**
+	 * send attend command
+	 */	
+	public void attend() {
+		//send the command to the server
+		Response reply = this.sendResponseCommand(new Command(CMD_ATTEND, null));						
+				
+		//get the result from the response
+		if ( !reply.getKeyword().equals(RESP_SUCCESS) ) {						
+			throw new InvalidResponseException("Invalid response received from server for " + CMD_ATTEND);
+		}						
+	}
+	
+	/**
 	 * get character choices
 	 */	
 	public HackerCard[] getCharacterChoices() {
@@ -373,6 +396,81 @@ public class ClientService implements NetworkConstants, ProtocolConstants {
 		}	
 		
 		return (HackerCard[]) reply.getParam("characters");
+	}
+	
+	/**
+	 * gets current mission card
+	 */	
+	public MissionCard getCurrMission() {
+		//send the command to the server
+		Response reply = this.sendResponseCommand(new Command(CMD_GET_CURR_MISSION, null));						
+				
+		//get the result from the response
+		if ( !reply.getKeyword().equals(RESP_MISSION) ) {						
+			throw new InvalidResponseException("Invalid response received from server for " + CMD_GET_CURR_MISSION);
+		}	
+		
+		return (MissionCard) reply.getParam("mission");
+	}
+	
+	/**
+	 * gets current player
+	 */	
+	public Player getCurrPlayer() {
+		//send the command to the server
+		Response reply = this.sendResponseCommand(new Command(CMD_GET_CURR_PLAYER, null));						
+				
+		//get the result from the response
+		if ( !reply.getKeyword().equals(RESP_PLAYER) ) {						
+			throw new InvalidResponseException("Invalid response received from server for " + CMD_GET_CURR_PLAYER);
+		}	
+		
+		return (Player) reply.getParam("player");
+	}
+	
+	/**
+	 * gets my player
+	 */	
+	public Player getMyPlayer() {
+		//send the command to the server
+		Response reply = this.sendResponseCommand(new Command(CMD_GET_MY_PLAYER, null));						
+				
+		//get the result from the response
+		if ( !reply.getKeyword().equals(RESP_PLAYER) ) {						
+			throw new InvalidResponseException("Invalid response received from server for " + CMD_GET_MY_PLAYER);
+		}	
+		
+		return (Player) reply.getParam("player");
+	}
+	
+	/**
+	 * check if my turn
+	 */	
+	public boolean isMyTurn() {
+		//send the command to the server
+		Response reply = this.sendResponseCommand(new Command(CMD_CHECK_TURN, null));						
+				
+		//get the result from the response
+		if ( !reply.getKeyword().equals(RESP_CHECK_TURN) ) {						
+			throw new InvalidResponseException("Invalid response received from server for " + CMD_CHECK_TURN);
+		}	
+		
+		return (Boolean) reply.getParam("your_turn");
+	}
+	
+	/**
+	 * check if my turn
+	 */	
+	public boolean rollTask() {
+		//send the command to the server
+		Response reply = this.sendResponseCommand(new Command(CMD_ROLL_TASK, null));						
+				
+		//get the result from the response
+		if ( !reply.getKeyword().equals(RESP_ROLL_TASK) ) {						
+			throw new InvalidResponseException("Invalid response received from server for " + CMD_ROLL_TASK);
+		}	
+		
+		return (Boolean) reply.getParam("result");
 	}
 	
 	/**
@@ -389,6 +487,24 @@ public class ClientService implements NetworkConstants, ProtocolConstants {
 		//get the result from the response
 		if ( !reply.getKeyword().equals(RESP_SUCCESS) ) {						
 			throw new InvalidResponseException("Invalid response received from server for " + CMD_SELECT_CHARACTER);
+		}	
+		
+	}
+	
+	/**
+	 * choose character
+	 */	
+	public void buyBagOfTricks(int i) {
+		//build params
+		HashMap<String, Object> params = new HashMap<String, Object>();
+		params.put("card", i);
+		
+		//send the command to the server
+		Response reply = this.sendResponseCommand(new Command(CMD_BUY_BAG_OF_TRICKS, params));						
+				
+		//get the result from the response
+		if ( !reply.getKeyword().equals(RESP_SUCCESS) ) {						
+			throw new InvalidResponseException("Invalid response received from server for " + CMD_BUY_BAG_OF_TRICKS);
 		}	
 		
 	}

@@ -8,6 +8,7 @@
 package grp.ctrlalthack.view;
 
 
+import grp.ctrlalthack.model.GameConstants;
 import grp.ctrlalthack.model.GameStats;
 import grp.ctrlalthack.model.HackerCard;
 
@@ -17,16 +18,20 @@ import grp.ctrlalthack.model.HackerCard;
 
 
 import grp.ctrlalthack.model.Player;
+import grp.ctrlalthack.model.mission.MissionCard;
 
 import java.awt.GridBagLayout;
 
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
 
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -68,6 +73,7 @@ public class GamePanel extends CardPanel implements ViewConstants {
 	private JLabel lblGameLog;
 	private JScrollPane scrollPane_1;
 	private JTextPane txt_game_log;
+	private JButton btn_roll;
 	
 	/*public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -111,8 +117,8 @@ public class GamePanel extends CardPanel implements ViewConstants {
 		
 		play_mission_panel = new PlayMissionPanel(null);
 		GridBagConstraints gbc_play_mission_panel = new GridBagConstraints();
-		gbc_play_mission_panel.gridheight = 7;
-		gbc_play_mission_panel.insets = new Insets(0, 0, 0, 5);
+		gbc_play_mission_panel.gridheight = 5;
+		gbc_play_mission_panel.insets = new Insets(0, 0, 5, 5);
 		gbc_play_mission_panel.fill = GridBagConstraints.BOTH;
 		gbc_play_mission_panel.gridx = 2;
 		gbc_play_mission_panel.gridy = 0;
@@ -128,6 +134,7 @@ public class GamePanel extends CardPanel implements ViewConstants {
 		add(game_stats_panel, gbc_game_stats_panel);
 		
 		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setPreferredSize(new Dimension(300, 250));
 		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
 		gbc_scrollPane.gridwidth = 2;
 		gbc_scrollPane.gridheight = 2;
@@ -168,6 +175,7 @@ public class GamePanel extends CardPanel implements ViewConstants {
 		add(lblGameLog, gbc_lblGameLog);
 		
 		scrollPane_1 = new JScrollPane();
+		scrollPane_1.setPreferredSize(new Dimension(300, 250));
 		GridBagConstraints gbc_scrollPane_1 = new GridBagConstraints();
 		gbc_scrollPane_1.gridwidth = 2;
 		gbc_scrollPane_1.insets = new Insets(0, 0, 5, 5);
@@ -181,6 +189,11 @@ public class GamePanel extends CardPanel implements ViewConstants {
 		scrollPane_1.setViewportView(txt_game_log);
 		
 		btn_your_character = new JButton("Your Character");
+		btn_your_character.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				viewMyCharacter();
+			}
+		});
 		GridBagConstraints gbc_btn_your_character = new GridBagConstraints();
 		gbc_btn_your_character.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btn_your_character.insets = new Insets(0, 0, 5, 5);
@@ -189,6 +202,11 @@ public class GamePanel extends CardPanel implements ViewConstants {
 		add(btn_your_character, gbc_btn_your_character);
 		
 		btn_your_mission = new JButton("Your Mission");
+		btn_your_mission.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				viewMyMission();
+			}
+		});
 		GridBagConstraints gbc_btn_your_mission = new GridBagConstraints();
 		gbc_btn_your_mission.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btn_your_mission.insets = new Insets(0, 0, 5, 5);
@@ -196,7 +214,26 @@ public class GamePanel extends CardPanel implements ViewConstants {
 		gbc_btn_your_mission.gridy = 5;
 		add(btn_your_mission, gbc_btn_your_mission);
 		
+		btn_roll = new JButton("ROLL!");
+		btn_roll.setFont(new Font("Tahoma", Font.BOLD, 13));
+		btn_roll.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				rollTask();
+			}
+		});
+		GridBagConstraints gbc_btn_roll = new GridBagConstraints();
+		gbc_btn_roll.gridheight = 2;
+		gbc_btn_roll.insets = new Insets(0, 0, 5, 5);
+		gbc_btn_roll.gridx = 2;
+		gbc_btn_roll.gridy = 5;
+		add(btn_roll, gbc_btn_roll);
+		
 		btn_your_entropy_on_hand = new JButton("Entropy On-hand");
+		btn_your_entropy_on_hand.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				viewMyEntropyOnHand();
+			}
+		});
 		GridBagConstraints gbc_btn_your_entropy_on_hand = new GridBagConstraints();
 		gbc_btn_your_entropy_on_hand.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btn_your_entropy_on_hand.insets = new Insets(0, 0, 0, 5);
@@ -205,6 +242,11 @@ public class GamePanel extends CardPanel implements ViewConstants {
 		add(btn_your_entropy_on_hand, gbc_btn_your_entropy_on_hand);
 		
 		btn_your_entropy_in_play = new JButton("Entropy in Play");
+		btn_your_entropy_in_play.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				viewMyEntropyInPlay();
+			}
+		});
 		GridBagConstraints gbc_btn_your_entropy_in_play = new GridBagConstraints();
 		gbc_btn_your_entropy_in_play.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btn_your_entropy_in_play.insets = new Insets(0, 0, 0, 5);
@@ -217,12 +259,29 @@ public class GamePanel extends CardPanel implements ViewConstants {
 				
 	}
 		
-	
+	/**
+	 * Roll Task
+	 */
+	protected void rollTask() {
+		switch ( this.getParent().getGameStatus() ) {
+			case GameConstants.STATUS_ATTENDANCE:
+				if (this.getParent().attend()) {
+					this.btn_roll.setText("ATTENDING..");
+					this.btn_roll.setEnabled(false);
+				}			
+				break;
+			case GameConstants.STATUS_PLAYING:
+				this.getParent().rollTask();
+				break;
+			}		
+	}
+
+
 	/**
 	 * Populate the fields
 	 */
-	private void populateFields() {
-		//TODO
+	public void populateFields() {
+		btn_roll.setEnabled(this.getParent().isMyTurn());	
 	}
 	
 	/**
@@ -255,6 +314,86 @@ public class GamePanel extends CardPanel implements ViewConstants {
 	}
 	
 	/**
+	 * Update mission card
+	 */
+	public void updateMission(MissionCard card) {
+		this.play_mission_panel.setMission(card);
+		this.play_mission_panel.setMissionMode(this.getParent().isMyTurn());
+		populateFields();
+	}
+	
+	/**
+	 * Update mission card
+	 */
+	public void endTurn() {		
+		this.play_mission_panel.unsetMissionMode();		
+	}
+	
+	/**
+	 * Update mission card
+	 */
+	public void newRound() {
+		this.play_mission_panel.unsetMissionMode();
+		this.play_mission_panel.setNewRound();
+	}
+	
+	/**
+	 * View the mission
+	 */
+	private void viewMyMission() {
+		if ( this.getParent().getMyPlayer() != null && this.getParent().getMyPlayer().getMission() != null ) {
+			JDialog mission_dialog = new JDialog(null, "Your Mission", JDialog.DEFAULT_MODALITY_TYPE);
+			mission_dialog.add(new MissionCardPanel(this.getParent().getMyPlayer().getMission()));		
+			mission_dialog.setSize(new Dimension(400,600));
+			mission_dialog.setVisible(true);
+		} else {
+			JOptionPane.showMessageDialog(null, "You don't have a mission yet.", "No Mission", JOptionPane.INFORMATION_MESSAGE);
+		}
+	}
+	
+	/**
+	 * View the character
+	 */
+	private void viewMyCharacter() {
+		if ( this.getParent().getMyPlayer() != null && this.getParent().getMyPlayer().getCharacter() != null ) {
+			JDialog mission_dialog = new JDialog(null, "Your Character", JDialog.DEFAULT_MODALITY_TYPE);
+			mission_dialog.add(new HackerCardPanel(this.getParent().getMyPlayer().getCharacter()));		
+			mission_dialog.setSize(new Dimension(400,600));
+			mission_dialog.setVisible(true);
+		} else {
+			JOptionPane.showMessageDialog(null, "You don't have a character yet.", "No Mission", JOptionPane.INFORMATION_MESSAGE);
+		}
+	}
+	
+	/**
+	 * View in play
+	 */
+	private void viewMyEntropyInPlay() {		
+		if ( this.getParent().getMyPlayer() == null || this.getParent().getMyPlayer().getEntropyCardsInPlay().size() == 0 ) {
+				JOptionPane.showMessageDialog(null, "You have no entropy cards in play", "No cards", JOptionPane.INFORMATION_MESSAGE);
+		} else {
+				JDialog entropy_in_play_dialog = new JDialog(null, "Entropy Cards in Play", JDialog.DEFAULT_MODALITY_TYPE);
+				entropy_in_play_dialog.add(new ListEntropyCardsPanel(this.getParent().getMyPlayer().getEntropyCardsInPlay()));		
+				entropy_in_play_dialog.setSize(new Dimension(600,600));
+				entropy_in_play_dialog.setVisible(true);
+		}		
+	}
+	
+	/**
+	 * View on hand
+	 */
+	private void viewMyEntropyOnHand() {		
+		if ( this.getParent().getMyPlayer() == null || this.getParent().getMyPlayer().getEntropyCards().size() == 0 ) {
+				JOptionPane.showMessageDialog(null, "You have no entropy cards on hand", "No cards", JOptionPane.INFORMATION_MESSAGE);
+		} else {
+				JDialog entropy_on_hand_dialog = new JDialog(null, "Entropy Cards on Hand", JDialog.DEFAULT_MODALITY_TYPE);
+				entropy_on_hand_dialog.add(new ListEntropyCardsPanel(this.getParent(), this.getParent().getMyPlayer().getEntropyCards()));		
+				entropy_on_hand_dialog.setSize(new Dimension(600,600));
+				entropy_on_hand_dialog.setVisible(true);
+		}		
+	}
+	
+	/**
 	 * Show details for selected player
 	 */
 	private void showSelectedPlayer() {
@@ -280,7 +419,7 @@ public class GamePanel extends CardPanel implements ViewConstants {
 				text_color = Color.BLACK;
 		}
 		this.txt_game_log.setEditable(true); //temporarily enable editing
-		this.prependToPane(this.txt_game_log, message + "\n", text_color, false);
+		this.prependToPane(this.txt_game_log, "-> " + message + "\n", text_color, false);
 		this.txt_game_log.setEditable(false);
 	}
 	
@@ -303,5 +442,21 @@ public class GamePanel extends CardPanel implements ViewConstants {
 	     tp.setCaretPosition(0);
 	     tp.setCharacterAttributes(aset, false);
 	     tp.replaceSelection(msg);	     
+	}
+	
+	/**
+	 * Updates the mode of the game panel
+	 */
+	public void updateMode() {
+		switch ( this.getParent().getGameStatus() ) {
+			case GameConstants.STATUS_ATTENDANCE:
+				this.btn_roll.setText("ATTEND");
+				this.btn_roll.setEnabled(true);
+				break;
+			case GameConstants.STATUS_PLAYING:
+				this.btn_roll.setText("ROLL!");
+				this.btn_roll.setEnabled(this.getParent().isMyTurn());
+				break;
+		}		
 	}
 }

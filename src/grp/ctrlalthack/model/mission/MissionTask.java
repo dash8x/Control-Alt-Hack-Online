@@ -7,9 +7,11 @@
 
 package grp.ctrlalthack.model.mission;
 
+import java.io.Serializable;
+
 import grp.ctrlalthack.model.HackerCard;
 
-public class MissionTask {	
+public class MissionTask implements Serializable {	
 	
 	//fields
 	private String skill; //the skill to roll for
@@ -32,8 +34,8 @@ public class MissionTask {
 		this.desc = desc;
 		this.setSkill(skill);
 		this.setAltSkill(alt_skill);
-		this.skill_mod = skill_mod;
-		this.alt_mod = alt_mod;
+		this.skill_mod = Math.abs(skill_mod);
+		this.alt_mod = Math.abs(alt_mod);
 	}
 
 	/**

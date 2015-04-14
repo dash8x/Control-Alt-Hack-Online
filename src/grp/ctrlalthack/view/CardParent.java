@@ -8,6 +8,7 @@
 
 package grp.ctrlalthack.view;
 
+import grp.ctrlalthack.model.GameConstants;
 import grp.ctrlalthack.model.GameStats;
 import grp.ctrlalthack.model.HackerCard;
 import grp.ctrlalthack.model.Message;
@@ -30,6 +31,7 @@ public class CardParent extends JPanel implements ViewConstants {
 	private ClientService client;	
 	private Thread server_thread;
 	private Thread client_thread;
+	private Player my_player;
 	
 	//panels
 	private CardPanel home_panel;
@@ -38,8 +40,11 @@ public class CardParent extends JPanel implements ViewConstants {
 	private ServerLobbyPanel server_lobby_panel;
 	private ChooseCharacterPanel choose_character_panel;
 	private GamePanel game_panel;
-
+	
 	private boolean game_open = false;
+	
+	private boolean is_my_turn = false;
+	private int game_status = GameConstants.STATUS_WAITING_TO_START;
 	
 	/**
 	 * Constructor
@@ -61,6 +66,27 @@ public class CardParent extends JPanel implements ViewConstants {
 		//set to client mode by default
 		this.setMode(CLIENT_MODE);
 	}	
+	
+	/**
+	 * returns the game status
+	 */
+	public int getGameStatus() {
+		return this.game_status;
+	}
+	
+	/**
+	 * @return the is_my_turn
+	 */
+	public boolean isMyTurn() {
+		return is_my_turn;
+	}
+
+	/**
+	 * @param is_my_turn the is_my_turn to set
+	 */
+	public void setMyTurn(boolean is_my_turn) {
+		this.is_my_turn = is_my_turn;
+	}
 	
 	/**
 	 * Check if game is open
@@ -207,11 +233,27 @@ public class CardParent extends JPanel implements ViewConstants {
 	}
 	
 	/**
+	 * Shows error
+	 */
+	public void showInfo(String msg) {
+		//JOptionPane.showMessageDialog(null, msg, "Info", JOptionPane.INFORMATION_MESSAGE);
+		this.game_panel.updateStatus(msg);
+	}
+	
+	/**
+	 * Returns my player
+	 */
+	public Player getMyPlayer() {
+		return this.my_player;
+	}
+	
+	/**
 	 * Updates the players list
 	 */
 	public void updatePlayers() {
 		try {			
-			ArrayList<Player> players = this.getClient().getPlayers();					
+			ArrayList<Player> players = this.getClient().getPlayers();		
+			this.my_player = this.getClient().getMyPlayer();
 			if ( this.isGameOpen() ) {
 				this.game_panel.updatePlayers(players);
 			} else if ( this.server_lobby_panel != null ) {
@@ -266,7 +308,7 @@ public class CardParent extends JPanel implements ViewConstants {
 		try {
 			this.getClient().chooseCharacter(i);	
 			openGamePanel();
-		} catch (Exception e) {
+		} catch (Exception e) {			
 			showError(e.getMessage());
 		}
 	}
@@ -303,6 +345,7 @@ public class CardParent extends JPanel implements ViewConstants {
 	 * Creates the server lobby
 	 */
 	public void openServerLobby() {
+		this.game_status = GameConstants.STATUS_WAITING_TO_START;
 		server_lobby_panel = new ServerLobbyPanel(this);
 		this.add(server_lobby_panel, SERVER_LOBBY_PANEL);
 		navigateTo(SERVER_LOBBY_PANEL);	
@@ -311,8 +354,9 @@ public class CardParent extends JPanel implements ViewConstants {
 	/**
 	 * Creates the choose character
 	 */
-	public void openChooseCharacter() {
+	public void openChooseCharacter() {		
 		try {
+			this.game_status = GameConstants.STATUS_CHOOSE_CHARACTER;
 			HackerCard[] cards = this.getClient().getCharacterChoices();		
 			choose_character_panel = new ChooseCharacterPanel(this, cards);
 			this.add(choose_character_panel, CHOOSE_CHARACTER_PANEL);
@@ -326,11 +370,100 @@ public class CardParent extends JPanel implements ViewConstants {
 	 * Creates the game panel
 	 */
 	public void openGamePanel() {
-		game_panel = new GamePanel(this);
+		game_panel = new GamePanel(this);		
 		this.add(game_panel, GAME_PANEL);
 		game_panel.updateStatus("Waiting for all players to choose characters.");
 		game_panel.updateRollMessage("");
+		this.my_player = this.getClient().getMyPlayer();
 		navigateTo(GAME_PANEL);	
 		this.game_open  = true;
+	}
+
+	/**
+	 * Prepares for new round
+	 */
+	public void newRound() {		
+		this.updatePlayers();
+		this.setMyTurn(false);		
+		game_panel.populateFields();		
+		this.game_panel.updateStatus("");
+		this.game_panel.updateRollMessage("");
+		this.game_panel.newRound();
+	}
+	
+	/**
+	 * Set up attendance
+	 */
+	public void setToAttendance() {
+		this.game_status = GameConstants.STATUS_ATTENDANCE;
+		this.game_panel.updateMode();
+	}
+	
+	/**
+	 * Rolls for a task
+	 */
+	public void rollTask() {
+		try {
+			this.getClient().rollTask();
+		} catch (Exception e) {
+			showError(e.getMessage());
+		}
+	}
+	
+	/**
+	 * Prepares for new turn
+	 */
+	public void newTurn() {
+		this.game_status = GameConstants.STATUS_PLAYING;
+		//check if it's my turn
+		boolean was_my_turn = this.isMyTurn();
+		try {
+			if ( this.getClient().isMyTurn() ) {
+				this.setMyTurn(true);				
+			} else {
+				this.setMyTurn(false);
+				if ( was_my_turn ) {
+					game_panel.endTurn();
+				}
+			}
+			game_panel.updateMode();
+			//set player info
+			this.updatePlayers();
+			Player curr_player = this.getClient().getCurrPlayer();
+			game_panel.updateStatus(curr_player.getPlayerName() + " playing.");
+			game_panel.updateRollMessage("");
+			//set mission card
+			game_panel.updateMission(this.getClient().getCurrMission());
+		} catch (Exception e) {
+			showError(e.getMessage());
+		}
+	}
+
+	/**
+	 * Sends buy card command
+	 */
+	public boolean buyBagOfTricks(int i) {
+		boolean bought = false;
+		try {
+			this.getClient().buyBagOfTricks(i);
+			bought = true;
+		} catch (Exception e) {
+			showError(e.getMessage());
+		}
+		return bought;
+	}
+	
+	/**
+	 * Attend	 
+	 */
+	public boolean attend() {
+		boolean success = false;
+		try {
+			this.getClient().attend();
+			success = true;
+		} catch (Exception e) {
+			showError(e.getMessage());
+		}
+		return success;
 	}
 }

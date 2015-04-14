@@ -14,6 +14,7 @@
 package grp.ctrlalthack.net;
 
 import grp.ctrlalthack.controller.Game;
+import grp.ctrlalthack.model.GameConstants;
 import grp.ctrlalthack.model.Message;
 
 import java.io.IOException;
@@ -101,6 +102,30 @@ public class Server implements NetworkConstants {
     		throw new IllegalArgumentException("Maximum number of players should be between 3 and 6");
     	} 
 		this.max_players = num_players;
+	}
+	
+	/**
+	 * Start new Round
+	 */
+	public void newRound() {
+		//end round 
+		this.getGame().endRound();
+		this.setAllUpdated(FLAG_NEW_ROUND);
+		this.getGame().setGameStatus(GameConstants.STATUS_ATTENDANCE);
+		this.setAllUpdated(FLAG_ATTENDANCE);
+		this.broadcastMessage(new Message("You have 1 minute to decide to attend Staff Video Conference.",Message.CONTEXT_PHASE));
+		Thread attendance = new Thread(new Runnable() {			
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(20 * 1000);
+				} catch (InterruptedException e) {}
+				getGame().setGameStatus(GameConstants.STATUS_PLAYING);
+				setAllUpdated(FLAG_NEW_TURN);				
+			}
+		});
+		attendance.start();
+		//this.setAllUpdated(FLAG_NEW_TURN);
 	}
 	
 	/**

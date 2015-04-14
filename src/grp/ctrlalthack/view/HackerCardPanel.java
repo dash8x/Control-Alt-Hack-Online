@@ -20,6 +20,7 @@ import java.awt.GridBagLayout;
 
 import javax.swing.JLabel;
 
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -94,6 +95,7 @@ public class HackerCardPanel extends JPanel {
 		
 		setBorder(new LineBorder(new Color(0, 0, 153), 10));
 		setBackground(new Color(153, 204, 255));
+		setPreferredSize(new Dimension(350, 400));
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{0, 0, 5, 0, 0, 0};
 		gridBagLayout.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0};

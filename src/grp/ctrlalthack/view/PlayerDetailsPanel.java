@@ -10,7 +10,9 @@ package grp.ctrlalthack.view;
 import grp.ctrlalthack.model.GameStats;
 import grp.ctrlalthack.model.Player;
 
+import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import java.awt.Color;
@@ -18,6 +20,7 @@ import java.awt.GridBagLayout;
 
 import javax.swing.JLabel;
 
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -28,6 +31,7 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.SwingConstants;
 import javax.swing.JButton;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -147,6 +151,11 @@ public class PlayerDetailsPanel extends JPanel {
 		add(lbl_cash, gbc_lbl_cash);
 		
 		btn_view_mission = new JButton("View Mission");
+		btn_view_mission.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				viewMission();
+			}
+		});
 		GridBagConstraints gbc_btn_view_mission = new GridBagConstraints();
 		gbc_btn_view_mission.fill = GridBagConstraints.HORIZONTAL;
 		gbc_btn_view_mission.anchor = GridBagConstraints.SOUTH;
@@ -158,6 +167,7 @@ public class PlayerDetailsPanel extends JPanel {
 		btn_view_entropy_in_play = new JButton("Entropy Cards in Play");
 		btn_view_entropy_in_play.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				viewEntropyInPlay();
 			}
 		});
 		GridBagConstraints gbc_btn_view_entropy_in_play = new GridBagConstraints();
@@ -171,6 +181,34 @@ public class PlayerDetailsPanel extends JPanel {
 		setPlayer(player);
 	}
 	
+	/**
+	 * View the mission
+	 */
+	private void viewMission() {
+		if ( this.player != null ) {
+			JDialog mission_dialog = new JDialog(null, "Mission", JDialog.DEFAULT_MODALITY_TYPE);
+			mission_dialog.add(new MissionCardPanel(player.getMission()));		
+			mission_dialog.setSize(new Dimension(400,600));
+			mission_dialog.setVisible(true);
+		}
+	}
+	
+	/**
+	 * View in play
+	 */
+	private void viewEntropyInPlay() {
+		if ( this.player != null ) {
+			if ( player.getEntropyCardsInPlay() == null || player.getEntropyCardsInPlay().size() == 0 ) {
+				JOptionPane.showMessageDialog(null, this.player.getPlayerName() + " has no entropy cards in play", "No cards", JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				JDialog entropy_in_play_dialog = new JDialog(null, "Entropy Cards in Play", JDialog.DEFAULT_MODALITY_TYPE);
+				entropy_in_play_dialog.add(new ListEntropyCardsPanel(player.getEntropyCardsInPlay()));		
+				entropy_in_play_dialog.setSize(new Dimension(400,600));
+				entropy_in_play_dialog.setVisible(true);
+			}
+		}
+	}
+
 	/**
 	 * Populate the fields
 	 */
@@ -188,6 +226,14 @@ public class PlayerDetailsPanel extends JPanel {
 			lbl_hacker_creds.setText(Integer.toString(player.getHackerCreds()));
 			lbl_cash.setText("$" + player.getCash());
 			character_panel.setCard(player.getCharacter());
+			btn_view_entropy_in_play.setEnabled(true);
+			btn_view_mission.setEnabled(true);
+		} else {
+			lbl_player_name.setText("No player selected");
+			lbl_hacker_creds.setText("");
+			lbl_cash.setText("");
+			btn_view_entropy_in_play.setEnabled(false);
+			btn_view_mission.setEnabled(false);
 		}
 	}
 

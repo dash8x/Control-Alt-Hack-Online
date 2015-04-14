@@ -7,9 +7,10 @@
 
 package grp.ctrlalthack.model.mission;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class MissionCard {	
+public class MissionCard implements Serializable {	
 	
 	private String title;
 	private String desc;

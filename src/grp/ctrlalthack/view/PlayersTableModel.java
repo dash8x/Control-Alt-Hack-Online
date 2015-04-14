@@ -77,7 +77,7 @@ public class PlayersTableModel extends AbstractTableModel {
 			case 2:
 				return player.getHackerCreds();
 			case 3:
-				return player.getCash();
+				return "$" + player.getCash();
 		}
 		return null;
 	}

@@ -104,7 +104,7 @@ public class BoTAutoSuccessCardPanel extends EntropyBagOfTricksCardPanel {
 		gbc_lbl_reroll_text.gridy = 5;
 		add(lbl_auto_success_text, gbc_lbl_reroll_text);
 		
-		lbl_keep_in_play.setText("Keep this card in play.");		
+		lbl_keep_in_play.setText("Discard this card after use.");		
 		GridBagConstraints gbc_lbl_keep_in_play = new GridBagConstraints();
 		gbc_lbl_keep_in_play.fill = GridBagConstraints.HORIZONTAL;
 		gbc_lbl_keep_in_play.gridwidth = 2;

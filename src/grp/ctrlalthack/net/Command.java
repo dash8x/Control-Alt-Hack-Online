@@ -28,7 +28,8 @@ public class Command extends Protocol {
 	public static final Set<String> COMMANDS = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
 			new String[]{CMD_CHECK_UPDATED, CMD_TERMINATE, CMD_INITIATE, CMD_GET_PLAYERS,
 					CMD_SELECT_CHARACTER, CMD_READY_TO_START, CMD_GET_CHARACTER_CHOICES,
-					CMD_START_GAME, CMD_GET_MESSAGE, CMD_GET_GAME_STATS}
+					CMD_START_GAME, CMD_GET_MESSAGE, CMD_GET_GAME_STATS, CMD_CHECK_TURN, CMD_GET_CURR_MISSION,
+					CMD_ROLL_TASK, CMD_GET_CURR_PLAYER, CMD_GET_MY_PLAYER, CMD_BUY_BAG_OF_TRICKS, CMD_ATTEND}
 			)));
 	
 	/**
@@ -50,13 +51,27 @@ public class Command extends Protocol {
 				return params != null && params.size() == 2 && (params.get("password") instanceof String) && (params.get("player_name") instanceof String);	
 			case CMD_SELECT_CHARACTER:
 				return params != null && params.size() == 1 && (params.get("character") instanceof Integer);	
+			case CMD_BUY_BAG_OF_TRICKS:
+				return params != null && params.size() == 1 && (params.get("card") instanceof Integer);	
 			case CMD_GET_CHARACTER_CHOICES:
 				return params == null || params.size() == 0;
 			case CMD_READY_TO_START:
 				return params == null || params.size() == 0;
+			case CMD_GET_MY_PLAYER:
+				return params == null || params.size() == 0;
 			case CMD_GET_PLAYERS:
 				return params == null || params.size() == 0;
+			case CMD_GET_CURR_MISSION:
+				return params == null || params.size() == 0;
+			case CMD_GET_CURR_PLAYER:
+				return params == null || params.size() == 0;
+			case CMD_CHECK_TURN:
+				return params == null || params.size() == 0;
+			case CMD_ATTEND:
+				return params == null || params.size() == 0;
 			case CMD_GET_GAME_STATS:
+				return params == null || params.size() == 0;
+			case CMD_ROLL_TASK:
 				return params == null || params.size() == 0;
 			case CMD_GET_MESSAGE:
 				return params == null || params.size() == 0;

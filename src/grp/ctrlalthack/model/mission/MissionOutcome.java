@@ -7,7 +7,9 @@
 
 package grp.ctrlalthack.model.mission;
 
-public abstract class MissionOutcome {	
+import java.io.Serializable;
+
+public abstract class MissionOutcome implements Serializable {	
 	
 	//fields
 	protected boolean all_players = false; //whether applies to all players

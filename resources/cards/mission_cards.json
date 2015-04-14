@@ -1,12 +1,4 @@
-[
-	{
-		"newb_mission": true,
-		"mission_title": "A Backup a Day",
-		"mission_desc": "...keeps disasters away. A couple of your company's computer systems need maintenance, and you drew the short straw.",
-		"tasks": [],
-		"success": { "hacker_cred": 0, "cash": 0, "desc": ""},
-		"failure": { "hacker_cred": 0, "cash": 0, "desc": ""}
-	},
+[	
 	{
 		"newb_mission": true,
 		"mission_title": "Gutenberg Groupie",

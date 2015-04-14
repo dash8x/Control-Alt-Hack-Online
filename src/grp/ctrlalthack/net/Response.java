@@ -11,6 +11,8 @@ package grp.ctrlalthack.net;
 import grp.ctrlalthack.model.GameStats;
 import grp.ctrlalthack.model.HackerCard;
 import grp.ctrlalthack.model.Message;
+import grp.ctrlalthack.model.Player;
+import grp.ctrlalthack.model.mission.MissionCard;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,7 +31,8 @@ public class Response extends Protocol {
 	//allowed responses
 	public static final Set<String> RESPONSES = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
 			new String[]{RESP_CHECK_UPDATED, RESP_TERMINATE, RESP_ERROR, RESP_SUCCESS,
-					RESP_FAIL, RESP_PLAYERS, RESP_CHARACTER_CHOICES, RESP_MESSAGE, RESP_GAME_STATS}
+					RESP_FAIL, RESP_PLAYERS, RESP_CHARACTER_CHOICES, RESP_MESSAGE, RESP_GAME_STATS,
+					RESP_CHECK_TURN, RESP_MISSION, RESP_ROLL_TASK, RESP_PLAYER}
 			)));
 	
 	/**
@@ -59,6 +62,14 @@ public class Response extends Protocol {
 				return (params == null || params.size() == 0);
 			case RESP_PLAYERS:
 				return params != null && params.size() == 1 && (params.get("players") instanceof ArrayList);
+			case RESP_PLAYER:
+				return params != null && params.size() == 1 && (params.get("player") instanceof Player);
+			case RESP_MISSION:
+				return params != null && params.size() == 1 && (params.get("mission") instanceof MissionCard);
+			case RESP_CHECK_TURN:
+				return params != null && params.size() == 1 && (params.get("your_turn") instanceof Boolean);
+			case RESP_ROLL_TASK:
+				return params != null && params.size() == 1 && (params.get("result") instanceof Boolean);
 			case RESP_GAME_STATS:
 				return params != null && params.size() == 1 && (params.get("stats") instanceof GameStats);
 			case RESP_MESSAGE:
