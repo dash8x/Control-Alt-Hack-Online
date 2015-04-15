@@ -13,6 +13,7 @@
 
 package grp.ctrlalthack.net;
 
+import grp.ctrlalthack.controller.EndGameException;
 import grp.ctrlalthack.controller.Game;
 import grp.ctrlalthack.model.GameConstants;
 import grp.ctrlalthack.model.Message;
@@ -109,22 +110,40 @@ public class Server implements NetworkConstants {
 	 */
 	public void newRound() {
 		//end round 
-		this.getGame().endRound();
-		this.setAllUpdated(FLAG_NEW_ROUND);
-		this.getGame().setGameStatus(GameConstants.STATUS_ATTENDANCE);
-		this.setAllUpdated(FLAG_ATTENDANCE);
-		this.broadcastMessage(new Message("You have 1 minute to decide to attend Staff Video Conference.",Message.CONTEXT_PHASE));
-		Thread attendance = new Thread(new Runnable() {			
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(20 * 1000);
-				} catch (InterruptedException e) {}
-				getGame().setGameStatus(GameConstants.STATUS_PLAYING);
-				setAllUpdated(FLAG_NEW_TURN);				
-			}
-		});
-		attendance.start();
+		try {
+			this.getGame().endRound();
+			this.setAllUpdated(FLAG_NEW_ROUND);
+			this.setAllUpdated(FLAG_GAME_STATS);
+			this.getGame().setGameStatus(GameConstants.STATUS_ATTENDANCE);
+			getGame().setPhase(2);
+			setAllUpdated(FLAG_GAME_STATS);
+			this.setAllUpdated(FLAG_ATTENDANCE);
+			this.broadcastMessage(new Message("You have 1 minute to decide to attend Staff Video Conference.",Message.CONTEXT_PHASE));		
+			Thread attendance = new Thread(new Runnable() {			
+				@Override
+				public void run() {
+					try {
+						Thread.sleep(20 * 1000);
+					} catch (InterruptedException e) {}
+					getGame().startMeeting();				
+					if ( getGame().getNumAttending() > 1 ) {
+						setAllUpdated(FLAG_MEETING);					
+						try {
+							Thread.sleep(60 * 1000);
+						} catch (InterruptedException e) {}
+					} else {
+						broadcastMessage(new Message("Meeting skipped since not enough players attended.",Message.CONTEXT_PHASE));
+					}
+					getGame().setGameStatus(GameConstants.STATUS_PLAYING);
+					getGame().setPhase(3);
+					setAllUpdated(FLAG_GAME_STATS);
+					setAllUpdated(FLAG_NEW_TURN);
+				}
+			});
+			attendance.start();		
+		} catch ( EndGameException e ) {
+			this.broadcastMessage(new Message(e.getMessage(), Message.CONTEXT_END));
+		}
 		//this.setAllUpdated(FLAG_NEW_TURN);
 	}
 	
@@ -236,9 +255,16 @@ public class Server implements NetworkConstants {
 	 * Removes a client from the list of clients
 	 */
 	public void removeClient(ServerService client) {
-		this.game.removePlayer(client.getPlayer());
-		this.clients.remove(client);
-		this.setAllUpdated(FLAG_PLAYERS); //notify others the players list was updated
+		try {
+			this.game.removePlayer(client.getPlayer());
+			this.clients.remove(client);
+			this.setAllUpdated(FLAG_PLAYERS); //notify others the players list was updated
+			if ( this.getGame().inChooseCharacter() || this.getGame().hasStarted() ) {
+				this.game.winner();
+			}
+		} catch ( EndGameException e ) {
+			this.broadcastMessage(new Message(e.getMessage(), Message.CONTEXT_END));
+		}
 	}	
 	
 	/**

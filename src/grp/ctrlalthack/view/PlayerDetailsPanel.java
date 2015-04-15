@@ -45,6 +45,7 @@ public class PlayerDetailsPanel extends JPanel {
 	private JButton btn_view_mission;
 	private HackerCardPanel character_panel;
 	private JLabel lbl_player_name;
+	private boolean can_view_mission = true;
 
 	
 	public static void main(String[] args) {
@@ -185,7 +186,7 @@ public class PlayerDetailsPanel extends JPanel {
 	 * View the mission
 	 */
 	private void viewMission() {
-		if ( this.player != null ) {
+		if ( this.player != null && this.canViewMission() ) {
 			JDialog mission_dialog = new JDialog(null, "Mission", JDialog.DEFAULT_MODALITY_TYPE);
 			mission_dialog.add(new MissionCardPanel(player.getMission()));		
 			mission_dialog.setSize(new Dimension(400,600));
@@ -227,7 +228,7 @@ public class PlayerDetailsPanel extends JPanel {
 			lbl_cash.setText("$" + player.getCash());
 			character_panel.setCard(player.getCharacter());
 			btn_view_entropy_in_play.setEnabled(true);
-			btn_view_mission.setEnabled(true);
+			btn_view_mission.setEnabled(canViewMission());
 		} else {
 			lbl_player_name.setText("No player selected");
 			lbl_hacker_creds.setText("");
@@ -235,6 +236,20 @@ public class PlayerDetailsPanel extends JPanel {
 			btn_view_entropy_in_play.setEnabled(false);
 			btn_view_mission.setEnabled(false);
 		}
+	}
+
+	/**
+	 * Set can view	 
+	 */
+	public boolean canViewMission() {
+		return this.can_view_mission;
+	}
+	
+	/**
+	 * Set can view	 
+	 */
+	public void setCanViewMission(boolean can) {
+		this.can_view_mission = can;
 	}
 
 

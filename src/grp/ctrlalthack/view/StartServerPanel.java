@@ -17,7 +17,9 @@ import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -52,6 +54,7 @@ public class StartServerPanel extends CardPanel implements ViewConstants {
 	public StartServerPanel(CardParent cards) {
 		//super();
 		super(cards);
+		setBackground(Color.WHITE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{30, 0, 0, 0, 0, 30, 0};
 		gridBagLayout.rowHeights = new int[]{30, 0, 0, 0, 0, 0, 0, 0, 30, 0, 0, 30, 0};
@@ -60,6 +63,7 @@ public class StartServerPanel extends CardPanel implements ViewConstants {
 		setLayout(gridBagLayout);
 		
 		JLabel lblStartServer = new JLabel("Start Server");
+		lblStartServer.setFont(new Font("Tahoma", Font.BOLD, 18));
 		GridBagConstraints gbc_lblStartServer = new GridBagConstraints();
 		gbc_lblStartServer.gridwidth = 2;
 		gbc_lblStartServer.insets = new Insets(0, 0, 5, 5);
@@ -68,6 +72,7 @@ public class StartServerPanel extends CardPanel implements ViewConstants {
 		add(lblStartServer, gbc_lblStartServer);
 		
 		JLabel lblServerName = new JLabel("Server Name:");
+		lblServerName.setFont(new Font("Tahoma", Font.BOLD, 13));
 		GridBagConstraints gbc_lblServerName = new GridBagConstraints();
 		gbc_lblServerName.anchor = GridBagConstraints.WEST;
 		gbc_lblServerName.insets = new Insets(0, 0, 5, 5);
@@ -76,6 +81,7 @@ public class StartServerPanel extends CardPanel implements ViewConstants {
 		add(lblServerName, gbc_lblServerName);
 		
 		txt_server_name = new JTextField("");
+		txt_server_name.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		GridBagConstraints gbc_txt_server_name = new GridBagConstraints();
 		gbc_txt_server_name.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txt_server_name.insets = new Insets(0, 0, 5, 5);
@@ -84,6 +90,7 @@ public class StartServerPanel extends CardPanel implements ViewConstants {
 		add(txt_server_name, gbc_txt_server_name);
 		
 		JLabel lblServer = new JLabel("Server Password:");
+		lblServer.setFont(new Font("Tahoma", Font.BOLD, 13));
 		GridBagConstraints gbc_lblServer = new GridBagConstraints();
 		gbc_lblServer.anchor = GridBagConstraints.WEST;
 		gbc_lblServer.insets = new Insets(0, 0, 5, 5);
@@ -92,6 +99,7 @@ public class StartServerPanel extends CardPanel implements ViewConstants {
 		add(lblServer, gbc_lblServer);
 		
 		txt_server_password = new JTextField("");
+		txt_server_password.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		GridBagConstraints gbc_txt_server_password = new GridBagConstraints();
 		gbc_txt_server_password.insets = new Insets(0, 0, 5, 5);
 		gbc_txt_server_password.fill = GridBagConstraints.HORIZONTAL;
@@ -100,6 +108,7 @@ public class StartServerPanel extends CardPanel implements ViewConstants {
 		add(txt_server_password, gbc_txt_server_password);
 		
 		JLabel lblPort = new JLabel("Port:");
+		lblPort.setFont(new Font("Tahoma", Font.BOLD, 13));
 		GridBagConstraints gbc_lblPort = new GridBagConstraints();
 		gbc_lblPort.anchor = GridBagConstraints.WEST;
 		gbc_lblPort.insets = new Insets(0, 0, 5, 5);
@@ -108,6 +117,7 @@ public class StartServerPanel extends CardPanel implements ViewConstants {
 		add(lblPort, gbc_lblPort);
 		
 		txt_server_port = new JTextField(Integer.toString(ClientService.DEFAULT_SERVER_PORT));
+		txt_server_port.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		GridBagConstraints gbc_txt_server_port = new GridBagConstraints();
 		gbc_txt_server_port.insets = new Insets(0, 0, 5, 5);
 		gbc_txt_server_port.fill = GridBagConstraints.HORIZONTAL;
@@ -116,6 +126,7 @@ public class StartServerPanel extends CardPanel implements ViewConstants {
 		add(txt_server_port, gbc_txt_server_port);
 		
 		JLabel lblNumberOfPlayers = new JLabel("Number of Players:");
+		lblNumberOfPlayers.setFont(new Font("Tahoma", Font.BOLD, 13));
 		GridBagConstraints gbc_lblNumberOfPlayers = new GridBagConstraints();
 		gbc_lblNumberOfPlayers.anchor = GridBagConstraints.WEST;
 		gbc_lblNumberOfPlayers.insets = new Insets(0, 0, 5, 5);
@@ -124,6 +135,7 @@ public class StartServerPanel extends CardPanel implements ViewConstants {
 		add(lblNumberOfPlayers, gbc_lblNumberOfPlayers);
 		
 		cmb_num_players = new JComboBox<Integer>();
+		cmb_num_players.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		cmb_num_players.setModel(new DefaultComboBoxModel<Integer>(new Integer[] {3, 4, 5, 6}));
 		GridBagConstraints gbc_cmb_num_players = new GridBagConstraints();
 		gbc_cmb_num_players.insets = new Insets(0, 0, 5, 5);
@@ -133,6 +145,7 @@ public class StartServerPanel extends CardPanel implements ViewConstants {
 		add(cmb_num_players, gbc_cmb_num_players);
 		
 		JLabel lblHostPlayerName = new JLabel("Host Player Name:");
+		lblHostPlayerName.setFont(new Font("Tahoma", Font.BOLD, 13));
 		GridBagConstraints gbc_lblHostPlayerName = new GridBagConstraints();
 		gbc_lblHostPlayerName.anchor = GridBagConstraints.WEST;
 		gbc_lblHostPlayerName.insets = new Insets(0, 0, 5, 5);
@@ -141,6 +154,7 @@ public class StartServerPanel extends CardPanel implements ViewConstants {
 		add(lblHostPlayerName, gbc_lblHostPlayerName);
 		
 		txt_host_player = new JTextField("Player");
+		txt_host_player.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		GridBagConstraints gbc_txt_host_player = new GridBagConstraints();
 		gbc_txt_host_player.insets = new Insets(0, 0, 5, 5);
 		gbc_txt_host_player.fill = GridBagConstraints.HORIZONTAL;
@@ -149,6 +163,7 @@ public class StartServerPanel extends CardPanel implements ViewConstants {
 		add(txt_host_player, gbc_txt_host_player);
 		
 		btn_start_server = new JButton("Start Server");
+		btn_start_server.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		GridBagConstraints gbc_btn_start_server = new GridBagConstraints();
 		gbc_btn_start_server.anchor = GridBagConstraints.WEST;
 		gbc_btn_start_server.insets = new Insets(0, 0, 5, 5);
@@ -157,6 +172,7 @@ public class StartServerPanel extends CardPanel implements ViewConstants {
 		add(btn_start_server, gbc_btn_start_server);
 		
 		btn_cancel_start_server = new JButton("Cancel");
+		btn_cancel_start_server.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		GridBagConstraints gbc_btn_cancel_start_server = new GridBagConstraints();
 		gbc_btn_cancel_start_server.anchor = GridBagConstraints.WEST;
 		gbc_btn_cancel_start_server.insets = new Insets(0, 0, 5, 5);

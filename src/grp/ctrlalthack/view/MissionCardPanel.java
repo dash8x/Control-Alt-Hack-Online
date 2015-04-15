@@ -90,7 +90,7 @@ public class MissionCardPanel extends JPanel {
 		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		setLayout(gridBagLayout);
 		Border lbl_perk_padding = BorderFactory.createEmptyBorder(10,10,10,10);
-		setPreferredSize(new Dimension(350, 400));
+		setPreferredSize(new Dimension(450, 450));
 		
 		lbl_name = new JLabel("MISSION");
 		lbl_name.setHorizontalAlignment(SwingConstants.CENTER);

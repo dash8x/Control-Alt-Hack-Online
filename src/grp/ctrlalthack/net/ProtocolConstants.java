@@ -28,12 +28,16 @@ public interface ProtocolConstants {
 	public final static String CMD_CHECK_TURN = "CHECK_TURN";
 	public final static String CMD_ROLL_TASK = "ROLL_TASK";	
 	public final static String CMD_ATTEND = "ATTEND";	
+	public final static String CMD_TRADE = "TRADE";
+	public final static String CMD_RESPOND_OFFER = "RESPOND_TO_OFFER";
+	public final static String CMD_GET_INCOMING_OFFER = "CMD_GET_INCOMING_OFFER";
 		
 	//responses
 	public final static String RESP_CHARACTER_CHOICES = "CHARACTER_CHOICES";
 	public final static String RESP_TERMINATE = "TERMINATE";
 	public final static String RESP_PLAYERS = "PLAYERS";
 	public final static String RESP_PLAYER = "PLAYER";
+	public final static String RESP_TRADE = "TRADE";
 	public final static String RESP_MISSION = "MISSION";
 	public final static String RESP_GAME_STATS = "GAME_STATS";
 	public final static String RESP_INITIATE = "INITIATE";

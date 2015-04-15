@@ -23,6 +23,7 @@ import grp.ctrlalthack.model.GameStats;
 import grp.ctrlalthack.model.HackerCard;
 import grp.ctrlalthack.model.Message;
 import grp.ctrlalthack.model.Player;
+import grp.ctrlalthack.model.Trade;
 import grp.ctrlalthack.model.mission.MissionCard;
 import grp.ctrlalthack.net.exception.ClientException;
 import grp.ctrlalthack.net.exception.ErrorResponseException;
@@ -153,7 +154,7 @@ public class ClientService implements NetworkConstants, ProtocolConstants {
 				} catch (InterruptedException e) {				
 				} catch (NoResponseException e) {				
 				} catch (Exception e) {
-					showError(e.getMessage());
+					client_ui.endGame(e.getMessage());
 				}
 			}
 		}
@@ -175,8 +176,14 @@ public class ClientService implements NetworkConstants, ProtocolConstants {
 			case FLAG_ATTENDANCE:
 				client_ui.setToAttendance();
 				break;
+			case FLAG_MEETING:
+				client_ui.setToMeeting();
+				break;
 			case FLAG_NEW_TURN:
 				client_ui.newTurn();
+				break;
+			case FLAG_NEW_OFFER:
+				client_ui.newOffer();
 				break;
 			case FLAG_PLAYERS:
 				client_ui.updatePlayers();
@@ -340,9 +347,9 @@ public class ClientService implements NetworkConstants, ProtocolConstants {
 	/**
 	 * Displays an error message	
 	 */
-	public void showError(String message) {
+	/*public void showError(String message) {
 		JOptionPane.showMessageDialog(null, message, "Network Error!", JOptionPane.ERROR_MESSAGE);
-	}
+	}*/
 	
 	/**
 	 * set ready to start
@@ -492,6 +499,42 @@ public class ClientService implements NetworkConstants, ProtocolConstants {
 	}
 	
 	/**
+	 * trade
+	 */	
+	public void trade(Trade t) {
+		//build params
+		HashMap<String, Object> params = new HashMap<String, Object>();
+		params.put("trade", t);
+		
+		//send the command to the server
+		Response reply = this.sendResponseCommand(new Command(CMD_TRADE, params));						
+				
+		//get the result from the response
+		if ( !reply.getKeyword().equals(RESP_SUCCESS) ) {						
+			throw new InvalidResponseException("Invalid response received from server for " + CMD_TRADE);
+		}	
+		
+	}
+	
+	/**
+	 * respond to offer
+	 */	
+	public void respondOffer(boolean accept) {
+		//build params
+		HashMap<String, Object> params = new HashMap<String, Object>();
+		params.put("accept", accept);
+		
+		//send the command to the server
+		Response reply = this.sendResponseCommand(new Command(CMD_RESPOND_OFFER, params));						
+				
+		//get the result from the response
+		if ( !reply.getKeyword().equals(RESP_SUCCESS) ) {						
+			throw new InvalidResponseException("Invalid response received from server for " + CMD_RESPOND_OFFER);
+		}	
+		
+	}
+	
+	/**
 	 * choose character
 	 */	
 	public void buyBagOfTricks(int i) {
@@ -527,6 +570,26 @@ public class ClientService implements NetworkConstants, ProtocolConstants {
 		}
 				
 		return message;
+	}
+	
+	/**
+	 * Gets an incoming offer from the server
+	 */
+	public Trade getIncomingOffer() {
+		//send the command to the server
+		Response reply = this.sendResponseCommand(new Command(CMD_GET_INCOMING_OFFER, null));		
+				
+		//initialize output array
+		Trade trade = null;
+				
+		//get the result from the response
+		if ( reply.getKeyword().equals(RESP_TRADE) ) {
+			trade = (Trade) reply.getParam("trade");
+		} else {			
+			throw new InvalidResponseException("Invalid response received from server for CMD_GET_INCOMING_OFFER");
+		}
+				
+		return trade;
 	}
 	
 	/**

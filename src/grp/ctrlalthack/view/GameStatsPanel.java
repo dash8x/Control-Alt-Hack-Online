@@ -79,7 +79,7 @@ public class GameStatsPanel extends JPanel {
 		gbc_lblCreds.gridy = 0;
 		add(lblCreds, gbc_lblCreds);
 		
-		lbl_hacker_creds = new JLabel("Total Hacker Creds:");
+		lbl_hacker_creds = new JLabel("");
 		lbl_hacker_creds.setOpaque(true);
 		lbl_hacker_creds.setForeground(Color.BLACK);
 		lbl_hacker_creds.setFont(new Font("Tahoma", Font.PLAIN, 13));
@@ -103,7 +103,7 @@ public class GameStatsPanel extends JPanel {
 		gbc_lblTotalCash.gridy = 1;
 		add(lblTotalCash, gbc_lblTotalCash);
 		
-		lbl_cash = new JLabel("Total Hacker Creds:");
+		lbl_cash = new JLabel("");
 		lbl_cash.setOpaque(true);
 		lbl_cash.setForeground(Color.BLACK);
 		lbl_cash.setFont(new Font("Tahoma", Font.PLAIN, 13));
@@ -127,7 +127,7 @@ public class GameStatsPanel extends JPanel {
 		gbc_lblCurrentRound.gridy = 2;
 		add(lblCurrentRound, gbc_lblCurrentRound);
 		
-		lbl_round = new JLabel("Total Hacker Creds:");
+		lbl_round = new JLabel("");
 		lbl_round.setOpaque(true);
 		lbl_round.setForeground(Color.BLACK);
 		lbl_round.setFont(new Font("Tahoma", Font.PLAIN, 13));
@@ -151,7 +151,7 @@ public class GameStatsPanel extends JPanel {
 		gbc_lblCurrentPhase.gridy = 3;
 		add(lblCurrentPhase, gbc_lblCurrentPhase);
 		
-		lbl_phase = new JLabel("Total Hacker Creds:");
+		lbl_phase = new JLabel("");
 		lbl_phase.setOpaque(true);
 		lbl_phase.setForeground(Color.BLACK);
 		lbl_phase.setFont(new Font("Tahoma", Font.PLAIN, 13));
@@ -175,7 +175,7 @@ public class GameStatsPanel extends JPanel {
 		gbc_lblCurrentPlayer.gridy = 4;
 		add(lblCurrentPlayer, gbc_lblCurrentPlayer);
 		
-		lbl_player = new JLabel("Total Hacker Creds:");
+		lbl_player = new JLabel("");
 		lbl_player.setOpaque(true);
 		lbl_player.setForeground(Color.BLACK);
 		lbl_player.setFont(new Font("Tahoma", Font.PLAIN, 13));

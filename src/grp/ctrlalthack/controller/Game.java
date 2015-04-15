@@ -12,6 +12,7 @@ import grp.ctrlalthack.model.GameConstants;
 import grp.ctrlalthack.model.GameStats;
 import grp.ctrlalthack.model.HackerCard;
 import grp.ctrlalthack.model.Player;
+import grp.ctrlalthack.model.Trade;
 import grp.ctrlalthack.model.entropy.EntropyCard;
 import grp.ctrlalthack.model.mission.MissionCard;
 
@@ -134,9 +135,27 @@ public class Game implements GameConstants {
 	}
 	
 	/**
+	 * Returns a single player
+	 */
+	public Player getPlayer(int id) {
+		// find player by id
+		for (Player pl : this.getPlayers()) {
+			if (pl.getPlayerID() == id) {
+				return pl;
+			}
+		}
+		return null;
+	}	
+	
+	/**
 	 * Removes a player from the game
 	 */
 	public void removePlayer(Player new_player) {
+		MissionCard mission = new_player.removeMission();
+		if ( mission != null ) {
+			this.missions_deck.add(mission);
+		}
+		this.entropy_discard.addAll(new_player.emptyEntropyCards());
 		this.players.remove(new_player);
 	}
 	
@@ -158,10 +177,25 @@ public class Game implements GameConstants {
 					new_player.setHost(true);
 				}				
 				//set the id of the player			
-				new_player.setPlayerID(this.last_id + 1);
+				new_player.setPlayerID(this.last_id++);
 				this.players.add(new_player);				
 			}
 		}
+	}
+	
+	/**
+	 * Get number of players attending
+	 */
+	public int getNumAttending() {		
+		int num = 0;
+		if ( this.getPlayers() != null ) {
+			for ( Player p : this.getPlayers() ) {
+				if ( p.isAttending() ) {
+					num++;
+				}
+			}
+		}
+		return num;
 	}
 	
 	/**
@@ -200,14 +234,14 @@ public class Game implements GameConstants {
 	 */
 	public void addEntropyCard(EntropyCard card) {
 		if ( card != null ) {
-			this.entropy_deck.add(card);
+			this.entropy_discard.add(card);
 		}
 	}
 	
 	/**
 	 * pop an entropy card
 	 */
-	private EntropyCard getEntropyCard() {
+	public EntropyCard getEntropyCard() {
 		if (this.entropy_deck.isEmpty()) {
 			this.entropy_deck.addAll(this.entropy_discard);
 			this.entropy_discard.clear();
@@ -308,7 +342,7 @@ public class Game implements GameConstants {
 				p.setMission(getMissionCard());
 			}
 			//set current player
-			this.current_player = 0;
+			this.current_player = getStartPlayer();
 			this.getCurrentPlayer().setMyTurn(true);
 		} else {
 			throw new GameException("Game has not started yet");
@@ -316,18 +350,175 @@ public class Game implements GameConstants {
 	}
 	
 	/**
-	 * Determine a start player
+	 * Get start player id
 	 */
-	//TODO
+	private int getStartPlayer() {
+		ArrayList<Integer> max_players = this.getMaxHackerCredIndexes();
+		if ( max_players.size() > 0 ) {
+			return ((Integer) getRandomElement(max_players));
+		} else {
+			return 0;
+		}
+		
+	}
+	
+	/**
+	 * Get list of players with max hacker cred
+	 */
+	private ArrayList<Integer> getMaxHackerCredIndexes() {
+		ArrayList<Integer> max_players = new ArrayList<Integer>();
+		int max_hacker_cred = 0;
+		if ( this.getPlayers() != null ) {
+			for ( int i = 0; i < this.getPlayers().size(); i++ ) {
+				Player p = this.getPlayers().get(i);
+				if ( p.getHackerCreds() > max_hacker_cred ) {
+					max_players.clear();
+					max_players.add(i);
+					max_hacker_cred = p.getHackerCreds();
+				} else if ( p.getHackerCreds() == max_hacker_cred ) {
+					max_players.add(i);
+				}
+			}
+		}
+		return max_players;
+	}
+	
+	/**
+	 * Get list of players with max hacker cred
+	 */
+	private ArrayList<Player> getMaxHackerCredPlayers() {
+		ArrayList<Player> max_players = new ArrayList<Player>();
+		int max_hacker_cred = 0;
+		if ( this.getPlayers() != null ) {
+			for ( Player p : this.getPlayers() ) {
+				if ( p.getHackerCreds() > max_hacker_cred ) {
+					max_players.clear();
+					max_players.add(p);
+					max_hacker_cred = p.getHackerCreds();
+				} else if ( p.getHackerCreds() == max_hacker_cred ) {
+					max_players.add(p);
+				}
+			}
+		}
+		return max_players;
+	}		
+	
+	/**
+	 * Get second best hacker cred
+	 */
+	private int getSecondBestHackerCred() {		
+		int max_hacker_cred = 0;
+		int second_best = -1;
+		if ( this.getPlayers() != null ) {
+			for ( Player p : this.getPlayers() ) {
+				if ( p.getHackerCreds() > max_hacker_cred ) {
+					if ( second_best == -1 ) {
+						second_best = p.getHackerCreds();
+					} else {
+						second_best = max_hacker_cred;
+					}					
+					max_hacker_cred = p.getHackerCreds();						
+				}
+			}
+		}
+		return second_best;
+	}
 	
 	/**
 	 * End the round
 	 */
 	public void endRound() {
-		//TODO
-		this.startRound();
+		if (this.hasStarted()) {
+			//bonus penalty
+			giveHackerCredBonusPenalty();
+			//check winning conditions
+			winner();
+			//remove extra entropy cards
+			for ( Player p : this.getPlayers() ) {
+				if ( p.getEntropyCards() != null && p.getEntropyCards().size() > 5 ) {
+					int to_remove = p.getEntropyCards().size() - 5;
+					for ( int i = 0; i < to_remove; i++ ) {
+						this.addEntropyCard(p.removeRandomEntropyCard());
+					}
+				}
+			}
+			this.startRound();
+		} else {
+			throw new GameException("Game has not started yet");
+		}
 	}
 	
+	/**
+	 * Hacker cred bonus/penalty 
+	 */
+	private void giveHackerCredBonusPenalty() {
+		ArrayList<Player> success_players = new ArrayList<Player>();
+		ArrayList<Player> fail_players = new ArrayList<Player>();
+		if ( this.getPlayers() != null ) {
+			for ( Player p : this.getPlayers() ) {
+				if ( p.getSucceeded() ) {					
+					success_players.add(p);
+				} else {
+					fail_players.add(p);
+				}
+			}
+		}
+		if ( success_players.size() == this.getNumPlayers() ) {
+			if ( this.getPlayers() != null ) {
+				for ( Player p : this.getPlayers() ) {
+					p.addHackerCreds(1);
+				}
+			}
+		} else if ( success_players.size() == 1 ) {
+			success_players.get(0).addHackerCreds(1);
+			success_players.get(0).addCash(1000);
+		} else if ( fail_players.size() == 1 ) {
+			fail_players.get(0).removeHackerCreds(1);
+		}
+	}
+	
+	/**
+	 * Get winning player
+	 */
+	public void winner() {
+		ArrayList<Player> max_players = getMaxHackerCredPlayers();
+		int total_creds = this.getTotalHackerCreds();
+		int num_players = this.getNumPlayers();
+		try {
+			if ( max_players.size() == 1 ) {
+				//check for 5 difference
+				if ( num_players < MIN_PLAYERS ) {
+					throw new EndGameException("Game has ended because of too few players. " + max_players.get(0).getPlayerName() + " won the game.");
+				} else if ( (max_players.get(0).getHackerCreds() - getSecondBestHackerCred()) > 5 ) {
+					throw new EndGameException(max_players.get(0).getPlayerName() + " has won by MadSkillz. " + max_players.get(0).getHackerCreds() + " " + getSecondBestHackerCred());
+				} else if ( total_creds < (4 * num_players) ){
+					throw new EndGameException(max_players.get(0).getPlayerName() + " has won by Canned CEO.");
+				} else if ( total_creds >= (10 * num_players) ){
+					throw new EndGameException(max_players.get(0).getPlayerName() + " has won by Profitable Retirement.");
+				}
+			} else if ( max_players.size() > 1 ) {
+				if ( num_players < MIN_PLAYERS ) {
+					throw new EndGameException("Game has ended because of too few players. It was a draw between " + max_players.toString());
+				} else if ( total_creds < (4 * num_players) ){
+					throw new EndGameException("Game has ended by Canned CEO. It was a draw between " + max_players.toString());
+				} else if ( total_creds >= (10 * num_players) ){
+					throw new EndGameException("Game has ended by Profitable Retirement. It was a draw between " + max_players.toString());				
+				}
+			}
+		} catch (EndGameException e) {
+			this.stopGame();
+			throw new EndGameException(e.getMessage());
+		}
+	}
+	
+	/**
+	 * Stops the game
+	 */
+	private void stopGame() {
+		// TODO Auto-generated method stub
+		
+	}
+
 	/**
 	 * Distributes character cards
 	 */
@@ -434,5 +625,23 @@ public class Game implements GameConstants {
 	 */
 	public boolean inPlaying() {
 		return this.getGameStatus() == STATUS_PLAYING;
+	}
+	
+	/**
+	 * Start the meeting
+	 */
+	public void startMeeting() {
+		if (this.hasStarted()) {			
+			for ( Player p : this.getPlayers() ) {
+				if ( p.isAttending() ) {
+					//give entropy card
+					p.addEntropyCard(getEntropyCard());
+				}				
+			}			
+			this.setGameStatus(STATUS_MEETING);
+			this.setPhase(2);
+		} else {
+			throw new GameException("Game has not started yet");
+		}
 	}
 }

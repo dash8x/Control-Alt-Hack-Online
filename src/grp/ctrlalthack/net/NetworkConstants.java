@@ -16,7 +16,9 @@ public interface NetworkConstants {
 	public final static String FLAG_CHOOSE_CHARACTERS = "CHOOSE_CHARACTERS";
 	public final static String FLAG_NEW_ROUND = "NEW_ROUND";
 	public final static String FLAG_NEW_TURN = "NEW_TURN";
+	public final static String FLAG_NEW_OFFER = "NEW_OFFER";
 	public final static String FLAG_ATTENDANCE = "ATTENDANCE";
+	public final static String FLAG_MEETING = "MEETING";	
 	
 	//logging constants
 	public final static String ERROR_MSG = "ERROR";

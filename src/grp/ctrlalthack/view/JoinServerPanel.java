@@ -16,7 +16,9 @@ import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -44,6 +46,7 @@ public class JoinServerPanel extends CardPanel implements ViewConstants {
 	public JoinServerPanel(CardParent cards) {
 		//super();
 		super(cards);
+		setBackground(Color.WHITE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{30, 0, 0, 0, 0, 30, 0};
 		gridBagLayout.rowHeights = new int[]{30, 0, 0, 0, 0, 0, 0, 30, 0, 0, 30, 0};
@@ -51,15 +54,17 @@ public class JoinServerPanel extends CardPanel implements ViewConstants {
 		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
 		setLayout(gridBagLayout);
 		
-		JLabel lblStartServer = new JLabel("Join Server");
+		JLabel lbl_panel_title = new JLabel("Join Server");
+		lbl_panel_title.setFont(new Font("Tahoma", Font.BOLD, 18));
 		GridBagConstraints gbc_lblStartServer = new GridBagConstraints();
 		gbc_lblStartServer.gridwidth = 2;
 		gbc_lblStartServer.insets = new Insets(0, 0, 5, 5);
 		gbc_lblStartServer.gridx = 2;
 		gbc_lblStartServer.gridy = 1;
-		add(lblStartServer, gbc_lblStartServer);
+		add(lbl_panel_title, gbc_lblStartServer);
 		
 		JLabel lblServerName = new JLabel("Server IP:");
+		lblServerName.setFont(new Font("Tahoma", Font.BOLD, 13));
 		GridBagConstraints gbc_lblServerName = new GridBagConstraints();
 		gbc_lblServerName.anchor = GridBagConstraints.WEST;
 		gbc_lblServerName.insets = new Insets(0, 0, 5, 5);
@@ -68,6 +73,7 @@ public class JoinServerPanel extends CardPanel implements ViewConstants {
 		add(lblServerName, gbc_lblServerName);
 		
 		txt_server_ip = new JTextField("");
+		txt_server_ip.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		GridBagConstraints gbc_txt_server_ip = new GridBagConstraints();
 		gbc_txt_server_ip.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txt_server_ip.insets = new Insets(0, 0, 5, 5);
@@ -76,6 +82,7 @@ public class JoinServerPanel extends CardPanel implements ViewConstants {
 		add(txt_server_ip, gbc_txt_server_ip);
 		
 		JLabel lblPort = new JLabel("Port:");
+		lblPort.setFont(new Font("Tahoma", Font.BOLD, 13));
 		GridBagConstraints gbc_lblPort = new GridBagConstraints();
 		gbc_lblPort.anchor = GridBagConstraints.WEST;
 		gbc_lblPort.insets = new Insets(0, 0, 5, 5);
@@ -84,6 +91,7 @@ public class JoinServerPanel extends CardPanel implements ViewConstants {
 		add(lblPort, gbc_lblPort);
 		
 		txt_server_port = new JTextField(Integer.toString(ClientService.DEFAULT_SERVER_PORT));
+		txt_server_port.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		GridBagConstraints gbc_txt_server_port = new GridBagConstraints();
 		gbc_txt_server_port.insets = new Insets(0, 0, 5, 5);
 		gbc_txt_server_port.fill = GridBagConstraints.HORIZONTAL;
@@ -92,6 +100,7 @@ public class JoinServerPanel extends CardPanel implements ViewConstants {
 		add(txt_server_port, gbc_txt_server_port);
 		
 		JLabel lblServer = new JLabel("Server Password:");
+		lblServer.setFont(new Font("Tahoma", Font.BOLD, 13));
 		GridBagConstraints gbc_lblServer = new GridBagConstraints();
 		gbc_lblServer.anchor = GridBagConstraints.WEST;
 		gbc_lblServer.insets = new Insets(0, 0, 5, 5);
@@ -100,6 +109,7 @@ public class JoinServerPanel extends CardPanel implements ViewConstants {
 		add(lblServer, gbc_lblServer);
 		
 		txt_server_password = new JTextField("");
+		txt_server_password.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		GridBagConstraints gbc_txt_server_password = new GridBagConstraints();
 		gbc_txt_server_password.insets = new Insets(0, 0, 5, 5);
 		gbc_txt_server_password.fill = GridBagConstraints.HORIZONTAL;
@@ -108,6 +118,7 @@ public class JoinServerPanel extends CardPanel implements ViewConstants {
 		add(txt_server_password, gbc_txt_server_password);
 		
 		JLabel lblHostPlayerName = new JLabel("Player Name:");
+		lblHostPlayerName.setFont(new Font("Tahoma", Font.BOLD, 13));
 		GridBagConstraints gbc_lblHostPlayerName = new GridBagConstraints();
 		gbc_lblHostPlayerName.anchor = GridBagConstraints.WEST;
 		gbc_lblHostPlayerName.insets = new Insets(0, 0, 5, 5);
@@ -116,6 +127,7 @@ public class JoinServerPanel extends CardPanel implements ViewConstants {
 		add(lblHostPlayerName, gbc_lblHostPlayerName);
 		
 		txt_player_name = new JTextField("Player");
+		txt_player_name.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		GridBagConstraints gbc_txt_player_name = new GridBagConstraints();
 		gbc_txt_player_name.insets = new Insets(0, 0, 5, 5);
 		gbc_txt_player_name.fill = GridBagConstraints.HORIZONTAL;
@@ -124,6 +136,7 @@ public class JoinServerPanel extends CardPanel implements ViewConstants {
 		add(txt_player_name, gbc_txt_player_name);
 		
 		btn_join_server = new JButton("Join Server");
+		btn_join_server.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		btn_join_server.setHorizontalAlignment(SwingConstants.RIGHT);
 		GridBagConstraints gbc_btn_join_server = new GridBagConstraints();
 		gbc_btn_join_server.anchor = GridBagConstraints.WEST;
@@ -133,6 +146,7 @@ public class JoinServerPanel extends CardPanel implements ViewConstants {
 		add(btn_join_server, gbc_btn_join_server);
 		
 		btn_cancel_join_server = new JButton("Cancel");
+		btn_cancel_join_server.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		GridBagConstraints gbc_btn_cancel_start_server = new GridBagConstraints();
 		gbc_btn_cancel_start_server.anchor = GridBagConstraints.WEST;
 		gbc_btn_cancel_start_server.insets = new Insets(0, 0, 5, 5);

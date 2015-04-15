@@ -20,7 +20,7 @@ public class PlayersTableModel extends AbstractTableModel {
 	private ArrayList<Player> players;
 	
 	//the column titles
-	private static final String[] COLUMNS = new String[]{"#", "Player Name","Creds", "Cash"};
+	private static final String[] COLUMNS = new String[]{"#", "Name","Creds", "Cash", "Attending"};
 	
 	/**
 	 * Constructor
@@ -71,13 +71,15 @@ public class PlayersTableModel extends AbstractTableModel {
 		//return the corresponding field
 		switch(col) {
 			case 0:
-				return row;
+				return row + 1;
 			case 1:
 				return player.getPlayerName();
 			case 2:
 				return player.getHackerCreds();
 			case 3:
 				return "$" + player.getCash();
+			case 4:
+				return (player.isAttending()) ? "YES" : "NO";
 		}
 		return null;
 	}

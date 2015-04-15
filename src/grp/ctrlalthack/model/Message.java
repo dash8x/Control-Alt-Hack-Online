@@ -19,6 +19,7 @@ public class Message implements Serializable {
 	public static final String CONTEXT_ROLL = "ROLL";
 	public static final String CONTEXT_ROUND = "ROUND";
 	public static final String CONTEXT_PHASE = "PHASE";
+	public static final String CONTEXT_END = "END";
 	
 	
 	/**

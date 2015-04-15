@@ -29,6 +29,7 @@ import javax.swing.JLabel;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.JTextPane;
 
 import java.awt.Dimension;
@@ -273,10 +274,40 @@ public class GamePanel extends CardPanel implements ViewConstants {
 			case GameConstants.STATUS_PLAYING:
 				this.getParent().rollTask();
 				break;
+			case GameConstants.STATUS_MEETING:
+				this.makeTrade();
+				break;
 			}		
 	}
 
-
+	/**
+	 * Make offer
+	 */
+	protected void makeTrade() {
+		if ( tbl_players.getSelectedRow() > - 1 ) {
+			//get the selected player details
+			int player_row = tbl_players.getSelectedRow();
+			Player player = ((PlayersTableModel)tbl_players.getModel()).getRow(player_row);				
+			// get the offer cash from user
+			JTextField txt_cash = new JTextField("1000");
+			Object[] fields = { "Cash:", txt_cash };
+			int option = JOptionPane.showConfirmDialog(null, fields,
+					"Make an offer to " + player.getPlayerName(), JOptionPane.OK_CANCEL_OPTION);
+			if (option == JOptionPane.OK_OPTION) {
+				int cash = -1;
+				try {
+					cash = Integer.parseInt(txt_cash.getText());
+					if (cash < 0 ) { // invalid port number
+						throw new NumberFormatException("Invalid cash value");
+					}
+					this.getParent().makeOffer(player.getPlayerID(), cash);
+				} catch (NumberFormatException e) {
+					this.showError("Invalid cash value");
+				}
+			} 
+		}
+	}
+	
 	/**
 	 * Populate the fields
 	 */
@@ -397,13 +428,22 @@ public class GamePanel extends CardPanel implements ViewConstants {
 	 * Show details for selected player
 	 */
 	private void showSelectedPlayer() {
-		if ( tbl_players.getSelectedRow() > - 1 ) {
+		boolean selected = tbl_players.getSelectedRow() > - 1;
+		if ( selected ) {
 			//get the selected student details
 			Player player = ((PlayersTableModel)tbl_players.getModel()).getRow(tbl_players.getSelectedRow());
 			this.player_details_panel.setPlayer(player);	
-			this.player_details_panel.setVisible(true);
+			this.player_details_panel.setVisible(true);			
+			if ( this.getParent().getGameStatus() == GameConstants.STATUS_MEETING ) {
+				btn_roll.setEnabled(player.isAttending() && player.getPlayerID() != this.getParent().getMyPlayer().getPlayerID() );
+				btn_roll.setText("MAKE OFFER");
+			}
 		} else {
 			this.player_details_panel.setVisible(false);
+			if ( this.getParent().getGameStatus() == GameConstants.STATUS_MEETING ) {
+				btn_roll.setEnabled(false);
+				btn_roll.setText("SELECT A PLAYER TO TRADE");
+			}
 		}
 	}
 	
@@ -450,12 +490,30 @@ public class GamePanel extends CardPanel implements ViewConstants {
 	public void updateMode() {
 		switch ( this.getParent().getGameStatus() ) {
 			case GameConstants.STATUS_ATTENDANCE:
+				this.player_details_panel.setCanViewMission(false);
 				this.btn_roll.setText("ATTEND");
 				this.btn_roll.setEnabled(true);
 				break;
 			case GameConstants.STATUS_PLAYING:
+				this.player_details_panel.setCanViewMission(true);
 				this.btn_roll.setText("ROLL!");
 				this.btn_roll.setEnabled(this.getParent().isMyTurn());
+				break;
+			case GameConstants.STATUS_MEETING:
+				if ( !this.getParent().getMyPlayer().isAttending() ) {
+					this.updateStatus("Please wait while other players trade");
+					this.player_details_panel.setCanViewMission(false);
+				} else {
+					this.updateStatus("You have 1 minute to trade with other players");
+					this.player_details_panel.setCanViewMission(true);
+				}
+				boolean selected = tbl_players.getSelectedRow() > -1;
+				if ( !selected ) {
+					btn_roll.setText("SELECT A PLAYER TO TRADE");
+				} else {
+					btn_roll.setText("MAKE OFFER");
+				}				
+				this.btn_roll.setEnabled(selected);
 				break;
 		}		
 	}

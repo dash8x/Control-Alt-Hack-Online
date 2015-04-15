@@ -13,6 +13,7 @@ import grp.ctrlalthack.model.GameStats;
 import grp.ctrlalthack.model.HackerCard;
 import grp.ctrlalthack.model.Message;
 import grp.ctrlalthack.model.Player;
+import grp.ctrlalthack.model.Trade;
 import grp.ctrlalthack.net.ClientService;
 import grp.ctrlalthack.net.Server;
 
@@ -194,8 +195,7 @@ public class CardParent extends JPanel implements ViewConstants {
 					try {
 						getClient().runClient();
 					} catch (Exception e) {									
-						showError(e.getMessage());
-						navigateTo(HOME_PANEL);
+						endGame(e.getMessage());						
 					}
 				}
 			});	
@@ -215,8 +215,7 @@ public class CardParent extends JPanel implements ViewConstants {
 					try {
 						getServer().runServer();
 					} catch (Exception e) {						
-						showError(e.getMessage());
-						navigateTo(HOME_PANEL);
+						endGame(e.getMessage());						
 					}
 				}
 			});	
@@ -320,7 +319,9 @@ public class CardParent extends JPanel implements ViewConstants {
 		try {
 			Message message = this.getClient().getMessage();		
 			if ( message != null && !message.getMessage().equals("") ) {
-				if ( isGameOpen() ) {
+				if ( message.getContext().equals(Message.CONTEXT_END) ) {
+					this.endGame(message.getMessage());
+				} else if ( isGameOpen() ) {
 					this.game_panel.displayLog(message.getMessage(), message.getContext());
 					//update main panel
 					switch (message.getContext()) {
@@ -340,7 +341,20 @@ public class CardParent extends JPanel implements ViewConstants {
 		}
 	}
 	
-	
+	/**
+	 * Ends the game
+	 */
+	public void endGame(String message) {
+		this.stopClient();
+		this.stopServer();
+		JOptionPane.showMessageDialog(null, message, "Game Ended", JOptionPane.WARNING_MESSAGE);		
+		this.game_panel = null;
+		this.choose_character_panel = null;
+		this.server_lobby_panel = null;
+		this.setMode(CLIENT_MODE);
+		this.navigateTo(HOME_PANEL);
+	}
+
 	/**
 	 * Creates the server lobby
 	 */
@@ -396,6 +410,14 @@ public class CardParent extends JPanel implements ViewConstants {
 	 */
 	public void setToAttendance() {
 		this.game_status = GameConstants.STATUS_ATTENDANCE;
+		this.game_panel.updateMode();
+	}
+	
+	/**
+	 * Set up attendance
+	 */
+	public void setToMeeting() {
+		this.game_status = GameConstants.STATUS_MEETING;
 		this.game_panel.updateMode();
 	}
 	
@@ -465,5 +487,39 @@ public class CardParent extends JPanel implements ViewConstants {
 			showError(e.getMessage());
 		}
 		return success;
+	}
+	
+	/**
+	 * Make offer
+	 */
+	public void makeOffer(int player_id, int cash) {	
+		try {
+			Trade offer = new Trade(player_id, cash);
+			this.getClient().trade(offer);
+		} catch (Exception e) {
+			showError(e.getMessage());
+		}
+	}
+	
+	/**
+	 * Offer
+	 */
+	public void newOffer() {
+		//check if received new offer
+		Trade offer = null;
+		try {
+			offer = this.getClient().getIncomingOffer();
+			if ( offer != null ) {
+				int option = JOptionPane.showConfirmDialog(null, offer.getPlayerName() + " made an offer of $" + offer.getCash() + " to you. Do you want to accept it?",
+						"New Offer", JOptionPane.YES_NO_OPTION);
+				try {					
+					this.getClient().respondOffer(option == JOptionPane.YES_OPTION);					
+				} catch (Exception e) {
+					showError(e.getMessage());
+				}
+			}
+		} catch (Exception e) {
+			showError(e.getMessage());
+		}
 	}
 }

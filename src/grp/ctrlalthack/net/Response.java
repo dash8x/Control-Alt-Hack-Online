@@ -12,6 +12,7 @@ import grp.ctrlalthack.model.GameStats;
 import grp.ctrlalthack.model.HackerCard;
 import grp.ctrlalthack.model.Message;
 import grp.ctrlalthack.model.Player;
+import grp.ctrlalthack.model.Trade;
 import grp.ctrlalthack.model.mission.MissionCard;
 
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ public class Response extends Protocol {
 	public static final Set<String> RESPONSES = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
 			new String[]{RESP_CHECK_UPDATED, RESP_TERMINATE, RESP_ERROR, RESP_SUCCESS,
 					RESP_FAIL, RESP_PLAYERS, RESP_CHARACTER_CHOICES, RESP_MESSAGE, RESP_GAME_STATS,
-					RESP_CHECK_TURN, RESP_MISSION, RESP_ROLL_TASK, RESP_PLAYER}
+					RESP_CHECK_TURN, RESP_MISSION, RESP_ROLL_TASK, RESP_PLAYER, RESP_TRADE}
 			)));
 	
 	/**
@@ -64,6 +65,8 @@ public class Response extends Protocol {
 				return params != null && params.size() == 1 && (params.get("players") instanceof ArrayList);
 			case RESP_PLAYER:
 				return params != null && params.size() == 1 && (params.get("player") instanceof Player);
+			case RESP_TRADE:
+				return params != null && params.size() == 1 && ((params.get("trade") instanceof Trade) || params.get("trade") == null);
 			case RESP_MISSION:
 				return params != null && params.size() == 1 && (params.get("mission") instanceof MissionCard);
 			case RESP_CHECK_TURN:

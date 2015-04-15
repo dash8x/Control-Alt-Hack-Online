@@ -60,6 +60,11 @@ public class Player implements Serializable {
 	//mission to play
 	private MissionCard mission;
 	private int curr_task; //current task to play
+	private boolean succeeded = false; 
+	
+	//trade
+	private Trade outgoing_trade;
+	private Trade incoming_trade;
 	
 	/**
 	 * Constructor
@@ -75,6 +80,61 @@ public class Player implements Serializable {
 		//status values
 		this.setReadyToStart(false);
 	}	
+	
+	/**
+	 * Get succeed 
+	 */
+	public boolean getSucceeded() {
+		return this.succeeded;
+	}
+	
+	/**
+	 * Set succeed 
+	 */
+	public void setSucceeded(boolean success) {
+		this.succeeded = success;
+	}
+	
+	/**
+	 * Check if has pending trades
+	 */
+	public boolean hasPendingTrades() {
+		return this.getIncomingTrade() != null || this.getOutgoingTrade() != null;
+	}
+	
+	/**
+	 * Set incoming trade
+	 */
+	public Trade getIncomingTrade() {
+		return this.incoming_trade;
+	}
+	
+	/**
+	 * Set incoming trade
+	 */
+	public Trade getOutgoingTrade() {
+		return this.outgoing_trade;
+	}
+	
+	/**
+	 * Set incoming trade
+	 */
+	public void setIncomingTrade(Trade incoming_trade) {
+		if ( incoming_trade != null && this.hasPendingTrades() ) {
+			throw new PlayerException("Cannot make offer. " + this.getPlayerName() + " has pending trades.");
+		}
+		this.incoming_trade = incoming_trade;
+	}
+	
+	/**
+	 * Set outgoing trade
+	 */
+	public void setOutgoingTrade(Trade outgoing_trade) {
+		if ( outgoing_trade != null && this.hasPendingTrades() ) {
+			throw new PlayerException("Pending trades need to be acknowledged before making offer.");
+		}
+		this.outgoing_trade = outgoing_trade;
+	}
 	
 	/**
 	 * Check if played in the current phase
@@ -120,6 +180,9 @@ public class Player implements Serializable {
 		this.setMission(null);
 		this.setAttending(false);
 		this.setFreeReroll(true);
+		this.setOutgoingTrade(null);
+		this.setIncomingTrade(null);
+		this.setSucceeded(false);
 		//reset rerolls
 		Iterator it = this.bot_reroll.entrySet().iterator();
 	    if (it.hasNext()) {
@@ -399,6 +462,17 @@ public class Player implements Serializable {
 	}
 	
 	/**
+	 * Remove a random entropy card
+	 */
+	public EntropyCard removeRandomEntropyCard() {
+		EntropyCard card = null;
+		if ( this.getEntropyCards() != null ) {
+			card = this.entropy_cards.remove((int)(Math.random() * entropy_cards.size()));
+		}
+		return card;
+	}
+	
+	/**
 	 * Empty the cash
 	 */
 	public int emptyCash() {
@@ -621,6 +695,13 @@ public class Player implements Serializable {
 			this.addCash(this.getMission().getFailure().getCash());
 			this.addHackerCreds(this.getMission().getFailure().getHackerCreds());
 		}
+	}
+	
+	/**
+	 * toString
+	 */
+	public String toString() {
+		return this.getPlayerName();
 	}
 	
 }

@@ -16,6 +16,7 @@ import grp.ctrlalthack.model.GameStats;
 import grp.ctrlalthack.model.HackerCard;
 import grp.ctrlalthack.model.Message;
 import grp.ctrlalthack.model.Player;
+import grp.ctrlalthack.model.Trade;
 import grp.ctrlalthack.model.entropy.EntropyCard;
 import grp.ctrlalthack.model.mission.MissionCard;
 import grp.ctrlalthack.model.mission.MissionTask;
@@ -384,6 +385,17 @@ public class ServerService implements Runnable, NetworkConstants, ProtocolConsta
 		this.sendResponse(new Response(RESP_ROLL_TASK, params));
 	}
 	
+	/**
+     * Sends a TRADE response
+     * @param courses
+     */
+	private void sendTrade(Trade trade) {
+		HashMap<String,Object> params = new HashMap<String,Object>(); 
+		params.put("trade", trade);
+		this.sendResponse(new Response(RESP_TRADE, params));
+	}
+	
+	
     /**
      * Handles commands
      * @param request the Command
@@ -406,6 +418,15 @@ public class ServerService implements Runnable, NetworkConstants, ProtocolConsta
 	    		break;
 	    	case CMD_BUY_BAG_OF_TRICKS:
 	    		buyBagOfTricks(keyword, params);
+	    		break;
+	    	case CMD_TRADE:
+	    		trade(keyword, params);
+	    		break;
+	    	case CMD_GET_INCOMING_OFFER:
+	    		getIncomingOffer(keyword, params);
+				break;
+	    	case CMD_RESPOND_OFFER:
+	    		respondToOffer(keyword, params);
 	    		break;
 	    	case CMD_GET_PLAYERS:
 	    		getPlayers(keyword, params);
@@ -477,8 +498,13 @@ public class ServerService implements Runnable, NetworkConstants, ProtocolConsta
 						this.setAllUpdated(FLAG_PLAYERS);
 						this.broadcastMessage(new Message(this.getPlayer().getPlayerName() + " used autosuccess card.", Message.CONTEXT_ROLL));						
 						success = true;
-					} else {																				
+					} else {	
+						this.getPlayer().setSucceeded(false);
 						this.player.applyFailure();
+						//remove entropy cards
+						for ( int i = 0; i < this.getPlayer().getMission().getFailure().getEntropyCards(); i++ ) {
+							this.server.getGame().addEntropyCard(this.getPlayer().removeRandomEntropyCard());
+						}
 						this.setAllUpdated(FLAG_PLAYERS);
 						this.setAllUpdated(FLAG_GAME_STATS);
 						this.broadcastMessage(new Message(this.getPlayer().getPlayerName() + " failed the mission.", Message.CONTEXT_ROLL));
@@ -496,7 +522,12 @@ public class ServerService implements Runnable, NetworkConstants, ProtocolConsta
 				this.getPlayer().nextTask();				
 				//check if was last task
 				if ( this.getPlayer().isLastTask() ) {
+					this.getPlayer().setSucceeded(true);
 					this.player.applySuccess();
+					//add entropy cards
+					for ( int i = 0; i < this.getPlayer().getMission().getSuccess().getEntropyCards(); i++ ) {
+						this.getPlayer().addEntropyCard(this.server.getGame().getEntropyCard());
+					}
 					this.setAllUpdated(FLAG_PLAYERS);
 					this.setAllUpdated(FLAG_GAME_STATS);
 					this.broadcastMessage(new Message(this.getPlayer().getPlayerName() + " succeeded the mission.", Message.CONTEXT_ROLL));
@@ -630,7 +661,9 @@ public class ServerService implements Runnable, NetworkConstants, ProtocolConsta
 			try {
 				this.getPlayer().setAttending(true);
 				this.getPlayer().setFreeReroll(false);
-				this.sendSuccess("You are attending");
+				this.sendSuccess("You are attending");				
+				this.setAllUpdated(FLAG_PLAYERS);
+				this.broadcastMessage(this.getPlayer().getPlayerName() + " chose to attend");
 			} catch ( Exception e ) {				
 				this.sendFail(keyword, e.getMessage());
 				return;
@@ -638,6 +671,96 @@ public class ServerService implements Runnable, NetworkConstants, ProtocolConsta
 		} else {
 			this.sendFail(keyword, "Game not in attendance stage.");
 		}
+	}
+    
+    /**
+     * trade
+     */
+    private void trade(String keyword, HashMap<String, Object> params) {
+    	Trade t = (Trade) params.get("trade");
+    	Player other_player = this.server.getGame().getPlayer(t.getPlayerID());
+    	if ( !this.server.getGame().inMeeting() ) { 
+    		this.sendFail(keyword, "Game not in meeting stage.");
+    	} else if ( !this.getPlayer().isAttending() ) {
+    		this.sendFail(keyword, "You need to be attending the Staff Video Conference to make trades.");			
+    	} else if ( this.getPlayer().getPlayerID() == t.getPlayerID() ) {
+    		this.sendFail(keyword, "You cannot trade with yourself.");			
+    	} else if ( other_player == null ) {
+    		this.sendFail(keyword, "Cannot find specified player.");			
+    	} else if ( !other_player.isAttending() ) {
+    		this.sendFail(keyword, "You can only trade with attending players.");			
+    	} else if ( this.getPlayer().hasPendingTrades() ) {
+    		this.sendFail(keyword, "Cannot make offer. You have pending trades that need to be addressed first.");			
+    	} else if ( this.getPlayer().getCash() < t.getCash() ) {
+    		this.sendFail(keyword, "Cannot make offer. You do not have enough cash.");			
+    	} else {
+    		try {				
+				other_player.setIncomingTrade(new Trade(this.getPlayer().getPlayerID(), t.getCash(), this.getPlayer().getPlayerName()));
+				this.getPlayer().setOutgoingTrade(t);				
+				this.sendSuccess("Offer made.");
+				this.setAllUpdated(FLAG_NEW_OFFER);
+				this.broadcastMessage(this.getPlayer().getPlayerName() + " made an offer of $" + t.getCash() + " to " + other_player.getPlayerName());
+			} catch ( Exception e ) {				
+				this.sendFail(keyword, e.getMessage());
+				return;
+			}		
+		}
+	}
+    
+    /**
+     * respond to offer
+     */
+    private void respondToOffer(String keyword, HashMap<String, Object> params) {    	    	
+    	if ( !this.server.getGame().inMeeting() ) { 
+    		this.sendFail(keyword, "Game not in meeting stage.");
+    	} else if ( !this.getPlayer().isAttending() ) {
+    		this.sendFail(keyword, "You need to be attending the Staff Video Conference to make trades.");			
+    	} else if ( this.getPlayer().getIncomingTrade() == null ) {
+    		this.sendFail(keyword, "You don't have any incoming offers.");			
+    	} else {
+    		try {	
+    			Trade t = this.getPlayer().getIncomingTrade();
+    			boolean accept = (Boolean) params.get("accept");
+    			Player other_player = this.server.getGame().getPlayer(t.getPlayerID());
+    			this.getPlayer().setIncomingTrade(null);
+    			other_player.setOutgoingTrade(null);
+    			if ( accept ) {
+    				other_player.removeCash(t.getCash());
+    				this.getPlayer().addCash(t.getCash());
+    				MissionCard other_mission = other_player.getMission();
+    				other_player.setMission(this.getPlayer().getMission());
+    				this.getPlayer().setMission(other_mission);
+    				this.sendSuccess("Offer accepted.");
+    				this.broadcastMessage(this.getPlayer().getPlayerName() + " accepted " + other_player.getPlayerName() + "'s offer of $" + t.getCash() );
+    			} else {
+    				this.sendSuccess("Offer rejected.");
+    				this.broadcastMessage(this.getPlayer().getPlayerName() + " rejected " + other_player.getPlayerName() + "'s offer of $" + t.getCash() );
+    			}				
+				this.setAllUpdated(FLAG_PLAYERS);				
+			} catch ( Exception e ) {				
+				this.sendFail(keyword, e.getMessage());
+				return;
+			}		
+		}
+	}
+    
+    /**
+     * returns incoming offer
+     */
+    private void getIncomingOffer(String keyword, HashMap<String, Object> params) {    	    	    	
+    	Trade t = null;
+    	if ( !this.server.getGame().inMeeting() ) {     		
+    		this.sendFail(keyword, "Game not in meeting stage.");
+    		return;
+    	} else {
+    		try {	
+    			t = this.getPlayer().getIncomingTrade();				
+			} catch ( Exception e ) {				
+				this.sendFail(keyword, e.getMessage());
+				return;
+			}		
+		}
+    	this.sendTrade(t);
 	}
     
     /**
