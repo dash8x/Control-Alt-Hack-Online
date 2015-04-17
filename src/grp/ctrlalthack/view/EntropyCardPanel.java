@@ -1,5 +1,5 @@
 /**
- * Contains static methods to read data from resources
+ * Abstract class for Entropy card panels
  * 
  * @author Arushad Ahmed
  * @arthor_uri http://arushad.org 
@@ -44,6 +44,11 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.JTextArea;
 
 public abstract class EntropyCardPanel extends JPanel {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4088850723351372912L;
 	
 	protected JTextArea lbl_card_desc;	
 	protected JLabel lbl_card_title;	

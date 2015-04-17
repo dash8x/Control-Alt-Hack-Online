@@ -12,6 +12,11 @@ import java.util.ArrayList;
 
 public class MissionCard implements Serializable {	
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8852483779629803179L;
+	
 	private String title;
 	private String desc;
 	private boolean is_newb = false;

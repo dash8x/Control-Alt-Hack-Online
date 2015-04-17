@@ -9,7 +9,6 @@
 
 package grp.ctrlalthack.net;
 
-import grp.ctrlalthack.model.HackerCard;
 import grp.ctrlalthack.model.Trade;
 
 import java.util.Arrays;

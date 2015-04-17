@@ -9,6 +9,11 @@ package grp.ctrlalthack.model.entropy;
 
 public abstract class BagOfTricksCard extends EntropyCard {	
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7050967132459634079L;
+	
 	//common fields
 	protected int cost; 
 	

@@ -1,5 +1,5 @@
 /**
- * Object to wrap game stats
+ * Object to wrap trade
  *   
  * @author Arushad Ahmed
  * @arthor_uri http://arushad.org  
@@ -11,6 +11,11 @@ import java.io.Serializable;
 
 public class Trade implements Serializable {
 		
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3200514985724069779L;
+	
 	private int player_id; //id
 	private int cash;		
 	private String player_name = "";

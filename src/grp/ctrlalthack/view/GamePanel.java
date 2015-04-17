@@ -1,5 +1,5 @@
 /**
- * Server lobby panel
+ * Main Game Screen
  *  
  * @author Arushad Ahmed
  * @arthor_uri http://arushad.org  
@@ -10,12 +10,6 @@ package grp.ctrlalthack.view;
 
 import grp.ctrlalthack.model.GameConstants;
 import grp.ctrlalthack.model.GameStats;
-import grp.ctrlalthack.model.HackerCard;
-
-
-
-
-
 
 import grp.ctrlalthack.model.Player;
 import grp.ctrlalthack.model.mission.MissionCard;
@@ -23,17 +17,11 @@ import grp.ctrlalthack.model.mission.MissionCard;
 import java.awt.GridBagLayout;
 
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
-
-
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
-
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -41,26 +29,23 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-
 import javax.swing.JButton;
-
-
-
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
-
 import java.awt.Color;
 import java.awt.Font;
-
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 
 public class GamePanel extends CardPanel implements ViewConstants {
-//public class GamePanel extends JPanel implements ViewConstants {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5300327629852189111L;
 	
 	//list of cards and buttons
 	private JTable tbl_players;
@@ -74,27 +59,11 @@ public class GamePanel extends CardPanel implements ViewConstants {
 	private JLabel lblGameLog;
 	private JScrollPane scrollPane_1;
 	private JTextPane txt_game_log;
-	private JButton btn_roll;
-	
-	/*public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					//ArrayList<HackerCard> cards = DataIO.readHackerCards();
-					JFrame window = new JFrame();
-					window.getContentPane().add(new GamePanel());
-					window.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}*/
+	private JButton btn_roll;	
 	
 	/**
 	 * Create the panel.
-	 */
-	//public GamePanel() {
+	 */	
 	public GamePanel(CardParent cards) {		
 		super(cards);		
 		setBackground(Color.WHITE);

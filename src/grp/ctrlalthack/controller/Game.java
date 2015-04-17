@@ -12,14 +12,11 @@ import grp.ctrlalthack.model.GameConstants;
 import grp.ctrlalthack.model.GameStats;
 import grp.ctrlalthack.model.HackerCard;
 import grp.ctrlalthack.model.Player;
-import grp.ctrlalthack.model.Trade;
 import grp.ctrlalthack.model.entropy.EntropyCard;
 import grp.ctrlalthack.model.mission.MissionCard;
 
 import java.util.ArrayList;
 import java.util.Random;
-
-import javax.xml.crypto.Data;
 
 public class Game implements GameConstants {
 		
@@ -212,10 +209,12 @@ public class Game implements GameConstants {
 	/**
 	 * Method to get a random object from an ArrayList
 	 */
+	@SuppressWarnings("rawtypes")
 	public static Object getRandomElement(ArrayList list) {
 		Object elem = null;
-		if ( list != null || list.size() != 0 ) {
+		if ( list != null && list.size() != 0 ) {
 			elem = list.get((int)(Math.random() * list.size()));
+			list.remove(elem);
 		} else {
 			throw new IndexOutOfBoundsException("List is empty, cannot get random choice.");
 		}
@@ -354,7 +353,9 @@ public class Game implements GameConstants {
 	 */
 	private int getStartPlayer() {
 		ArrayList<Integer> max_players = this.getMaxHackerCredIndexes();
-		if ( max_players.size() > 0 ) {
+		if ( max_players.size() == 1 ) {
+			return max_players.get(0);
+		} else if ( max_players.size() > 1 ) {
 			return ((Integer) getRandomElement(max_players));
 		} else {
 			return 0;

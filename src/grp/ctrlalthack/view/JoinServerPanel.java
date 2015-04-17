@@ -1,5 +1,5 @@
 /**
- * Join Server Panel
+ * Displays Join Server Panel
  *  
  * @author Arushad Ahmed
  * @arthor_uri http://arushad.org  
@@ -8,30 +8,24 @@
 package grp.ctrlalthack.view;
 
 import grp.ctrlalthack.net.ClientService;
-
-import javax.swing.JPanel;
-
 import java.awt.GridBagLayout;
-
 import javax.swing.JLabel;
-
-import java.awt.CardLayout;
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import javax.swing.JButton;
 import javax.swing.JTextField;
-import javax.swing.JComboBox;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.SwingConstants;
 
-//public class JoinServerPanel extends JPanel implements ViewConstants {
 public class JoinServerPanel extends CardPanel implements ViewConstants {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7961184287151143688L;
 	
 	private JTextField txt_server_password;	
 	private JTextField txt_server_port;
@@ -43,8 +37,7 @@ public class JoinServerPanel extends CardPanel implements ViewConstants {
 	/**
 	 * Create the panel.
 	 */
-	public JoinServerPanel(CardParent cards) {
-		//super();
+	public JoinServerPanel(CardParent cards) {		
 		super(cards);
 		setBackground(Color.WHITE);
 		GridBagLayout gridBagLayout = new GridBagLayout();

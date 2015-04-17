@@ -1,19 +1,24 @@
+/**
+ * Main class of the application
+ * 
+ * @author Arushad Ahmed
+ * @arthor_uri http://arushad.org 
+ */
+
+
 package grp.ctrlalthack.view;
 
 import java.awt.EventQueue;
 import javax.swing.JFrame;
-import java.awt.GridBagLayout;
-import javax.swing.JLabel;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import javax.swing.JButton;
-import javax.swing.JPanel;
 import java.awt.CardLayout;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 public class MainView extends JFrame {	
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 544954603755763496L;
+	
 	private CardParent cards;
 
 	/**

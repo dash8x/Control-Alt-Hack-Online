@@ -3,7 +3,6 @@
  * - Keeps listening for incoming requests from the client
  * - Perform requested operation using the controller
  * - Responds back to the client with the result of the requested operation
- * - Addded the ability to edit the current total credits and GPA of student
  * 
  * @author Arushad Ahmed
  * @arthor_uri http://arushad.org  
@@ -14,7 +13,6 @@ package grp.ctrlalthack.net;
 import grp.ctrlalthack.controller.Game;
 import grp.ctrlalthack.model.GameStats;
 import grp.ctrlalthack.model.HackerCard;
-import grp.ctrlalthack.model.Message;
 import grp.ctrlalthack.model.Player;
 import grp.ctrlalthack.model.Trade;
 import grp.ctrlalthack.model.entropy.EntropyCard;
@@ -28,6 +26,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class ServerService implements Runnable, NetworkConstants, ProtocolConstants {
 		
@@ -42,6 +41,9 @@ public class ServerService implements Runnable, NetworkConstants, ProtocolConsta
     private LinkedList<String> data_updated = new LinkedList<String>(); //flag to check if data has updated since last request
     private LinkedList<Message> messages = new LinkedList<Message>(); //messages for the client
 	
+    private ReentrantLock addFlagSynchronizer = new ReentrantLock();
+    private ReentrantLock addMessageSynchronizer = new ReentrantLock();
+    
     /**
      * Constructor
      */
@@ -93,9 +95,14 @@ public class ServerService implements Runnable, NetworkConstants, ProtocolConsta
 	 * Adds a message
 	 */
 	public void addMessage(Message message) {
-		if ( message != null ) {
-			this.messages.add(message);		
-			this.server.showSuccessLog("MESSAGE Signal received for " + message , this);
+		this.addMessageSynchronizer.lock();
+		try {			
+			if ( message != null ) {
+				this.messages.add(message);		
+				this.server.showSuccessLog("MESSAGE Signal received for " + message , this);
+			}
+		} finally {
+			this.addMessageSynchronizer.unlock();
 		}
 	}
 	
@@ -114,9 +121,14 @@ public class ServerService implements Runnable, NetworkConstants, ProtocolConsta
 	 * Sets the updated flag
 	 */
 	public void setUpdated(String updated) {
-		if ( updated != null && !updated.equals("") ) {
-			this.data_updated.add(updated);		
-			this.server.showSuccessLog(CMD_CHECK_UPDATED + " Signal received for " + updated , this);
+		this.addFlagSynchronizer.lock();
+		try {
+			if ( updated != null && !updated.equals("") ) {
+				this.data_updated.add(updated);		
+				this.server.showSuccessLog(CMD_CHECK_UPDATED + " Signal received for " + updated , this);
+			}
+		} finally {
+			this.addFlagSynchronizer.unlock();
 		}
 	}
 	
@@ -481,8 +493,7 @@ public class ServerService implements Runnable, NetworkConstants, ProtocolConsta
 			String roll_text = this.getPlayer().getPlayerName() + " rolled " + dice + " on the " + task.getTitle() + " roll.";
 			if ( success ) {
 				this.broadcastMessage(new Message(roll_text + " " + this.getPlayer().getPlayerName() + " succeeded the task.", Message.CONTEXT_ROLL));								
-			} else {
-				//TODO
+			} else {				
 				this.broadcastMessage(new Message(roll_text + " " + this.getPlayer().getPlayerName() + " failed the task.", Message.CONTEXT_ROLL));
 				//check for fee rerolls
 				if ( this.getPlayer().hasFreeReroll() || this.getPlayer().hasFreeReroll(task.getSkill()) || (task.hasAltSkill() && this.getPlayer().hasFreeReroll(task.getAltSkill())) ) {
@@ -534,8 +545,7 @@ public class ServerService implements Runnable, NetworkConstants, ProtocolConsta
 					//end the turn
 					if ( this.server.getGame().nextPlayer() ) {
 						//inform next player	
-						this.setAllUpdated(FLAG_NEW_TURN);
-						//TODO
+						this.setAllUpdated(FLAG_NEW_TURN);						
 					} else {
 						this.newRound();
 					}
@@ -604,8 +614,7 @@ public class ServerService implements Runnable, NetworkConstants, ProtocolConsta
     private void checkTurn(String keyword, HashMap<String, Object> params) {
     	boolean turn = false;
 		try {	
-			turn = this.getPlayer().equals(this.server.getGame().getCurrentPlayer());	
-			//TODO
+			turn = this.getPlayer().equals(this.server.getGame().getCurrentPlayer());				
 		} catch (Exception e) {
 			this.sendFail(keyword, e.getMessage());
 			return;
@@ -844,19 +853,6 @@ public class ServerService implements Runnable, NetworkConstants, ProtocolConsta
 		}
 		this.sendPlayers(players);
 	}
-	
-	/**
-	 * Process GET STUDENT
-	 */
-	/*private void getStudent(String keyword, HashMap<String, Object> params) {
-		Student stud = null;
-		try {					
-			stud = this.student_controller.getStudent((Integer)params.get("student_id"));					
-		} catch (Exception e) {
-			this.sendFail(keyword, e.getMessage());
-			return;
-		}
-		this.sendStudent(stud);
-	}*/
+
 
 }

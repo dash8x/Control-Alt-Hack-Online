@@ -8,35 +8,28 @@
 package grp.ctrlalthack.view;
 
 import grp.ctrlalthack.model.Player;
-import grp.ctrlalthack.net.ClientService;
 
-import javax.swing.JPanel;
 
 import java.awt.GridBagLayout;
-
 import javax.swing.JLabel;
-
-import java.awt.CardLayout;
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-
 import javax.swing.JButton;
-import javax.swing.JTextField;
-import javax.swing.JComboBox;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
-import javax.swing.table.DefaultTableModel;
 
 public class ServerLobbyPanel extends CardPanel implements ViewConstants {
-//public class ServerLobbyPanel extends JPanel implements ViewConstants {
 		
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8716216701135013734L;
+	
 	private JButton btn_start_game;
 	private JButton btn_cancel_start_game;	
 	private JTable table;

@@ -1,5 +1,5 @@
 /**
- * Contains static methods to read data from resources
+ * Abstract class for Bag of Tricks card panels
  * 
  * @author Arushad Ahmed
  * @arthor_uri http://arushad.org 
@@ -8,23 +8,18 @@
 package grp.ctrlalthack.view;
 
 
-import javax.swing.JPanel;
-
 import java.awt.Color;
-
-
 import javax.swing.JLabel;
-
 import java.awt.Font;
-
-
-import javax.swing.SwingConstants;
-import javax.swing.border.LineBorder;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
-import javax.swing.JTextArea;
 
 public abstract class EntropyBagOfTricksCardPanel extends EntropyCardPanel {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8124743601643825597L;
 	
 	protected JLabel lbl_keep_in_play;
 	protected JLabel lblCost;

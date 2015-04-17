@@ -1,5 +1,5 @@
 /**
- * Custom AbstractTableModel for displaying courses
+ * Custom AbstractTableModel for displaying player clients
  * 
  * @author Arushad Ahmed
  * @arthor_uri http://arushad.org  
@@ -16,9 +16,9 @@ import javax.swing.table.AbstractTableModel;
 public class ClientsTableModel extends AbstractTableModel {
 	
 	/**
-	 * Serial Version UID
+	 * 
 	 */
-	private static final long serialVersionUID = 7970142342039314753L;	
+	private static final long serialVersionUID = 4903899538620328103L;
 
 	//stores the courses
 	private ArrayList<Player> players;

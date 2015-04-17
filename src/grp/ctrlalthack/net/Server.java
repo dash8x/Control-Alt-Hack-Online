@@ -16,16 +16,12 @@ package grp.ctrlalthack.net;
 import grp.ctrlalthack.controller.EndGameException;
 import grp.ctrlalthack.controller.Game;
 import grp.ctrlalthack.model.GameConstants;
-import grp.ctrlalthack.model.Message;
+import grp.ctrlalthack.net.exception.ServerException;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.SocketException;
-import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantLock;
@@ -35,6 +31,7 @@ public class Server implements NetworkConstants {
 	private int server_port; 	//port to run server on	
 	private ServerSocket server_socket; //serversocket
 	private String password; //server password
+	@SuppressWarnings("unused")
 	private String server_name; //server name
 	private int max_players; //maximum number of players allowed
 	private ExecutorService client_threads; //thread pool to manage client threads
@@ -123,7 +120,7 @@ public class Server implements NetworkConstants {
 				@Override
 				public void run() {
 					try {
-						Thread.sleep(20 * 1000);
+						Thread.sleep(60 * 1000);
 					} catch (InterruptedException e) {}
 					getGame().startMeeting();				
 					if ( getGame().getNumAttending() > 1 ) {
@@ -186,7 +183,7 @@ public class Server implements NetworkConstants {
 		try { //open the chosen port
 			this.server_socket = new ServerSocket(this.server_port);
 		} catch (IOException e) { //abort if cannot open the port
-			this.showServerError("Cannot open port " + this.server_port);			
+			throw new ServerException("Cannot open port " + this.server_port);			
 		}
 	}
 	
@@ -211,7 +208,7 @@ public class Server implements NetworkConstants {
 				}
 			}			
 		} catch (IOException e) {			
-			this.showServerError(e.getMessage());			
+			throw new ServerException(e.getMessage());			
 		} finally {
 			this.stop();
 		}
@@ -226,8 +223,8 @@ public class Server implements NetworkConstants {
 			this.broadcast(new Response("TERMINATE", null));
 			try { //close the server port
 				this.server_socket.close();
-			} catch (IOException e) { //show error if cannot close the port
-				this.showServerError("Error closing the server");			
+			} catch (Exception e) { //show error if cannot close the port
+				throw new ServerException("Error closing the server");			
 			}
 			this.running = false; //close the flag
 		}
@@ -275,7 +272,7 @@ public class Server implements NetworkConstants {
 	}
 	
 	/**
-	 * Sends a messgae to all clients
+	 * Add a message to all client's message queue
 	 */
 	public void broadcastMessage(Message message) {
 		this.messageSynchronizer.lock();
@@ -370,108 +367,5 @@ public class Server implements NetworkConstants {
 			this.logSynchronizer.unlock();
 		}
 	}
-	
-	/*						
-	private ReentrantLock lockSynchronizer; //allows concurrent access to the lock methods		
-		
-	*//**
-	 * Locks a student record to a given client
-	 *//*
-	public void lock(Integer record, ServerService client) {
-		this.lockSynchronizer.lock();
-		try {
-			//first check if already locked by someone else		
-			checkLocked(record, client);
-			//check if student exist
-			this.student_controller.getStudent(record);
-			this.student_record_locks.put(record, client);
-		} finally {
-			this.lockSynchronizer.unlock();
-		}
-	}
-	
-	*//**
-	 * Raises an exception if student record is locked
-	 *//*
-	public void checkLocked(Integer record, ServerService client) {
-		if ( this.isLocked(record, client) ) {
-			throw new LockedException("Specified student is being edited by another user.");
-		}
-	}
-	
-	*//**
-	 * Checks if a student record is locked
-	 *//*
-	public boolean isLocked(Integer record, ServerService client) {
-		//first check if already locked by someone else
-		ServerService owner = this.student_record_locks.get(record);
-		return ( owner != null && !owner.equals(client) );
-	}
-	
-	*//**
-	 * Unlocks a given student record
-	 *//*
-	public void unlock(Integer record) {
-		this.lockSynchronizer.lock();
-		try {
-			if ( this.student_record_locks.remove(record) == null ) { //if not present in locks, check if student exists
-				this.student_controller.getStudent(record);
-			}
-		} finally {
-			this.lockSynchronizer.unlock();
-		}
-	}
-	
-	*//**
-	 * Unlocks all locks owned by a client
-	 *//*
-	public void unlockAll(ServerService client) {
-		this.lockSynchronizer.lock();
-		try {
-			//iterate over all the locks
-			Iterator<Map.Entry<Integer,ServerService>> it = this.student_record_locks.entrySet().iterator();
-		    while (it.hasNext()) {
-		        Map.Entry<Integer,ServerService> pairs = it.next();
-		        if(pairs.getValue().equals(client)) { //remove if client is the owner
-		        	it.remove(); //using an iterator to remove avoids a ConcurrentModificationException
-		        }
-		    }
-		} finally {
-			this.lockSynchronizer.unlock();
-		}
-	}		
-	
-	*//**
-	 * Method to add client to list of clients in the server GUI
-	 * @param ip of the client
-	 *//*
-	public void guiAddClient(String ip) {
-		this.server_gui.addClient(ip);
-	}
-
-	*//**
-	 * Method to remove a client from list of clients in the server GUI
-	 * @param ip of the client
-	 *//*
-	public void guiRemoveClient(String ip) {
-		this.server_gui.removeClient(ip);
-	}
-	
-	*//**
-	 * Initializes the GUI and displays initial info
-	 *//*
-	private void initGUI() {
-		this.server_gui = new ServerView(); //initialize the GUI						
-		//stop when GUI closed
-		this.server_gui.getFrame().addWindowListener(new java.awt.event.WindowAdapter() {
-		    @Override
-		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {		        
-		    	stop();
-		    }
-		});
-		this.server_gui.setPort(this.apr_port); //display the port number
-		this.server_gui.displayLog("Waiting for connections...");
-	}						
-	
-
-*/}
+			
+}

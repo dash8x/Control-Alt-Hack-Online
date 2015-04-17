@@ -1,5 +1,5 @@
 /**
- * Superclass for all game related Exceptions
+ * Exception thrown when game ends
  * 
  * @author Arushad Ahmed
  * @arthor_uri http://arushad.org  
@@ -10,9 +10,9 @@ package grp.ctrlalthack.controller;
 public class EndGameException extends GameException {
 	
 	/**
-	 * Serial Version UID
+	 * 
 	 */
-	
+	private static final long serialVersionUID = 8216925974690768258L;
 
 	/**
 	 * Empty Constructor

@@ -13,6 +13,11 @@ import grp.ctrlalthack.model.HackerCard;
 
 public class SkillModifier implements Serializable {	
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -204858292658541447L;
+	
 	//fields
 	private String skill; //the skill to roll for
 	private int skill_mod = 0; //skill modifier

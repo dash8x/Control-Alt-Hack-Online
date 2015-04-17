@@ -1,5 +1,5 @@
 /**
- * Bag Of Tricks cards skill modifier card
+ * Bag Of Tricks auto success card
  *   
  * @author Arushad Ahmed
  * @arthor_uri http://arushad.org  
@@ -9,9 +9,12 @@ package grp.ctrlalthack.model.entropy;
 
 import grp.ctrlalthack.model.HackerCard;
 
-import java.util.ArrayList;
-
 public class BoTAutoSuccessCard extends BagOfTricksCard {	
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2010492328816599149L;
 	
 	//common fields
 	private String skill;

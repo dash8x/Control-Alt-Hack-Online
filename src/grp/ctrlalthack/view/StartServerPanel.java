@@ -1,5 +1,5 @@
 /**
- * Main Home Panel
+ * Displays the Start Server Screen
  *  
  * @author Arushad Ahmed
  * @arthor_uri http://arushad.org  
@@ -8,17 +8,9 @@
 package grp.ctrlalthack.view;
 
 import grp.ctrlalthack.net.ClientService;
-import grp.ctrlalthack.net.Server;
-
-import javax.swing.JPanel;
-
 import java.awt.GridBagLayout;
-
 import javax.swing.JLabel;
-
-import java.awt.CardLayout;
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -30,8 +22,12 @@ import javax.swing.JTextField;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 
-//public class StartServerPanel extends JPanel implements ViewConstants {
 public class StartServerPanel extends CardPanel implements ViewConstants {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -455218529248508555L;
 	
 	private JTextField txt_server_password;	
 	private JTextField txt_server_port;
@@ -40,14 +36,7 @@ public class StartServerPanel extends CardPanel implements ViewConstants {
 	private JButton btn_start_server;
 	private JButton btn_cancel_start_server;
 	private JTextField txt_server_name;	
-	
-	/**
-	 * @wbp.parser.constructor 
-	 */
-	public StartServerPanel() {
-		this(new CardParent());
-	}
-	
+		
 	/**
 	 * Create the panel.
 	 */

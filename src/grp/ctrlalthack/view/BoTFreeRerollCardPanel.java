@@ -1,5 +1,5 @@
 /**
- * Contains static methods to read data from resources
+ * Displays Free Reroll Bag of Tricks card
  * 
  * @author Arushad Ahmed
  * @arthor_uri http://arushad.org 
@@ -7,54 +7,23 @@
 
 package grp.ctrlalthack.view;
 
-import grp.ctrlalthack.data.DataIO;
-import grp.ctrlalthack.model.GameConstants;
-import grp.ctrlalthack.model.HackerCard;
 import grp.ctrlalthack.model.entropy.BoTFreeRerollCard;
-import grp.ctrlalthack.model.mission.MissionCard;
-import grp.ctrlalthack.model.mission.MissionTask;
-
-import javax.swing.BorderFactory;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-
-import java.awt.Color;
 import java.awt.GridBagLayout;
-
-import javax.swing.JLabel;
-
-import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.Font;
-import java.util.ArrayList;
-
-import javax.swing.SwingConstants;
-import javax.swing.border.Border;
-import javax.swing.border.LineBorder;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JTextArea;
 
 public class BoTFreeRerollCardPanel extends EntropyBagOfTricksCardPanel {
 			
-	private JTextArea lbl_reroll_text;
-
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1576734748780967386L;
 	
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					ArrayList<BoTFreeRerollCard> cards = DataIO.readBoTFreeRerollCards();
-					JFrame window = new JFrame();
-					window.getContentPane().add(new BoTFreeRerollCardPanel(cards.get(4)));					
-					window.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+	private JTextArea lbl_reroll_text;
 	
 	/**
 	 * Create the panel.

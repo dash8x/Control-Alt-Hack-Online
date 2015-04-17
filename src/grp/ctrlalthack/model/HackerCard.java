@@ -7,44 +7,29 @@
 
 package grp.ctrlalthack.model;
 
-import grp.ctrlalthack.model.perks.DrawDouble;
-import grp.ctrlalthack.model.perks.HackerCredPenalty;
-import grp.ctrlalthack.model.perks.Perk;
-import grp.ctrlalthack.model.perks.StartCash;
-
 import java.io.Serializable;
 import java.util.HashMap;
 
 public class HackerCard implements GameConstants, Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8850566825132470566L;
+	
 	private String name; //name of the character
 	private String desc; //character description
 	private int kitchen_sink; //kitchen sink skill level
 	private HashMap<String,Integer> skills; //skill set
-	private Perk perk; //special perks
-	
-	/*
-	 * 
-	 * reroll_cond 
-	 * by_entropy_card_discard
-	 */
 	
 	/**
 	 * Constructor
 	 */
 	public HackerCard(String name, String desc, HashMap<String,Integer> skills, int kitchen_sink) {
-		this(name, desc, skills, kitchen_sink, null);		
-	}		
-	
-	/**
-	 * Constructor
-	 */
-	public HackerCard(String name, String desc, HashMap<String,Integer> skills, int kitchen_sink, Perk perk) {
 		this.name = name;
 		this.desc = desc;	
 		this.setKitchenSink(kitchen_sink);
 		this.setSkills(skills);	
-		this.perk = perk;
 	}
 	
 	/**
@@ -89,24 +74,6 @@ public class HackerCard implements GameConstants, Serializable {
 	public int getKitchenSink() {
 		return kitchen_sink;
 	}
-
-	/**
-	 * @return the perk
-	 */
-	public Perk getPerk() {
-		return perk;
-	}
-	
-	/**
-	 * @return perk text
-	 */
-	public String getPerkText() {
-		String text = "";
-		if ( getPerk() != null ) {
-			text = getPerk().toString();
-		}
-		return text;
-	}
 	
 	/**
 	 * @return the skills
@@ -132,29 +99,21 @@ public class HackerCard implements GameConstants, Serializable {
 	 * @return the start_cash
 	 */
 	public int getStartCash() {
-		if ( getPerk() instanceof StartCash ) {
-			return ((StartCash) getPerk()).getAmount();
-		} else {
-			return START_CASH;
-		}
+		return START_CASH;		
 	}
 
 	/**
 	 * @return the draw_double
 	 */
 	public boolean canDrawDouble() {
-		return this.getPerk() instanceof DrawDouble;
+		return false;
 	}	
 
 	/**
 	 * @return the fail_penalty
 	 */
 	public int getHackerCredPenalty() {
-		if ( this.getPerk() instanceof HackerCredPenalty ) {
-			return ((HackerCredPenalty) getPerk()).getPenalty();
-		} else {
-			return 0;
-		}
+		return 0;		
 	}
 	
 	/**

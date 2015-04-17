@@ -1,5 +1,5 @@
 /**
- * Bag Of Tricks cards skill modifier card
+ * Bag Of Tricks cards skill free re-roll card
  *   
  * @author Arushad Ahmed
  * @arthor_uri http://arushad.org  
@@ -12,6 +12,11 @@ import grp.ctrlalthack.model.HackerCard;
 import java.util.ArrayList;
 
 public class BoTFreeRerollCard extends BagOfTricksCard {	
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6186945214230272289L;
 	
 	//common fields
 	private ArrayList<String> skills = new ArrayList<String>();

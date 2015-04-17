@@ -1,5 +1,5 @@
 /**
- * Contains static methods to read data from resources
+ * Displays a list of Entropy Card panels
  * 
  * @author Arushad Ahmed
  * @arthor_uri http://arushad.org 
@@ -7,56 +7,27 @@
 
 package grp.ctrlalthack.view;
 
-import grp.ctrlalthack.data.DataIO;
-import grp.ctrlalthack.model.GameStats;
 import grp.ctrlalthack.model.entropy.EntropyCard;
-import grp.ctrlalthack.model.mission.MissionCard;
-
-import javax.swing.JFrame;
 import javax.swing.JPanel;
-
 import java.awt.Color;
 import java.awt.GridBagLayout;
-
-import javax.swing.JLabel;
-
-import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import java.awt.Font;
 import java.util.ArrayList;
-
-import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
-import javax.swing.JButton;
 import javax.swing.JScrollPane;
-
-import java.awt.BorderLayout;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 
 public class ListEntropyCardsPanel extends JPanel {
 	
-	private GameStats stats;	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3928018893052298921L;
+	
 	private ArrayList<EntropyCard> cards;
 	private CardParent parent;
-	
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					ArrayList<EntropyCard> cards = DataIO.readEntropyCards();
-					JFrame window = new JFrame();
-					window.getContentPane().add(new ListEntropyCardsPanel(cards));					
-					window.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+
+	private JPanel body;	
 	
 	/**
 	 * Create the panel.
@@ -88,25 +59,23 @@ public class ListEntropyCardsPanel extends JPanel {
 		gbc_scrollPane.gridy = 0;
 		add(scrollPane, gbc_scrollPane);
 		
-		JPanel body = new JPanel();
+		body = new JPanel();
 		body.setOpaque(false);
 		scrollPane.setViewportView(body);	
-		//int rows = cards.size() / 2;
 		body.setLayout(new GridLayout(0, 2, 5, 5));
 		
-		for (int i = 0; i < cards.size(); i++) {				
-			ActionableEntropyCardPanel panel = new ActionableEntropyCardPanel(this.parent, i, cards.get(i));			
-	        body.add(panel);
-	    }
-		
+		populateFields();
 	}
 		
 	/**
 	 * Populate the fields
 	 */
 	private void populateFields() {
-		if ( this.stats != null ) {									
-			
+		if ( this.cards != null ) {														
+			for (int i = 0; i < this.cards.size(); i++) {				
+				ActionableEntropyCardPanel panel = new ActionableEntropyCardPanel(this.parent, i, cards.get(i));			
+		        body.add(panel);
+		    }
 		}
 	}
 

@@ -1,5 +1,5 @@
 /**
- * Contains static methods to read data from resources
+ * Display the play mission panel
  * 
  * @author Arushad Ahmed
  * @arthor_uri http://arushad.org 
@@ -7,33 +7,27 @@
 
 package grp.ctrlalthack.view;
 
-import grp.ctrlalthack.data.DataIO;
-import grp.ctrlalthack.model.GameStats;
 import grp.ctrlalthack.model.mission.MissionCard;
-
-import javax.swing.JFrame;
 import javax.swing.JPanel;
-
 import java.awt.Color;
 import java.awt.GridBagLayout;
-
 import javax.swing.JLabel;
-
-import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.Font;
-import java.util.ArrayList;
-
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
-import javax.swing.JButton;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 
 
 public class PlayMissionPanel extends JPanel {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8097766342719091892L;
+
 	//modes
 	private boolean mission_mode = false;
 		
@@ -42,24 +36,7 @@ public class PlayMissionPanel extends JPanel {
 	private JTextArea lbl_roll;
 
 	private JLabel lbl_status;
-	private JLabel lbl_title;
-
-	
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					ArrayList<MissionCard> cards = DataIO.readMissionCards();
-					JFrame window = new JFrame();
-					window.getContentPane().add(new PlayMissionPanel(cards.get(4)));					
-					window.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-	
+	private JLabel lbl_title;	
 	
 	/**
 	 * Create the panel.

@@ -10,7 +10,6 @@ package grp.ctrlalthack.net;
 
 import grp.ctrlalthack.model.GameStats;
 import grp.ctrlalthack.model.HackerCard;
-import grp.ctrlalthack.model.Message;
 import grp.ctrlalthack.model.Player;
 import grp.ctrlalthack.model.Trade;
 import grp.ctrlalthack.model.mission.MissionCard;

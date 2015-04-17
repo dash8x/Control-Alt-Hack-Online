@@ -10,6 +10,11 @@ package grp.ctrlalthack.model.mission;
 public class MissionSuccess extends MissionOutcome {			
 	
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6024983569128702357L;
+
+	/**
 	 * Constructor
 	 */
 	public MissionSuccess(String desc, int hacker_creds, int cash, int entropy_cards, boolean all_players) {

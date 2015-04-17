@@ -1,5 +1,5 @@
 /**
- * Server lobby panel
+ * Choose Character Panel
  *  
  * @author Arushad Ahmed
  * @arthor_uri http://arushad.org  
@@ -12,25 +12,23 @@ import grp.ctrlalthack.model.HackerCard;
 
 
 import java.awt.GridBagLayout;
-
 import javax.swing.JLabel;
-
-
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-
 import javax.swing.JButton;
-
-
 import java.awt.Color;
 import java.awt.Font;
 
 public class ChooseCharacterPanel extends CardPanel implements ViewConstants {
-//public class ChooseCharacterPanel extends JPanel implements ViewConstants {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1146079549808956155L;
+
 	private JButton btn_cancel_game;	
 	
 	private HackerCardPanel hacker_card_1;
@@ -43,27 +41,11 @@ public class ChooseCharacterPanel extends CardPanel implements ViewConstants {
 	//list of cards and buttons
 	private HackerCard[] hacker_cards;
 	private ArrayList<JButton> choose_buttons = new ArrayList<JButton>();
-	private ArrayList<HackerCardPanel> hacker_panels = new ArrayList<HackerCardPanel>();
-	
-	/*public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					ArrayList<HackerCard> cards = DataIO.readHackerCards();
-					JFrame window = new JFrame();
-					window.getContentPane().add(new ChooseCharacterPanel(cards));
-					window.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}*/
+	private ArrayList<HackerCardPanel> hacker_panels = new ArrayList<HackerCardPanel>();	
 	
 	/**
 	 * Create the panel.
-	 */
-	//public ChooseCharacterPanel(CardParent cards) {
+	 */	
 	public ChooseCharacterPanel(CardParent cards, HackerCard[] hacker_cards) {		
 		super(cards);		
 		setBackground(Color.WHITE);

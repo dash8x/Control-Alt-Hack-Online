@@ -1,5 +1,5 @@
 /**
- * Custom AbstractTableModel for displaying courses
+ * Custom AbstractTableModel for displaying players
  * 
  * @author Arushad Ahmed
  * @arthor_uri http://arushad.org  
@@ -10,11 +10,15 @@ package grp.ctrlalthack.view;
 import grp.ctrlalthack.model.Player;
 
 import java.util.ArrayList;
-
 import javax.swing.table.AbstractTableModel;
 
 public class PlayersTableModel extends AbstractTableModel {
 	
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8228285472818261150L;
 
 	//stores the courses
 	private ArrayList<Player> players;

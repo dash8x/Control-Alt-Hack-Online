@@ -32,6 +32,7 @@ import org.json.JSONObject;
 public class DataIO implements GameConstants {
 	
 	//constants
+	@SuppressWarnings("unused")
 	private static final String RESOURCES = "/resources";
 	private static final String CARDS = "/cards";
 	private static final String ENTROPY_CARDS = CARDS + "/entropy_cards";

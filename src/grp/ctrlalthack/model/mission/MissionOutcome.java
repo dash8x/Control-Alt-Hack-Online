@@ -11,6 +11,11 @@ import java.io.Serializable;
 
 public abstract class MissionOutcome implements Serializable {	
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -959167260132533111L;
+	
 	//fields
 	protected boolean all_players = false; //whether applies to all players
 	protected int cash = 0; //cash bonus

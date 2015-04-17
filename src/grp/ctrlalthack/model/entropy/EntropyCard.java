@@ -11,6 +11,11 @@ import java.io.Serializable;
 
 public abstract class EntropyCard implements Serializable {	
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3841950571948778255L;
+	
 	//common fields
 	protected String title; //card title
 	protected String desc; //card description

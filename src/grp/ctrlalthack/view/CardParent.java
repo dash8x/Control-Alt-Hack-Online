@@ -1,5 +1,5 @@
 /**
- * Abstract class for card panels
+ * Parent panel for card panels
  *  
  * @author Arushad Ahmed
  * @arthor_uri http://arushad.org  
@@ -11,10 +11,10 @@ package grp.ctrlalthack.view;
 import grp.ctrlalthack.model.GameConstants;
 import grp.ctrlalthack.model.GameStats;
 import grp.ctrlalthack.model.HackerCard;
-import grp.ctrlalthack.model.Message;
 import grp.ctrlalthack.model.Player;
 import grp.ctrlalthack.model.Trade;
 import grp.ctrlalthack.net.ClientService;
+import grp.ctrlalthack.net.Message;
 import grp.ctrlalthack.net.Server;
 
 import java.awt.CardLayout;
@@ -22,10 +22,14 @@ import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.text.JTextComponent;
 
 public class CardParent extends JPanel implements ViewConstants {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 996178440544043172L;
+
 	private byte ui_mode;
 	
 	private Server server;
@@ -168,7 +172,11 @@ public class CardParent extends JPanel implements ViewConstants {
 	 */
 	public void stopClient() {
 		if ( getClient() != null ) {
-			getClient().stop();
+			try {
+				getClient().stop();
+			} catch ( Exception e ) {
+				showError(e.getMessage());
+			}
 		}
 	}
 	
@@ -177,7 +185,11 @@ public class CardParent extends JPanel implements ViewConstants {
 	 */
 	public void stopServer() {
 		if ( getServer() != null ) {
-			getServer().stop();
+			try {
+				getServer().stop();
+			} catch ( Exception e ) {
+				showError(e.getMessage());
+			}
 		}
 		//set back to client mode
 		setMode(CLIENT_MODE);

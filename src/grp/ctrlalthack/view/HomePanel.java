@@ -11,8 +11,6 @@ package grp.ctrlalthack.view;
 import java.awt.GridBagLayout;
 
 import javax.swing.JLabel;
-import javax.swing.JPanel;
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -23,12 +21,12 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 
 public class HomePanel extends CardPanel implements ViewConstants {	
-//public class HomePanel extends JPanel implements ViewConstants {
 	
-	/*public void navigateTo(String s) {
-		
-	}*/
-	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8365348987745015940L;
+
 	/**
 	 * Create the panel.
 	 */

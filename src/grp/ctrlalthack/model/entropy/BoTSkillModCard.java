@@ -11,6 +11,11 @@ import java.util.ArrayList;
 
 public class BoTSkillModCard extends BagOfTricksCard {	
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6065670154253079251L;
+	
 	//common fields
 	private ArrayList<SkillModifier> skill_mods = new ArrayList<SkillModifier>();
 	

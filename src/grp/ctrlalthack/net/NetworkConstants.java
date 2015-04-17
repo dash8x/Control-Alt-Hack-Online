@@ -1,5 +1,5 @@
 /**
- * Constants used in the server
+ * Constants used in the networking classes
  *   
  * @author Arushad Ahmed
  * @arthor_uri http://arushad.org  

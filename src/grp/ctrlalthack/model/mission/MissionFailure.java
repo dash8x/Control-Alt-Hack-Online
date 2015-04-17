@@ -1,5 +1,5 @@
 /**
- * Defines what happens when a mission succeeds
+ * Defines what happens when a mission fails
  *   
  * @author Arushad Ahmed
  * @arthor_uri http://arushad.org  
@@ -9,6 +9,11 @@ package grp.ctrlalthack.model.mission;
 
 public class MissionFailure extends MissionOutcome {			
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8121922935986452384L;
+
 	/**
 	 * Constructor
 	 */

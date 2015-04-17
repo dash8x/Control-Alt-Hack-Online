@@ -1,5 +1,5 @@
 /**
- * Contains static methods to read data from resources
+ * Displays overall game statistics
  * 
  * @author Arushad Ahmed
  * @arthor_uri http://arushad.org 
@@ -9,19 +9,13 @@ package grp.ctrlalthack.view;
 
 import grp.ctrlalthack.model.GameStats;
 
-import javax.swing.JFrame;
 import javax.swing.JPanel;
-
 import java.awt.Color;
 import java.awt.GridBagLayout;
-
 import javax.swing.JLabel;
-
-import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.Font;
-
 import javax.swing.border.LineBorder;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -29,29 +23,17 @@ import javax.swing.border.EmptyBorder;
 
 public class GameStatsPanel extends JPanel {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7326593342846798511L;
+	
 	private GameStats stats;	
 	private JLabel lbl_player;
 	private JLabel lbl_hacker_creds;
 	private JLabel lbl_cash;
 	private JLabel lbl_round;
-	private JLabel lbl_phase;
-
-	/*
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					//ArrayList<BoTAutoSuccessCard> cards = DataIO.readBoTAutoSuccessCards();
-					JFrame window = new JFrame();
-					window.getContentPane().add(new GameStatsPanel(new GameStats(1,400,2,3,"Arushad")));					
-					window.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-	*/
+	private JLabel lbl_phase;	
 	
 	/**
 	 * Create the panel.

@@ -1,5 +1,5 @@
 /**
- * Contains static methods to read data from resources
+ * Displays actionable entropy card
  * 
  * @author Arushad Ahmed
  * @arthor_uri http://arushad.org 
@@ -7,60 +7,31 @@
 
 package grp.ctrlalthack.view;
 
-import grp.ctrlalthack.data.DataIO;
-import grp.ctrlalthack.model.GameStats;
 import grp.ctrlalthack.model.entropy.BagOfTricksCard;
 import grp.ctrlalthack.model.entropy.EntropyCard;
-import grp.ctrlalthack.model.mission.MissionCard;
-
-import javax.swing.JFrame;
 import javax.swing.JPanel;
-
-import java.awt.Color;
 import java.awt.GridBagLayout;
-
-import javax.swing.JLabel;
-
-import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.Font;
-import java.util.ArrayList;
-
-import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JButton;
-import javax.swing.JScrollPane;
-
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 
 public class ActionableEntropyCardPanel extends JPanel {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3199508874385217762L;
+	
 	private EntropyCard card;	
 	private int id;
 	private EntropyCardPanel card_panel;
 	private JButton btn_action;
-	private CardParent parent;
-	
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					ArrayList<EntropyCard> cards = DataIO.readEntropyCards();
-					JFrame window = new JFrame();
-					window.getContentPane().add(new ActionableEntropyCardPanel(0, cards.get(0)));					
-					window.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-	
+	private CardParent parent;		
 	
 	/**
 	 * Constructor

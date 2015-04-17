@@ -1,5 +1,5 @@
 /**
- * Contains static methods to read data from resources
+ * Displays a Hacker Card
  * 
  * @author Arushad Ahmed
  * @arthor_uri http://arushad.org 
@@ -7,12 +7,10 @@
 
 package grp.ctrlalthack.view;
 
-import grp.ctrlalthack.data.DataIO;
 import grp.ctrlalthack.model.GameConstants;
 import grp.ctrlalthack.model.HackerCard;
 
 import javax.swing.BorderFactory;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import java.awt.Color;
@@ -21,15 +19,14 @@ import java.awt.GridBagLayout;
 import javax.swing.JLabel;
 
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
-import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import javax.swing.border.CompoundBorder;
@@ -38,6 +35,11 @@ import javax.swing.JTextArea;
 
 public class HackerCardPanel extends JPanel {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4479625927478502873L;
+	
 	private JLabel lbl_skill_1;
 	private JTextArea lbl_desc;
 	private JTextArea lbl_perk;
@@ -61,22 +63,7 @@ public class HackerCardPanel extends JPanel {
 	
 	//list to store variables
 	private ArrayList<SkillLabel> skill_labels;
-	private ArrayList<SkillLabel> skill_values;
-	
-	/*public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					ArrayList<HackerCard> cards = DataIO.readHackerCards();
-					JFrame window = new JFrame();
-					window.getContentPane().add(new HackerCardPanel(cards.get(3)));
-					window.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}*/
+	private ArrayList<SkillLabel> skill_values;		
 	
 	/**
 	 * Create the panel.
@@ -251,8 +238,7 @@ public class HackerCardPanel extends JPanel {
 		lbl_perk.setLineWrap(true);
 		lbl_perk.setEditable(false);
 		lbl_perk.setOpaque(false);
-		lbl_perk.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		Border lbl_perk_padding = BorderFactory.createEmptyBorder(10,10,10,10);
+		lbl_perk.setFont(new Font("Tahoma", Font.PLAIN, 12));		
 		lbl_perk.setBorder(new CompoundBorder(null, new EmptyBorder(10, 10, 10, 10)));
 		GridBagConstraints gbc_lbl_perk = new GridBagConstraints();
 		gbc_lbl_perk.fill = GridBagConstraints.BOTH;
@@ -266,8 +252,7 @@ public class HackerCardPanel extends JPanel {
 		lbl_desc.setLineWrap(true);
 		lbl_desc.setWrapStyleWord(true);
 		lbl_desc.setEditable(false);
-		lbl_desc.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		Border lbl_desc_padding = BorderFactory.createEmptyBorder(10,10,10,10);
+		lbl_desc.setFont(new Font("Tahoma", Font.PLAIN, 12));		
 		lbl_desc.setBorder(new CompoundBorder(null, new EmptyBorder(10, 10, 10, 10)));
 		lbl_desc.setBackground(Color.WHITE);
 		lbl_desc.setOpaque(true);
@@ -314,16 +299,16 @@ public class HackerCardPanel extends JPanel {
 		if ( this.card != null ) {
 			lbl_name.setText(card.getName());
 			lbl_desc.setText(card.getDesc());
-			lbl_perk.setText(card.getPerkText());
+			lbl_perk.setText("");
 			lbl_skill_1.setText("Kitchen Sink");
 			lbl_val_1.setText(Integer.toString(card.getKitchenSink()));
 			//add skills
-			Iterator it = card.getSkills().entrySet().iterator();
+			Iterator<Entry<String, Integer>> it = card.getSkills().entrySet().iterator();
 		    for ( int i = 0; i < skill_labels.size(); i++ ) {
 				SkillLabel label = skill_labels.get(i);
 				SkillLabel val = skill_values.get(i);
 		    	if (it.hasNext()) {
-			        Map.Entry pair = (Map.Entry)it.next();
+			        Map.Entry<String, Integer> pair = (Map.Entry<String, Integer>)it.next();
 			        label.setText(HackerCard.getSkillName(pair.getKey().toString()));
 			        if ( (Integer) pair.getValue() == GameConstants.INFINITE_SKILL ) {
 			        	val.setText("*");
@@ -347,8 +332,14 @@ public class HackerCardPanel extends JPanel {
 	private class SkillLabel extends JLabel {
 		
 		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 2640168007645021849L;
+
+		/**
 		 * Constructor
 		 */
+		@SuppressWarnings("unused")
 		public SkillLabel() {
 			this("");
 		}

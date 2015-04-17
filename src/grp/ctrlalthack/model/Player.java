@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class Player implements Serializable {
 	
@@ -42,8 +43,7 @@ public class Player implements Serializable {
 	
 	//skill modifier
 	private HashMap<String,Integer> bot_skill_modifiers = new HashMap<String,Integer>(); //skill modifiers from BoT cards
-	private HashMap<String,Boolean> bot_reroll = new HashMap<String,Boolean>(); //bot free reroll skill
-	private ArrayList<String> bot_autosuccess = new ArrayList<String>(); //bot auto success 
+	private HashMap<String,Boolean> bot_reroll = new HashMap<String,Boolean>(); //bot free reroll skill	
 	
 	//status values
 	private boolean attending = false; 
@@ -184,9 +184,9 @@ public class Player implements Serializable {
 		this.setIncomingTrade(null);
 		this.setSucceeded(false);
 		//reset rerolls
-		Iterator it = this.bot_reroll.entrySet().iterator();
+		Iterator<Entry<String, Boolean>> it = this.bot_reroll.entrySet().iterator();
 	    if (it.hasNext()) {
-	    	Map.Entry pair = (Map.Entry)it.next();
+	    	Map.Entry<String, Boolean> pair = (Map.Entry<String, Boolean>)it.next();
 	    	pair.setValue(true);    
 	    }
 	}

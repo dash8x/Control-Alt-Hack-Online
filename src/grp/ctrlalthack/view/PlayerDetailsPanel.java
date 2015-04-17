@@ -1,5 +1,5 @@
 /**
- * Contains static methods to read data from resources
+ * Displays the details of a player
  * 
  * @author Arushad Ahmed
  * @arthor_uri http://arushad.org 
@@ -7,36 +7,32 @@
 
 package grp.ctrlalthack.view;
 
-import grp.ctrlalthack.model.GameStats;
 import grp.ctrlalthack.model.Player;
-
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-
 import java.awt.Color;
 import java.awt.GridBagLayout;
-
 import javax.swing.JLabel;
-
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.Font;
-
 import javax.swing.border.LineBorder;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.SwingConstants;
 import javax.swing.JButton;
-
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 
 public class PlayerDetailsPanel extends JPanel {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5251991144212739046L;
 	
 	private Player player;	
 	private JLabel lbl_hacker_creds;
@@ -45,24 +41,7 @@ public class PlayerDetailsPanel extends JPanel {
 	private JButton btn_view_mission;
 	private HackerCardPanel character_panel;
 	private JLabel lbl_player_name;
-	private boolean can_view_mission = true;
-
-	
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					//ArrayList<BoTAutoSuccessCard> cards = DataIO.readBoTAutoSuccessCards();
-					JFrame window = new JFrame();
-					window.getContentPane().add(new PlayerDetailsPanel(null));					
-					window.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-	
+	private boolean can_view_mission = true;		
 	
 	/**
 	 * Create the panel.
@@ -242,7 +221,10 @@ public class PlayerDetailsPanel extends JPanel {
 	 * Set can view	 
 	 */
 	public boolean canViewMission() {
-		return this.can_view_mission;
+		if ( !this.can_view_mission && this.player != null) {
+			return this.player.isAttending();
+		}
+		return this.can_view_mission ;
 	}
 	
 	/**

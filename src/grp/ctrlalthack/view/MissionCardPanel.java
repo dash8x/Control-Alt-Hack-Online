@@ -1,5 +1,5 @@
 /**
- * Contains static methods to read data from resources
+ * Displays a Mission Card
  * 
  * @author Arushad Ahmed
  * @arthor_uri http://arushad.org 
@@ -7,38 +7,30 @@
 
 package grp.ctrlalthack.view;
 
-import grp.ctrlalthack.data.DataIO;
-import grp.ctrlalthack.model.GameConstants;
-import grp.ctrlalthack.model.HackerCard;
 import grp.ctrlalthack.model.mission.MissionCard;
 import grp.ctrlalthack.model.mission.MissionTask;
 
-import javax.swing.BorderFactory;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
-
 import java.awt.Color;
 import java.awt.GridBagLayout;
-
 import javax.swing.JLabel;
-
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.Font;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
-
 import javax.swing.SwingConstants;
-import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JTextArea;
 
 public class MissionCardPanel extends JPanel {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2163547109680487689L;
 	
 	private JTextArea lbl_mission_desc;	
 	private JLabel lbl_mission_title;
@@ -56,22 +48,6 @@ public class MissionCardPanel extends JPanel {
 	private JTextArea lbl_success_desc;
 	private JTextArea lbl_failure_desc;
 	private JLabel lbl_name;
-
-	
-	/*public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					ArrayList<MissionCard> cards = DataIO.readMissionCards();
-					JFrame window = new JFrame();
-					window.getContentPane().add(new MissionCardPanel(cards.get(1)));
-					window.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}*/
 	
 	/**
 	 * Create the panel.
@@ -89,7 +65,6 @@ public class MissionCardPanel extends JPanel {
 		gridBagLayout.columnWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
 		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		setLayout(gridBagLayout);
-		Border lbl_perk_padding = BorderFactory.createEmptyBorder(10,10,10,10);
 		setPreferredSize(new Dimension(450, 450));
 		
 		lbl_name = new JLabel("MISSION");
@@ -292,6 +267,11 @@ public class MissionCardPanel extends JPanel {
 	 * Skill panel
 	 */
 	private class TaskPanel extends JPanel {
+		
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -7268846997039149481L;
 		
 		private JLabel lbl_task_title;
 		private JTextArea lbl_task_desc;

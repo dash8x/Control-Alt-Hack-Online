@@ -1,0 +1,1 @@
+javac -classpath bin -sourcepath src -d bin src\grp\ctrlalthack\view\MainView.java

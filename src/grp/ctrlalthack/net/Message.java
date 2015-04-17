@@ -1,16 +1,21 @@
 /**
- * Object to wrap game stats
+ * Object to send contextual messages
  *   
  * @author Arushad Ahmed
  * @arthor_uri http://arushad.org  
  */
 
-package grp.ctrlalthack.model;
+package grp.ctrlalthack.net;
 
 import java.io.Serializable;
 
 public class Message implements Serializable {
 		
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3032314617933471069L;
+	
 	private String message; //message
 	private String context; //context
 	

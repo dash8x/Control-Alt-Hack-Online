@@ -17,11 +17,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.swing.JOptionPane;
-
 import grp.ctrlalthack.model.GameStats;
 import grp.ctrlalthack.model.HackerCard;
-import grp.ctrlalthack.model.Message;
 import grp.ctrlalthack.model.Player;
 import grp.ctrlalthack.model.Trade;
 import grp.ctrlalthack.model.mission.MissionCard;
@@ -30,7 +27,6 @@ import grp.ctrlalthack.net.exception.ErrorResponseException;
 import grp.ctrlalthack.net.exception.FailResponseException;
 import grp.ctrlalthack.net.exception.InvalidResponseException;
 import grp.ctrlalthack.net.exception.NoResponseException;
-import grp.ctrlalthack.view.CardPanel;
 import grp.ctrlalthack.view.CardParent;
 
 public class ClientService implements NetworkConstants, ProtocolConstants {
@@ -52,8 +48,6 @@ public class ClientService implements NetworkConstants, ProtocolConstants {
 	//constant for DATA UPDATED Command
 	public static final Command DATA_UPDATED_CHECKER = new Command(CMD_CHECK_UPDATED, null);
 	
-	//TODO
-	//private ClientView client_gui; //client GUI
 	
 	/**
 	 * Constructor
@@ -157,9 +151,7 @@ public class ClientService implements NetworkConstants, ProtocolConstants {
 					client_ui.endGame(e.getMessage());
 				}
 			}
-		}
-
-			
+		}	
 	}
 	
 	/**
@@ -309,8 +301,7 @@ public class ClientService implements NetworkConstants, ProtocolConstants {
 		} catch ( SocketException e ) { //give up if can't talk to server
 			if (this.isRunning()) {
 				this.closeConnection();
-				throw new ClientException("Connection to server lost.\nThis client will now close");				
-				//TODO
+				throw new ClientException("Connection to server lost.\nThis client will now close");								
 			}
 		} catch ( IOException e ) {			
 			throw new ClientException("Error sending request to server\n" + request.toString() + "\n" + e.getMessage());					
@@ -325,13 +316,11 @@ public class ClientService implements NetworkConstants, ProtocolConstants {
 		try {
 			reply = ( Response ) this.input.readObject();
 			if ( reply.getKeyword().equals(RESP_TERMINATE) ) {
-				throw new ClientException("The server has closed the connection.\nThis client will now close");							
-				//TODO
+				throw new ClientException("The server has closed the connection.\nThis client will now close");											
 			} 
 		} catch ( SocketException e ) { //give up if can't talk to server
 			if (this.isRunning()) {
-				throw new ClientException("Connection to server lost.\nThis client will now close");				
-				//TODO
+				throw new ClientException("Connection to server lost.\nThis client will now close");								
 			}
 		} catch ( IOException e ) {
         	throw new ClientException("Error reading response from server\n" + e.getMessage());        

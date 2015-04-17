@@ -1,5 +1,5 @@
 /**
- * Defines what happens when a mission ends
+ * Defines the task for a mission
  *   
  * @author Arushad Ahmed
  * @arthor_uri http://arushad.org  
@@ -12,6 +12,11 @@ import java.io.Serializable;
 import grp.ctrlalthack.model.HackerCard;
 
 public class MissionTask implements Serializable {	
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8284095424253152682L;
 	
 	//fields
 	private String skill; //the skill to roll for

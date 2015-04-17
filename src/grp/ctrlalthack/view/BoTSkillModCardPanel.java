@@ -1,5 +1,5 @@
 /**
- * Contains static methods to read data from resources
+ * Displays Bag of Tricks Skill Modifier card
  * 
  * @author Arushad Ahmed
  * @arthor_uri http://arushad.org 
@@ -7,59 +7,31 @@
 
 package grp.ctrlalthack.view;
 
-import grp.ctrlalthack.data.DataIO;
-import grp.ctrlalthack.model.GameConstants;
-import grp.ctrlalthack.model.HackerCard;
+
 import grp.ctrlalthack.model.entropy.BoTSkillModCard;
 import grp.ctrlalthack.model.entropy.SkillModifier;
-import grp.ctrlalthack.model.mission.MissionCard;
-import grp.ctrlalthack.model.mission.MissionTask;
-
-import javax.swing.BorderFactory;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 
 import java.awt.Color;
 import java.awt.GridBagLayout;
-
 import javax.swing.JLabel;
-
-import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.Font;
 import java.util.ArrayList;
-
-import javax.swing.SwingConstants;
-import javax.swing.border.Border;
-import javax.swing.border.LineBorder;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
-import javax.swing.JTextArea;
 
 public class BoTSkillModCardPanel extends EntropyBagOfTricksCardPanel {	
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7480015942731055329L;
 	
 	//list to store variables
 	private ArrayList<JLabel> skill_mod_labels;		
 	private JLabel lbl_skill_mod_1;	
 	private JLabel lbl_skill_mod_2;
-
-
-	
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					ArrayList<BoTSkillModCard> cards = DataIO.readBoTSkillModCards();
-					JFrame window = new JFrame();
-					window.getContentPane().add(new BoTSkillModCardPanel(cards.get(3)));					
-					window.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 	
 	/**
 	 * Create the panel.

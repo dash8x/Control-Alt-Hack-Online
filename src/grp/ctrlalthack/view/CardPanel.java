@@ -12,12 +12,15 @@ import grp.ctrlalthack.net.ClientService;
 import grp.ctrlalthack.net.Server;
 
 import java.awt.CardLayout;
-
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.text.JTextComponent;
 
 public abstract class CardPanel extends JPanel {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7643984802863932250L;
 	
 	private CardParent cards;
 
