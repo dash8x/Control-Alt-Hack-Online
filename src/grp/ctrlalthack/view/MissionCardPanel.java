@@ -65,7 +65,8 @@ public class MissionCardPanel extends JPanel {
 		gridBagLayout.columnWeights = new double[]{0.0, 1.0, Double.MIN_VALUE};
 		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		setLayout(gridBagLayout);
-		setPreferredSize(new Dimension(450, 450));
+		setMinimumSize(new Dimension(350, 450));
+		setPreferredSize(new Dimension(600, 350));
 		
 		lbl_name = new JLabel("MISSION");
 		lbl_name.setHorizontalAlignment(SwingConstants.CENTER);

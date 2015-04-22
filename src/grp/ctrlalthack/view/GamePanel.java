@@ -469,12 +469,11 @@ public class GamePanel extends CardPanel implements ViewConstants {
 				this.btn_roll.setEnabled(this.getParent().isMyTurn());
 				break;
 			case GameConstants.STATUS_MEETING:
+				this.player_details_panel.setCanViewMission(false);
 				if ( !this.getParent().getMyPlayer().isAttending() ) {
-					this.updateStatus("Please wait while other players trade");
-					this.player_details_panel.setCanViewMission(false);
+					this.updateStatus("Please wait while other players trade");					
 				} else {
-					this.updateStatus("You have 1 minute to trade with other players");
-					this.player_details_panel.setCanViewMission(true);
+					this.updateStatus("You have 1 minute to trade with other players");					
 				}
 				boolean selected = tbl_players.getSelectedRow() > -1;
 				if ( !selected ) {
